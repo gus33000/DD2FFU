@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31025.218
+# Visual Studio 15
+VisualStudioVersion = 15.0.27924.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DD2FFU", "DD2FFU\DD2FFU.csproj", "{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}"
 EndProject
@@ -19,8 +19,8 @@ Global
 		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Debug|x86.Build.0 = Debug|x86
 		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|x86.ActiveCfg = Release|Any CPU
-		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|x86.Build.0 = Release|Any CPU
+		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|x86.ActiveCfg = Release|x86
+		{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
