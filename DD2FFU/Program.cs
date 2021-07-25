@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +12,17 @@ using UsbEject;
 
 namespace DD2FFU
 {
+    internal static class AssemblyExtensions
+    {
+        public static T GetAssemblyAttribute<T>(this Assembly ass) where T : Attribute
+        {
+            object[] attributes = ass.GetCustomAttributes(typeof(T), false);
+            if (attributes == null || attributes.Length == 0)
+                return null;
+            return attributes.OfType<T>().SingleOrDefault();
+        }
+    }
+
     internal class Program
     {
         internal static string[] partitions = Constants.partitions;
@@ -20,9 +30,8 @@ namespace DD2FFU
         private static void Main(string[] args)
         {
             var ass = Assembly.GetExecutingAssembly();
-            var fvi = FileVersionInfo.GetVersionInfo(ass.Location);
-            var Heading = new HeadingInfo(fvi.FileDescription, ass.GetName().Version.ToString());
-            var Copyright = new CopyrightInfo(fvi.CompanyName, DateTime.Today.Year);
+            var Heading = new HeadingInfo(ass.GetAssemblyAttribute<AssemblyDescriptionAttribute>().Description, ass.GetName().Version.ToString());
+            var Copyright = new CopyrightInfo(ass.GetAssemblyAttribute<AssemblyCompanyAttribute>().Company, DateTime.Today.Year);
 
             Parser.Default.ParseArguments<Options>(args).WithParsed(o =>
             {
@@ -30,7 +39,7 @@ namespace DD2FFU
                 Console.WriteLine(Copyright.ToString());
                 Console.WriteLine();
 
-                var tmp = ass.Location.Substring(0, ass.Location.LastIndexOf("\\")) + @"\temp\";
+                var tmp = Directory.GetCurrentDirectory() + @"\temp\";
                 if (!string.IsNullOrEmpty(o.Temp)) tmp = o.Temp;
 
                 Directory.CreateDirectory(tmp);
@@ -49,9 +58,9 @@ namespace DD2FFU
             var tempvhd = temp + @"\tempdisk.vhd";
             tempvhd = tempvhd.Replace(@"\\", @"\");
 
-            //var diskid = @"\\.\physicaldrive3";
+            var diskid = @"\\.\physicaldrive6";
 
-            ulong eMMCDumpSize;
+            /*ulong eMMCDumpSize;
             ulong SectorSize = 0x200;
 
             if (imgFile.ToLower().Contains(@"\\.\physicaldrive"))
@@ -76,7 +85,7 @@ namespace DD2FFU
             if (imgFile.ToLower().Contains(@"\\.\physicaldrive"))
             {
                 Logging.Log("Ejecting Mass Storage Device...");
-                var ret = new DiskDeviceClass().Disks.First(x => x.DiskNumber == int.Parse(imgFile.ToLower().Replace(@"\\.\physicaldrive", ""))).Eject(false);
+                var ret = new VolumeDeviceClass().Volumes.First(x => x.DiskNumbers.Any(y => y == int.Parse(imgFile.ToLower().Replace(@"\\.\physicaldrive", "")))).Eject(false);
                 if (!string.IsNullOrEmpty(ret))
                 {
                     Logging.Log("We could not eject the Mass storage device from your computer. Please remove it and press any key once done.", severity: Logging.LoggingLevel.Warning);
@@ -119,8 +128,14 @@ namespace DD2FFU
                     }
                 }
 
+            Logging.Log("Unmounting MainOS as drive " + drive);
+            ImageUtils.UnMountDiskId(diskid, mainosid, drive);
+
             Logging.Log("Beginning cleaning of source device partitions...");
             WPImageCleaning.Clean(diskid, partitionarray, drive, excludelist);
+
+            Logging.Log("Remounting MainOS as drive " + drive);
+            ImageUtils.MountDiskId(diskid, mainosid, drive);
 
             Logging.Log("Reading source device Platform information on MainOS...");
             var plat = GetXmlClass<OEMDevicePlatform>(drive + @":\Windows\ImageUpdate\OEMDevicePlatform.xml");
@@ -139,14 +154,14 @@ namespace DD2FFU
                 "Please verify the data free'd is a correct amount, if not, you'll need to capture and apply or clean image further... (The Data partition must be shrunk by: " +
                 diff + "MB) Press any key once checked.", Logging.LoggingLevel.Warning);
             Console.ReadKey();
-            Console.ReadKey();
+            Console.ReadKey();*/
 
             Logging.Log("Committing FFU image...");
 
             ImageUtils.CommitFFU(diskid, ffuFile, antitheftversion, osversion);
             Logging.Log("FFU file has been commited.");
             Logging.Log("Cleaning up temporary VHD file...");
-            File.Delete(tempvhd);
+            //File.Delete(tempvhd);
         }
 
         public static T GetXmlClass<T>(string XmlFile)

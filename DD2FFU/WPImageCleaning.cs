@@ -89,212 +89,242 @@ namespace DD2FFU
                 switch (partition.Name.ToLower())
                 {
                     case "mainos":
-                    {
-                        mainosid = partition.id.ToString();
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
-
-                        foreach (var file in filedeletionMainOS)
-                            try
-                            {
-                                if (File.Exists(letter + @":" + file))
-                                {
-                                    File.Delete(letter + @":" + file);
-                                    Logging.Log("Removed " + file);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        var hivetamperLogs = Directory.GetFiles(letter + @":" + @"\Windows\System32\Config", "*.TM*",
-                            SearchOption.TopDirectoryOnly);
-                        foreach (var file in hivetamperLogs)
                         {
-                            Logging.Log("Removing " + file + "...");
-                            File.Delete(file);
-                        }
+                            mainosid = partition.id.ToString();
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        break;
-                    }
-                    case "logfs":
-                    {
-                        ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(),
-                            "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7");
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
-
-                        foreach (var file in Directory.EnumerateFiles(letter + @":\", "*.txt",
-                            SearchOption.TopDirectoryOnly))
-                            try
-                            {
-                                Console.WriteLine(file);
-                                if (File.Exists(file))
-                                {
-                                    File.Delete(file);
-                                    Logging.Log("Removed " + file);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        try
-                        {
-                            CleanBin(letter);
-                            Logging.Log("Removed " + letter + @":\$RECYCLE.BIN");
-                        }
-                        catch (Exception ex)
-                        {
-                            Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                        }
-
-                        CleanFS(letter);
-
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(), partition.Type);
-                        break;
-                    }
-                    case "plat":
-                    {
-                        ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(),
-                            "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7");
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
-
-                        try
-                        {
-                            CleanBin(letter);
-                            Logging.Log("Removed " + letter + @":\$RECYCLE.BIN");
-                        }
-                        catch (Exception ex)
-                        {
-                            Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                        }
-
-                        CleanFS(letter);
-
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(), partition.Type);
-                        break;
-                    }
-                    case "efiesp":
-                    {
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
-
-
-                        foreach (var file in filedeletionEFIESP)
-                            try
-                            {
-                                if (File.Exists(letter + @":" + file))
-                                {
-                                    File.Delete(letter + @":" + file);
-                                    Logging.Log("Removed " + file);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        foreach (var file in filepurgeEFIESP)
-                            try
-                            {
-                                var things = File.ReadAllText(letter + @":" + file).ToCharArray();
-                                for (var i = 0; i < things.Length; i++) things[i] = ' ';
-                                File.WriteAllText(letter + @":" + file, new string(things));
-                                Logging.Log("Purged " + file);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        foreach (var folder in folderdeletionEFIESP)
-                            try
-                            {
-                                Directory.Delete(letter + @":" + folder, true);
-                                Logging.Log("Removed " + folder);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        break;
-                    }
-                    case "data":
-                    {
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
-
-                        foreach (var file in filedeletionDATA)
-                            try
-                            {
-                                if (File.Exists(letter + @":" + file))
-                                {
-                                    File.Delete(letter + @":" + file);
-                                    Logging.Log("Removed " + file);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                            }
-
-                        try
-                        {
-                            foreach (var item in Directory.EnumerateFileSystemEntries(
-                                letter.Substring(0, 1) + @":\SystemData\Telemetry", "*", SearchOption.AllDirectories))
+                            foreach (var file in filedeletionMainOS)
                                 try
                                 {
-                                    if (item != letter.Substring(0, 1) + @":\SystemData\Telemetry\Archive" &&
-                                        item != letter.Substring(0, 1) +
-                                        @":\SystemData\Telemetry\KernelDumps\LiveDumps" && item !=
-                                        letter.Substring(0, 1) + @":\SystemData\Telemetry\KernelDumps")
+                                    if (File.Exists(letter + @":" + file))
                                     {
-                                        if (File.Exists(item))
-                                            File.Delete(item);
-                                        else
-                                            Directory.Delete(item, true);
+                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
+                                        {
+                                            File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
+                                        }
 
-                                        Logging.Log("Removed " + item);
+                                        File.Delete(letter + @":" + file);
+                                        Logging.Log("Removed " + file);
                                     }
                                 }
                                 catch (Exception ex)
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+
+                            var hivetamperLogs = Directory.GetFiles(letter + @":" + @"\Windows\System32\Config", "*.TM*",
+                                SearchOption.TopDirectoryOnly);
+                            foreach (var file in hivetamperLogs)
+                            {
+                                Logging.Log("Removing " + file + "...");
+                                File.Delete(file);
+                            }
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            break;
                         }
-                        catch (Exception ex)
+                    case "logfs":
                         {
-                            Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                        }
+                            ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(),
+                                "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7");
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        break;
-                    }
-                    case "crashdump":
-                    {
-                        ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            foreach (var file in Directory.EnumerateFiles(letter + @":\", "*.txt",
+                                SearchOption.TopDirectoryOnly))
+                                try
+                                {
+                                    Console.WriteLine(file);
+                                    if (File.Exists(file))
+                                    {
+                                        var attributes = File.GetAttributes(file);
+                                        if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
+                                        {
+                                            File.SetAttributes(file, FileAttributes.Normal);
+                                        }
 
-                        foreach (var file in filedeletionCrashDump)
+                                        File.Delete(file);
+                                        Logging.Log("Removed " + file);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
                             try
                             {
-                                if (File.Exists(letter + @":" + file))
-                                {
-                                    File.Delete(letter + @":" + file);
-                                    Logging.Log("Removed " + file);
-                                }
+                                CleanBin(letter);
+                                Logging.Log("Removed " + letter + @":\$RECYCLE.BIN");
                             }
                             catch (Exception ex)
                             {
                                 Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                             }
 
-                        ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
-                        break;
-                    }
+                            CleanFS(letter);
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(), partition.Type);
+                            break;
+                        }
+                    case "plat":
+                        {
+                            ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(),
+                                "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7");
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
+
+                            try
+                            {
+                                CleanBin(letter);
+                                Logging.Log("Removed " + letter + @":\$RECYCLE.BIN");
+                            }
+                            catch (Exception ex)
+                            {
+                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                            }
+
+                            CleanFS(letter);
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            ImageUtils.SetDiskType(physicalharddisk, partition.id.ToString(), partition.Type);
+                            break;
+                        }
+                    case "efiesp":
+                        {
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
+
+
+                            foreach (var file in filedeletionEFIESP)
+                                try
+                                {
+                                    if (File.Exists(letter + @":" + file))
+                                    {
+                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
+                                        {
+                                            File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
+                                        }
+
+                                        File.Delete(letter + @":" + file);
+                                        Logging.Log("Removed " + file);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
+                            foreach (var file in filepurgeEFIESP)
+                                try
+                                {
+                                    var things = File.ReadAllText(letter + @":" + file).ToCharArray();
+                                    for (var i = 0; i < things.Length; i++) things[i] = ' ';
+                                    File.WriteAllText(letter + @":" + file, new string(things));
+                                    Logging.Log("Purged " + file);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
+                            foreach (var folder in folderdeletionEFIESP)
+                                try
+                                {
+                                    Directory.Delete(letter + @":" + folder, true);
+                                    Logging.Log("Removed " + folder);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            break;
+                        }
+                    case "data":
+                        {
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
+
+                            foreach (var file in filedeletionDATA)
+                                try
+                                {
+                                    if (File.Exists(letter + @":" + file))
+                                    {
+                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
+                                        {
+                                            File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
+                                        }
+
+                                        File.Delete(letter + @":" + file);
+                                        Logging.Log("Removed " + file);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
+                            try
+                            {
+                                foreach (var item in Directory.EnumerateFileSystemEntries(
+                                    letter.Substring(0, 1) + @":\SystemData\Telemetry", "*", SearchOption.AllDirectories))
+                                    try
+                                    {
+                                        if (item != letter.Substring(0, 1) + @":\SystemData\Telemetry\Archive" &&
+                                            item != letter.Substring(0, 1) +
+                                            @":\SystemData\Telemetry\KernelDumps\LiveDumps" && item !=
+                                            letter.Substring(0, 1) + @":\SystemData\Telemetry\KernelDumps")
+                                        {
+                                            if (File.Exists(item))
+                                                File.Delete(item);
+                                            else
+                                                Directory.Delete(item, true);
+
+                                            Logging.Log("Removed " + item);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                            }
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            break;
+                        }
+                    case "crashdump":
+                        {
+                            ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
+
+                            foreach (var file in filedeletionCrashDump)
+                                try
+                                {
+                                    if (File.Exists(letter + @":" + file))
+                                    {
+                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
+                                        {
+                                            File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
+                                        }
+
+                                        File.Delete(letter + @":" + file);
+                                        Logging.Log("Removed " + file);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                }
+
+                            ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
+                            break;
+                        }
                 }
 
                 if (partition.Type.ToLower() == "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7")
