@@ -18,13 +18,28 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             SaveKeyToRegistry = true;
         }
 
-        [XmlAttribute] public bool SaveKeyToRegistry { get; set; }
+        [XmlAttribute]
+        public bool SaveKeyToRegistry
+        {
+            get; set;
+        }
 
-        [XmlAttribute] public bool IncludeDescriptions { get; set; }
+        [XmlAttribute]
+        public bool IncludeDescriptions
+        {
+            get; set;
+        }
 
-        [XmlAttribute] public bool IncludeRegistryHeader { get; set; }
+        [XmlAttribute]
+        public bool IncludeRegistryHeader
+        {
+            get; set;
+        }
 
-        public BcdObjectsInput Objects { get; set; }
+        public BcdObjectsInput Objects
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(StreamWriter writer, string path)
         {

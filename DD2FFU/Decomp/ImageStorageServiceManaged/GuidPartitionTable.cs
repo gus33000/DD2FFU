@@ -22,26 +22,44 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             BytesPerSector = bytesPerSector;
         }
 
-        public int BytesPerSector { get; set; }
+        public int BytesPerSector
+        {
+            get; set;
+        }
 
-        public MasterBootRecord ProtectiveMbr { get; private set; }
+        public MasterBootRecord ProtectiveMbr
+        {
+            get; private set;
+        }
 
-        public GuidPartitionTableHeader Header { get; private set; }
+        public GuidPartitionTableHeader Header
+        {
+            get; private set;
+        }
 
-        public List<GuidPartitionTableEntry> Entries { get; private set; }
+        public List<GuidPartitionTableEntry> Entries
+        {
+            get; private set;
+        }
 
-        private IULogger Logger { get; }
+        private IULogger Logger
+        {
+            get;
+        }
 
         public void ReadFromStream(Stream stream, bool readPrimaryTable)
         {
             long num = BytesPerSector;
             if (BytesPerSector == 0)
+            {
                 throw new ImageStorageException(
-                    "BytesPerSector must be initialized before calling GuidPartitionTable.ReadFromStream.");
+                                "BytesPerSector must be initialized before calling GuidPartitionTable.ReadFromStream.");
+            }
+
             if (readPrimaryTable)
             {
                 ProtectiveMbr = new MasterBootRecord(Logger, BytesPerSector);
-                ProtectiveMbr.ReadFromStream(stream, MasterBootRecord.MbrParseType.Normal);
+                _ = ProtectiveMbr.ReadFromStream(stream, MasterBootRecord.MbrParseType.Normal);
             }
             else
             {
@@ -51,24 +69,27 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             stream.Position = num;
             Header = new GuidPartitionTableHeader(Logger);
             Header.ReadFromStream(stream, BytesPerSector);
-            stream.Position = (long) Header.PartitionEntryStartSector * BytesPerSector;
-            var capacity = (int) Math.Max(Header.PartitionEntryCount, 16384U / Header.PartitionEntrySizeInBytes);
+            stream.Position = (long)Header.PartitionEntryStartSector * BytesPerSector;
+            int capacity = (int)Math.Max(Header.PartitionEntryCount, 16384U / Header.PartitionEntrySizeInBytes);
             Entries = new List<GuidPartitionTableEntry>(capacity);
-            for (var index = 0; index < capacity; ++index)
+            for (int index = 0; index < capacity; ++index)
             {
-                var partitionTableEntry = new GuidPartitionTableEntry(Logger);
-                partitionTableEntry.ReadFromStream(stream, (int) Header.PartitionEntrySizeInBytes);
+                GuidPartitionTableEntry partitionTableEntry = new(Logger);
+                partitionTableEntry.ReadFromStream(stream, (int)Header.PartitionEntrySizeInBytes);
                 Entries.Add(partitionTableEntry);
             }
         }
 
         public void WriteToStream(Stream stream, bool fPrimaryTable, bool onlyAllocateDefinedGptEntries)
         {
-            var num = (long) BytesPerSector;
+            long num = BytesPerSector;
             if (fPrimaryTable)
             {
                 if (ProtectiveMbr == null)
+                {
                     throw new ImageStorageException("The GuidPartitionTable protective MBR is null.");
+                }
+
                 ProtectiveMbr.WriteToStream(stream, false);
             }
             else
@@ -77,7 +98,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
 
             if (Header == null)
+            {
                 throw new ImageStorageException("The GuidPartitionTable header is null.");
+            }
+
             stream.Position = num;
             Header.PartitionEntryCount = !onlyAllocateDefinedGptEntries
                 ? Math.Max(Header.PartitionEntryCount, 16384U / Header.PartitionEntrySizeInBytes)
@@ -85,9 +109,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Header.PartitionEntryArrayCrc32 = ComputePartitionEntryCrc(Header.PartitionEntryCount);
             Header.FixHeaderCrc(BytesPerSector);
             Header.WriteToStream(stream, BytesPerSector);
-            stream.Position = (long) Header.PartitionEntryStartSector * BytesPerSector;
-            foreach (var entry in Entries)
-                entry.WriteToStream(stream, (int) Header.PartitionEntrySizeInBytes);
+            stream.Position = (long)Header.PartitionEntryStartSector * BytesPerSector;
+            foreach (GuidPartitionTableEntry entry in Entries)
+            {
+                entry.WriteToStream(stream, (int)Header.PartitionEntrySizeInBytes);
+            }
         }
 
         public void LogInfo(ushort indentLevel = 0)
@@ -96,32 +122,38 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Header.LogInfo(indentLevel);
             Logger.LogInfo("");
             Logger.LogInfo("Partition Entry Array");
-            foreach (var entry in Entries)
-                entry.LogInfo((ushort) (indentLevel + 2U));
+            foreach (GuidPartitionTableEntry entry in Entries)
+            {
+                entry.LogInfo((ushort)(indentLevel + 2U));
+            }
         }
 
         public Guid SetEntryId(string partitionName, Guid partitionId)
         {
-            var guid = Guid.Empty;
-            foreach (var entry in Entries)
+            Guid guid = Guid.Empty;
+            foreach (GuidPartitionTableEntry entry in Entries)
+            {
                 if (string.CompareOrdinal(entry.PartitionName.Split(new char[1])[0], partitionName) == 0)
                 {
                     guid = entry.PartitionId;
                     entry.PartitionId = partitionId;
                     break;
                 }
+            }
 
             return guid;
         }
 
         public void RemoveEntry(string partitionName)
         {
-            foreach (var entry in Entries)
+            foreach (GuidPartitionTableEntry entry in Entries)
+            {
                 if (string.CompareOrdinal(entry.PartitionName.Split(new char[1])[0], partitionName) == 0)
                 {
                     entry.Clean();
                     break;
                 }
+            }
         }
 
         public uint ComputePartitionEntryCrc()
@@ -131,32 +163,41 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public uint ComputePartitionEntryCrc(uint partitionEntryCount)
         {
-            var crC32 = new CRC32();
-            var memoryStream = new MemoryStream();
+            CRC32 crC32 = new();
+            MemoryStream memoryStream = new();
             uint num = 0;
-            foreach (var entry in Entries)
+            foreach (GuidPartitionTableEntry entry in Entries)
+            {
                 if (++num <= partitionEntryCount)
-                    entry.WriteToStream(memoryStream, (int) Header.PartitionEntrySizeInBytes);
+                {
+                    entry.WriteToStream(memoryStream, (int)Header.PartitionEntrySizeInBytes);
+                }
                 else
+                {
                     break;
-            var hash = crC32.ComputeHash(memoryStream.GetBuffer());
-            return (uint) ((hash[0] << 24) | (hash[1] << 16) | (hash[2] << 8)) | hash[3];
+                }
+            }
+
+            byte[] hash = crC32.ComputeHash(memoryStream.GetBuffer());
+            return (uint)((hash[0] << 24) | (hash[1] << 16) | (hash[2] << 8)) | hash[3];
         }
 
         public void ValidatePartitionEntryCrc()
         {
-            var partitionEntryCrc = ComputePartitionEntryCrc();
-            if ((int) Header.PartitionEntryArrayCrc32 != (int) partitionEntryCrc)
+            uint partitionEntryCrc = ComputePartitionEntryCrc();
+            if ((int)Header.PartitionEntryArrayCrc32 != (int)partitionEntryCrc)
+            {
                 throw new ImageStorageException(string.Format(
-                    "The partition entry array CRC is invalid.  Actual: {0:x} Expected: {1:x}.",
-                    Header.PartitionEntryArrayCrc32, partitionEntryCrc));
+                                "The partition entry array CRC is invalid.  Actual: {0:x} Expected: {1:x}.",
+                                Header.PartitionEntryArrayCrc32, partitionEntryCrc));
+            }
         }
 
         public void NormalizeGptIds(out Guid originalSystemPartitionId)
         {
             Header.DiskId = ImageConstants.SYSTEM_STORE_GUID;
-            SetEntryId(ImageConstants.MAINOS_PARTITION_NAME, ImageConstants.MAINOS_PARTITION_ID);
-            SetEntryId(ImageConstants.MMOS_PARTITION_NAME, ImageConstants.MMOS_PARTITION_ID);
+            _ = SetEntryId(ImageConstants.MAINOS_PARTITION_NAME, ImageConstants.MAINOS_PARTITION_ID);
+            _ = SetEntryId(ImageConstants.MMOS_PARTITION_NAME, ImageConstants.MMOS_PARTITION_ID);
             originalSystemPartitionId =
                 SetEntryId(ImageConstants.SYSTEM_PARTITION_NAME, ImageConstants.SYSTEM_PARTITION_ID);
         }
@@ -164,9 +205,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void RandomizeGptIds()
         {
             Header.DiskId = Guid.NewGuid();
-            SetEntryId(ImageConstants.MAINOS_PARTITION_NAME, Guid.NewGuid());
-            SetEntryId(ImageConstants.MMOS_PARTITION_NAME, Guid.NewGuid());
-            SetEntryId(ImageConstants.SYSTEM_PARTITION_NAME, Guid.NewGuid());
+            _ = SetEntryId(ImageConstants.MAINOS_PARTITION_NAME, Guid.NewGuid());
+            _ = SetEntryId(ImageConstants.MMOS_PARTITION_NAME, Guid.NewGuid());
+            _ = SetEntryId(ImageConstants.SYSTEM_PARTITION_NAME, Guid.NewGuid());
         }
 
         public void FixCrcs()
@@ -183,14 +224,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public GuidPartitionTableEntry GetEntry(string partitionName)
         {
-            var partitionTableEntry = (GuidPartitionTableEntry) null;
-            for (var index = 0; index < Entries.Count; ++index)
+            GuidPartitionTableEntry partitionTableEntry = null;
+            for (int index = 0; index < Entries.Count; ++index)
+            {
                 if (string.Compare(Entries[index].PartitionName, partitionName, true, CultureInfo.InvariantCulture) ==
-                    0)
+                                0)
                 {
                     partitionTableEntry = Entries[index];
                     break;
                 }
+            }
 
             return partitionTableEntry;
         }
@@ -198,17 +241,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public static bool IsGuidPartitionStyle(List<DataBlockEntry> blockEntries, int bytesPerSector,
             int bytesPerBlock)
         {
-            var num = bytesPerBlock / bytesPerSector;
-            var dataBlockEntry = (DataBlockEntry) null;
-            foreach (var blockEntry in blockEntries)
-                for (var index = 0; index < blockEntry.BlockLocationsOnDisk.Count; ++index)
+            _ = bytesPerBlock / bytesPerSector;
+            foreach (DataBlockEntry blockEntry in blockEntries)
+            {
+                for (int index = 0; index < blockEntry.BlockLocationsOnDisk.Count; ++index)
+                {
                     if (blockEntry.BlockLocationsOnDisk[index].AccessMethod ==
-                        DiskLocation.DiskAccessMethod.DiskBegin &&
-                        blockEntry.BlockLocationsOnDisk[index].BlockIndex == 0U)
+                                        DiskLocation.DiskAccessMethod.DiskBegin &&
+                                        blockEntry.BlockLocationsOnDisk[index].BlockIndex == 0U)
                     {
-                        dataBlockEntry = blockEntry;
                         break;
                     }
+                }
+            }
 
             return false;
         }

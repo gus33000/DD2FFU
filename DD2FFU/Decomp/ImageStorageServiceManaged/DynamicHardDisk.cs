@@ -12,7 +12,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     internal class DynamicHardDisk : IVirtualHardDisk, IDisposable
     {
-        public static byte[] emptySectorBuffer = new byte[(int) VhdCommon.VHDSectorSize];
+        public static byte[] emptySectorBuffer = new byte[(int)VhdCommon.VHDSectorSize];
         private bool _alreadyDisposed;
         private readonly ulong _fileSize;
         private FileStream _fileStream;
@@ -27,39 +27,46 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _fileSize = sectorCount * SectorSize;
             _fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
             SectorCount = sectorCount;
-            _footer = new VhdFooter(_fileSize, VhdType.Dynamic, (ulong) Marshal.SizeOf(typeof(VhdFooter)));
+            _footer = new VhdFooter(_fileSize, VhdType.Dynamic, (ulong)Marshal.SizeOf(typeof(VhdFooter)));
             WriteVHDFooter(offset1);
-            var offset2 = offset1 + (ulong) Marshal.SizeOf(typeof(VhdFooter));
+            ulong offset2 = offset1 + (ulong)Marshal.SizeOf(typeof(VhdFooter));
             _header = new VhdHeader(_fileSize);
             WriteVHDHeader(offset2);
-            var offset3 = offset2 + (ulong) Marshal.SizeOf(typeof(VhdHeader));
+            ulong offset3 = offset2 + (ulong)Marshal.SizeOf(typeof(VhdHeader));
             _tableOffset = offset3;
             AllocationTable = new BlockAllocationTable(_header.MaxTableEntries);
             WriteBlockAllocationTable(offset3);
-            var offset4 = offset3 + AllocationTable.SizeInBytes;
+            ulong offset4 = offset3 + AllocationTable.SizeInBytes;
             _footerOffset = offset4;
             WriteVHDFooter(offset4);
-            var num = offset4 + (ulong) Marshal.SizeOf(typeof(VhdFooter));
+
+            _ = offset4 + (ulong)Marshal.SizeOf(typeof(VhdFooter));
         }
 
         public DynamicHardDisk(string existingFile, bool addWriteAccess = false)
         {
-            var access = FileAccess.Read;
+            FileAccess access = FileAccess.Read;
             if (addWriteAccess)
+            {
                 access = FileAccess.ReadWrite;
+            }
+
             _fileStream = new FileStream(existingFile, FileMode.Open, access, FileShare.ReadWrite);
             _footer = VhdFooter.Read(_fileStream);
             _fileSize = _footer.CurrentSize;
             SectorCount = _fileSize / VhdCommon.VHDSectorSize;
-            _fileStream.Position = (long) _footer.DataOffset;
+            _fileStream.Position = (long)_footer.DataOffset;
             _header = VhdHeader.Read(_fileStream);
             _tableOffset = _header.TableOffset;
-            _fileStream.Position = (long) _header.TableOffset;
+            _fileStream.Position = (long)_header.TableOffset;
             AllocationTable = new BlockAllocationTable(_header.MaxTableEntries);
             AllocationTable.Read(_fileStream);
         }
 
-        public BlockAllocationTable AllocationTable { get; }
+        public BlockAllocationTable AllocationTable
+        {
+            get;
+        }
 
         public uint BlockSize => _header.BlockSize;
 
@@ -67,13 +74,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             get
             {
-                var num1 = (int) (BlockSize / SectorSize);
-                var num2 = (uint) num1 / 8U;
-                if ((uint) num1 % 8U != 0U)
+                int num1 = (int)(BlockSize / SectorSize);
+                uint num2 = (uint)num1 / 8U;
+                if ((uint)num1 % 8U != 0U)
+                {
                     ++num2;
-                var num3 = num2 / SectorSize;
+                }
+
+                uint num3 = num2 / SectorSize;
                 if (num2 % SectorSize != 0U)
+                {
                     ++num3;
+                }
+
                 return num3;
             }
         }
@@ -82,7 +95,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public uint SectorSize => VhdCommon.VHDSectorSize;
 
-        public ulong SectorCount { get; }
+        public ulong SectorCount
+        {
+            get;
+        }
 
         public void FlushFile()
         {
@@ -93,57 +109,70 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void ReadSector(ulong sector, byte[] buffer, uint offset)
         {
             if (sector >= SectorCount)
+            {
                 throw new ArgumentException("Sector is out of bound", nameof(sector));
+            }
+
             if (buffer.Length - offset < SectorSize)
+            {
                 throw new ArgumentException("The buffer, from the given offset, is smaller than the sector size.",
-                    nameof(offset));
-            var index = (uint) (sector / SectorsPerBlock);
-            var num1 = (uint) (sector % SectorsPerBlock);
+                                nameof(offset));
+            }
+
+            uint index = (uint)(sector / SectorsPerBlock);
+            uint num1 = (uint)(sector % SectorsPerBlock);
             if (uint.MaxValue == AllocationTable[index])
             {
                 Array.Copy(emptySectorBuffer, 0L, buffer, offset, SectorSize);
             }
             else
             {
-                var buffer1 = new byte[(int) SectorSize];
-                _fileStream.Seek((int) AllocationTable[index] * (int) SectorSize, SeekOrigin.Begin);
-                _fileStream.Read(buffer1, 0, (int) SectorSize);
-                var num2 = (int) (num1 / 8U);
-                _fileStream.Seek((AllocationTable[index] + num1 + BlockBitmapSectorCount) * SectorSize,
+                byte[] buffer1 = new byte[(int)SectorSize];
+                _ = _fileStream.Seek((int)AllocationTable[index] * (int)SectorSize, SeekOrigin.Begin);
+                _ = _fileStream.Read(buffer1, 0, (int)SectorSize);
+
+                _ = (int)(num1 / 8U);
+                _ = _fileStream.Seek((AllocationTable[index] + num1 + BlockBitmapSectorCount) * SectorSize,
                     SeekOrigin.Begin);
-                _fileStream.Read(buffer, (int) offset, (int) SectorSize);
+                _ = _fileStream.Read(buffer, (int)offset, (int)SectorSize);
             }
         }
 
         public void WriteSector(ulong sector, byte[] buffer, uint offset)
         {
             if (sector >= SectorCount)
+            {
                 throw new ArgumentException("Sector is out of bound", nameof(sector));
+            }
+
             if (buffer.Length - offset < SectorSize)
+            {
                 throw new ArgumentException("The buffer, from the given offset, is smaller than the sector size.",
-                    nameof(offset));
-            var index = (uint) (sector / SectorsPerBlock);
-            var num1 = (uint) (sector % SectorsPerBlock);
+                                nameof(offset));
+            }
+
+            uint index = (uint)(sector / SectorsPerBlock);
+            uint num1 = (uint)(sector % SectorsPerBlock);
             if (uint.MaxValue == AllocationTable[index])
             {
-                AllocationTable[index] = (uint) (_footerOffset / SectorSize);
+                AllocationTable[index] = (uint)(_footerOffset / SectorSize);
                 WriteBlockAllocationTable(_tableOffset);
-                _fileStream.Seek((long) _footerOffset, SeekOrigin.Begin);
-                _fileStream.Write(emptySectorBuffer, 0, (int) SectorSize);
+                _ = _fileStream.Seek((long)_footerOffset, SeekOrigin.Begin);
+                _fileStream.Write(emptySectorBuffer, 0, (int)SectorSize);
                 _footerOffset += SectorSize + VhdCommon.DynamicVHDBlockSize;
             }
 
-            var buffer1 = new byte[(int) SectorSize];
-            _fileStream.Seek((int) AllocationTable[index] * (int) SectorSize, SeekOrigin.Begin);
-            _fileStream.Read(buffer1, 0, (int) SectorSize);
-            var num2 = num1 / 8U;
-            var num3 = (byte) (num1 % 8U);
-            buffer1[(int) num2] = (byte) (buffer1[(int) num2] | (1U << num3));
-            _fileStream.Seek((int) AllocationTable[index] * (int) SectorSize, SeekOrigin.Begin);
-            _fileStream.Write(buffer1, 0, (int) SectorSize);
-            _fileStream.Seek((uint) ((int) AllocationTable[index] + (int) num1 + 1) * (long) SectorSize,
+            byte[] buffer1 = new byte[(int)SectorSize];
+            _ = _fileStream.Seek((int)AllocationTable[index] * (int)SectorSize, SeekOrigin.Begin);
+            _ = _fileStream.Read(buffer1, 0, (int)SectorSize);
+            uint num2 = num1 / 8U;
+            byte num3 = (byte)(num1 % 8U);
+            buffer1[(int)num2] = (byte)(buffer1[(int)num2] | (1U << num3));
+            _ = _fileStream.Seek((int)AllocationTable[index] * (int)SectorSize, SeekOrigin.Begin);
+            _fileStream.Write(buffer1, 0, (int)SectorSize);
+            _ = _fileStream.Seek((uint)((int)AllocationTable[index] + (int)num1 + 1) * (long)SectorSize,
                 SeekOrigin.Begin);
-            _fileStream.Write(buffer, (int) offset, (int) SectorSize);
+            _fileStream.Write(buffer, (int)offset, (int)SectorSize);
         }
 
         public void Dispose()
@@ -155,14 +184,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void Close()
         {
             if (_fileStream == null)
+            {
                 return;
+            }
+
             _fileStream.Close();
             _fileStream = null;
         }
 
         public bool SectorIsAllocated(ulong sectorIndex)
         {
-            return uint.MaxValue != AllocationTable[(uint) (sectorIndex / SectorsPerBlock)];
+            return uint.MaxValue != AllocationTable[(uint)(sectorIndex / SectorsPerBlock)];
         }
 
         ~DynamicHardDisk()
@@ -173,8 +205,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected virtual void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
-            var num = isDisposing ? 1 : 0;
+            }
+
+            _ = isDisposing ? 1 : 0;
             if (_fileStream != null)
             {
                 _fileStream.Close();
@@ -186,19 +221,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private void WriteVHDFooter(ulong offset)
         {
-            _fileStream.Seek((long) offset, SeekOrigin.Begin);
+            _ = _fileStream.Seek((long)offset, SeekOrigin.Begin);
             _footer.Write(_fileStream);
         }
 
         private void WriteVHDHeader(ulong offset)
         {
-            _fileStream.Seek((long) offset, SeekOrigin.Begin);
+            _ = _fileStream.Seek((long)offset, SeekOrigin.Begin);
             _header.Write(_fileStream);
         }
 
         private void WriteBlockAllocationTable(ulong offset)
         {
-            _fileStream.Seek((long) offset, SeekOrigin.Begin);
+            _ = _fileStream.Seek((long)offset, SeekOrigin.Begin);
             AllocationTable.Write(_fileStream);
         }
     }

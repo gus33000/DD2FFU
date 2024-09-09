@@ -8,19 +8,25 @@ using System;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
-    
+
     public interface IVirtualHardDisk : IDisposable
     {
-        uint SectorSize { get; }
+        uint SectorSize
+        {
+            get;
+        }
 
-        ulong SectorCount { get; }
+        ulong SectorCount
+        {
+            get;
+        }
 
         void FlushFile();
 
-        
+
         void ReadSector(ulong sector, byte[] buffer, uint offset);
 
-        
+
         void WriteSector(ulong sector, byte[] buffer, uint offset);
     }
 }

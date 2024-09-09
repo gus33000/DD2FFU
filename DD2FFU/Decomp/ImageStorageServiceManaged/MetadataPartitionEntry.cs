@@ -16,26 +16,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public static int PartitionNameLength = 36;
         public static int BytesPerGuid = 16;
 
-        public Guid PartitionId { get; set; }
+        public Guid PartitionId
+        {
+            get; set;
+        }
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get; set;
+        }
 
-        public ulong DiskOffset { get; set; }
+        public ulong DiskOffset
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
             DiskOffset = reader.ReadUInt64();
-            var str = Encoding.Unicode.GetString(reader.ReadBytes(PartitionNameLength * 2));
-            Name = str.Substring(0, str.IndexOf(char.MinValue));
+            string str = Encoding.Unicode.GetString(reader.ReadBytes(PartitionNameLength * 2));
+            Name = str[..str.IndexOf(char.MinValue)];
             PartitionId = new Guid(reader.ReadBytes(BytesPerGuid));
         }
 
         public void LogInfo(IULogger logger, ushort indentLevel = 0)
         {
-            new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo((int) indentLevel + "Name        : {0}", (object) Name);
-            logger.LogInfo((int) indentLevel + "Partition Id: {0}", (object) PartitionId);
-            logger.LogInfo((int) indentLevel + "Disk Offset : {0}", (object) DiskOffset);
+            _ = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo((int)indentLevel + "Name        : {0}", Name);
+            logger.LogInfo((int)indentLevel + "Partition Id: {0}", PartitionId);
+            logger.LogInfo((int)indentLevel + "Disk Offset : {0}", DiskOffset);
         }
     }
 }

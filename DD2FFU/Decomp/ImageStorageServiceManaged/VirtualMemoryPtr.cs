@@ -11,14 +11,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public sealed class VirtualMemoryPtr : SafeHandle
     {
-        private readonly UIntPtr _memorySize;
+        private readonly nuint _memorySize;
         private bool _disposed;
 
-        
+
         public VirtualMemoryPtr(uint memorySize)
-            : base(IntPtr.Zero, true)
+            : base(nint.Zero, true)
         {
-            _memorySize = (UIntPtr) memorySize;
+            _memorySize = memorySize;
             try
             {
                 AllocatedPointer = Win32Exports.VirtualAlloc(_memorySize,
@@ -31,13 +31,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-        public IntPtr AllocatedPointer { get; }
+        public nint AllocatedPointer
+        {
+            get;
+        }
 
-         public uint MemorySize => (uint) _memorySize;
+        public uint MemorySize => (uint)_memorySize;
 
         public override bool IsInvalid => _disposed;
 
-        public static implicit operator IntPtr(VirtualMemoryPtr virtualMemoryPointer)
+        public static implicit operator nint(VirtualMemoryPtr virtualMemoryPointer)
         {
             return virtualMemoryPointer.AllocatedPointer;
         }

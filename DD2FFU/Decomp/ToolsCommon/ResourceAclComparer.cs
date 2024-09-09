@@ -13,17 +13,23 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
     {
         public bool Equals(ResourceAcl x, ResourceAcl y)
         {
-            var flag = false;
+            bool flag = false;
             if (!string.IsNullOrEmpty(x.Path) && !string.IsNullOrEmpty(y.Path))
+            {
                 flag = x.Path.Equals(y.Path, StringComparison.OrdinalIgnoreCase);
+            }
+
             return flag;
         }
 
         public int GetHashCode(ResourceAcl obj)
         {
-            var num = 0;
+            int num = 0;
             if (!string.IsNullOrEmpty(obj.Path))
+            {
                 num = obj.Path.GetHashCode();
+            }
+
             return num;
         }
     }

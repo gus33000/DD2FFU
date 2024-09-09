@@ -25,17 +25,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _logger = logger;
         }
 
-        public List<MetadataPartitionEntry> Entries { get; } = new List<MetadataPartitionEntry>();
+        public List<MetadataPartitionEntry> Entries { get; } = [];
 
         public MetadataPartitionHeader Header { get; } = new MetadataPartitionHeader();
 
         public void ReadFromStream(Stream stream)
         {
-            var reader = new BinaryReader(stream);
+            BinaryReader reader = new(stream);
             Header.ReadFromStream(reader);
             for (uint index = 0; index < Header.PartitionCount; ++index)
             {
-                var metadataPartitionEntry = new MetadataPartitionEntry();
+                MetadataPartitionEntry metadataPartitionEntry = new();
                 metadataPartitionEntry.ReadFromStream(reader);
                 Entries.Add(metadataPartitionEntry);
             }
@@ -43,9 +43,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void LogInfo(ushort indentLevel = 0)
         {
-            Header.LogInfo(_logger, (ushort) (indentLevel + 2U));
-            foreach (var entry in Entries)
-                entry.LogInfo(_logger, (ushort) (indentLevel + 2U));
+            Header.LogInfo(_logger, (ushort)(indentLevel + 2U));
+            foreach (MetadataPartitionEntry entry in Entries)
+            {
+                entry.LogInfo(_logger, (ushort)(indentLevel + 2U));
+            }
         }
     }
 }

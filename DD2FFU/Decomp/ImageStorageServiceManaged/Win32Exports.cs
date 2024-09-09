@@ -4,19 +4,19 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public sealed class Win32Exports
     {
         [Flags]
-        
+
         public enum AllocationType : uint
         {
             MEM_COMMIT = 4096, // 0x00001000
@@ -28,7 +28,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             MEM_WRITE_WATCH = 2097152 // 0x00200000
         }
 
-        
+
         public enum CreationDisposition : uint
         {
             CREATE_NEW = 1,
@@ -39,7 +39,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum DesiredAccess : uint
         {
             GENERIC_READ = 2147483648, // 0x80000000
@@ -47,7 +47,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum FlagsAndAttributes : uint
         {
             FILE_ATTRIBUTES_ARCHIVE = 32, // 0x00000020
@@ -69,14 +69,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum FreeType : uint
         {
             MEM_DECOMMIT = 16384, // 0x00004000
             MEM_RELEASE = 32768 // 0x00008000
         }
 
-        
+
         public enum IoctlControlCode : uint
         {
             IoctlDiskGetDriveLayoutEx = 458832, // 0x00070050
@@ -84,7 +84,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum MemoryProtection : uint
         {
             PAGE_EXECUTE = 16, // 0x00000010
@@ -100,7 +100,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             PAGE_WRITECOMBINE = 1024 // 0x00000400
         }
 
-        
+
         public enum MoveMethod : uint
         {
             FILE_BEGIN,
@@ -116,7 +116,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum PartitionAttributes : ulong
         {
             GPT_ATTRIBUTE_PLATFORM_REQUIRED = 1,
@@ -127,7 +127,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [Flags]
-        
+
         public enum ShareMode : uint
         {
             FILE_SHARE_NONE = 0,
@@ -151,63 +151,63 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public const int ANYSIZE_ARRAY = 1;
         public const int INVALID_HANDLE_VALUE = -1;
 
-         public const uint SE_PRIVILEGE_ENABLED_BY_DEFAULT = 1;
+        public const uint SE_PRIVILEGE_ENABLED_BY_DEFAULT = 1;
 
-         public const uint SE_PRIVILEGE_ENABLED = 2;
+        public const uint SE_PRIVILEGE_ENABLED = 2;
 
-         public const uint SE_PRIVILEGE_REMOVED = 4;
+        public const uint SE_PRIVILEGE_REMOVED = 4;
 
-         public const uint SE_PRIVILEGE_USED_FOR_ACCESS = 2147483648;
+        public const uint SE_PRIVILEGE_USED_FOR_ACCESS = 2147483648;
 
-         public const uint STANDARD_RIGHTS_REQUIRED = 983040;
+        public const uint STANDARD_RIGHTS_REQUIRED = 983040;
 
-         public const uint STANDARD_RIGHTS_READ = 131072;
+        public const uint STANDARD_RIGHTS_READ = 131072;
 
-         public const uint TOKEN_ASSIGN_PRIMARY = 1;
+        public const uint TOKEN_ASSIGN_PRIMARY = 1;
 
-         public const uint TOKEN_DUPLICATE = 2;
+        public const uint TOKEN_DUPLICATE = 2;
 
-         public const uint TOKEN_IMPERSONATE = 4;
+        public const uint TOKEN_IMPERSONATE = 4;
 
-         public const uint TOKEN_QUERY = 8;
+        public const uint TOKEN_QUERY = 8;
 
-         public const uint TOKEN_QUERY_SOURCE = 16;
+        public const uint TOKEN_QUERY_SOURCE = 16;
 
-         public const uint TOKEN_ADJUST_PRIVILEGES = 32;
+        public const uint TOKEN_ADJUST_PRIVILEGES = 32;
 
-         public const uint TOKEN_ADJUST_GROUPS = 64;
+        public const uint TOKEN_ADJUST_GROUPS = 64;
 
-         public const uint TOKEN_ADJUST_DEFAULT = 128;
+        public const uint TOKEN_ADJUST_DEFAULT = 128;
 
-         public const uint TOKEN_ADJUST_SESSIONID = 256;
+        public const uint TOKEN_ADJUST_SESSIONID = 256;
 
-         public const uint TOKEN_READ = 131080;
+        public const uint TOKEN_READ = 131080;
 
-         public const uint TOKEN_ALL_ACCESS = 983551;
+        public const uint TOKEN_ALL_ACCESS = 983551;
 
-         public const uint REG_NONE = 0;
+        public const uint REG_NONE = 0;
 
-         public const uint REG_SZ = 1;
+        public const uint REG_SZ = 1;
 
-         public const uint REG_EXPAND_SZ = 2;
+        public const uint REG_EXPAND_SZ = 2;
 
-         public const uint REG_BINARY = 3;
+        public const uint REG_BINARY = 3;
 
-         public const uint REG_DWORD = 4;
+        public const uint REG_DWORD = 4;
 
-         public const uint REG_DWORD_BIG_ENDIAN = 5;
+        public const uint REG_DWORD_BIG_ENDIAN = 5;
 
-         public const uint REG_LINK = 6;
+        public const uint REG_LINK = 6;
 
-         public const uint REG_MULTI_SZ = 7;
+        public const uint REG_MULTI_SZ = 7;
 
-         public const uint REG_RESOURCE_LIST = 8;
+        public const uint REG_RESOURCE_LIST = 8;
 
-         public const uint REG_FULL_RESOURCE_DESCRIPTOR = 9;
+        public const uint REG_FULL_RESOURCE_DESCRIPTOR = 9;
 
-         public const uint REG_RESOURCE_REQUIREMENTS_LIST = 10;
+        public const uint REG_RESOURCE_REQUIREMENTS_LIST = 10;
 
-         public const uint REG_QWORD = 11;
+        public const uint REG_QWORD = 11;
 
         public static int ERROR_SUCCESS = 0;
         public static int ERROR_NO_MORE_ITEMS = 259;
@@ -225,30 +225,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         [DllImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CloseHandle_Native(IntPtr handle);
+        private static extern bool CloseHandle_Native(nint handle);
 
-        public static void CloseHandle(IntPtr handle)
+        public static void CloseHandle(nint handle)
         {
             if (!CloseHandle_Native(handle))
+            {
                 throw new Win32ExportException(string.Format("{0} failed with error {1}",
-                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
+                                MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "CreateFile", CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         private static extern SafeFileHandle CreateFile_Native(string fileName, DesiredAccess desiredAccess,
-            ShareMode shareMode, IntPtr securityAttributes, CreationDisposition creationDisposition,
-            FlagsAndAttributes flagsAndAttributes, IntPtr templateFileHandle);
+            ShareMode shareMode, nint securityAttributes, CreationDisposition creationDisposition,
+            FlagsAndAttributes flagsAndAttributes, nint templateFileHandle);
 
-        
+
         public static SafeFileHandle CreateFile(string fileName, DesiredAccess desiredAccess, ShareMode shareMode,
             CreationDisposition creationDisposition, FlagsAndAttributes flagsAndAttributes)
         {
-            var fileNative = CreateFile_Native(fileName, desiredAccess, shareMode, IntPtr.Zero, creationDisposition,
-                flagsAndAttributes, IntPtr.Zero);
+            SafeFileHandle fileNative = CreateFile_Native(fileName, desiredAccess, shareMode, nint.Zero, creationDisposition,
+                flagsAndAttributes, nint.Zero);
             if (!fileNative.IsInvalid)
+            {
                 return fileNative;
-            var lastWin32Error = Marshal.GetLastWin32Error();
+            }
+
+            int lastWin32Error = Marshal.GetLastWin32Error();
             throw new Win32ExportException(string.Format("{0}({1}) failed with error {2}",
                 MethodBase.GetCurrentMethod().Name, string.IsNullOrEmpty(fileName) ? "" : fileName, lastWin32Error));
         }
@@ -256,40 +261,46 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [DllImport("kernel32.dll", EntryPoint = "ReadFile", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool ReadFile_Native(SafeFileHandle fileHandle, out byte[] buffer, uint bytesToRead,
-            out uint bytesRead, IntPtr overlapped);
+            out uint bytesRead, nint overlapped);
 
-        
+
         public static void ReadFile(SafeFileHandle fileHandle, out byte[] buffer, uint bytesToRead, out uint bytesRead)
         {
-            if (!ReadFile_Native(fileHandle, out buffer, bytesToRead, out bytesRead, IntPtr.Zero))
+            if (!ReadFile_Native(fileHandle, out buffer, bytesToRead, out bytesRead, nint.Zero))
+            {
                 throw new Win32ExportException(string.Format("ReadFile failed with error: {0}",
-                    Marshal.GetLastWin32Error()));
+                                Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "ReadFile", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool ReadFile_Native(SafeFileHandle fileHandle, IntPtr buffer, uint bytesToRead,
-            out uint bytesRead, IntPtr overlapped);
+        private static extern bool ReadFile_Native(SafeFileHandle fileHandle, nint buffer, uint bytesToRead,
+            out uint bytesRead, nint overlapped);
 
-        
-        public static void ReadFile(SafeFileHandle fileHandle, IntPtr buffer, uint bytesToRead, out uint bytesRead)
+
+        public static void ReadFile(SafeFileHandle fileHandle, nint buffer, uint bytesToRead, out uint bytesRead)
         {
-            if (!ReadFile_Native(fileHandle, buffer, bytesToRead, out bytesRead, IntPtr.Zero))
+            if (!ReadFile_Native(fileHandle, buffer, bytesToRead, out bytesRead, nint.Zero))
+            {
                 throw new Win32ExportException(string.Format("ReadFile failed with error: {0}",
-                    Marshal.GetLastWin32Error()));
+                                Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "WriteFile", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool WriteFile_Native(SafeFileHandle handle, IntPtr buffer, uint numBytesToWrite,
-            out uint numBytesWritten, IntPtr overlapped);
+        private static extern bool WriteFile_Native(SafeFileHandle handle, nint buffer, uint numBytesToWrite,
+            out uint numBytesWritten, nint overlapped);
 
-        
-        public static void WriteFile(SafeFileHandle fileHandle, IntPtr buffer, uint bytesToWrite, out uint bytesWritten)
+
+        public static void WriteFile(SafeFileHandle fileHandle, nint buffer, uint bytesToWrite, out uint bytesWritten)
         {
-            if (!WriteFile_Native(fileHandle, buffer, bytesToWrite, out bytesWritten, IntPtr.Zero))
+            if (!WriteFile_Native(fileHandle, buffer, bytesToWrite, out bytesWritten, nint.Zero))
+            {
                 throw new Win32ExportException(string.Format("WriteFile failed with error: {0}",
-                    Marshal.GetLastWin32Error()));
+                                Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "SetFilePointerEx", SetLastError = true)]
@@ -297,100 +308,110 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private static extern bool SetFilePointerEx_Native(SafeFileHandle fileHandle, long distanceToMove,
             out long newFilePointer, MoveMethod moveMethod);
 
-        
+
         public static void SetFilePointerEx(SafeFileHandle fileHandle, long distanceToMove, out long newFileLocation,
             MoveMethod moveMethod)
         {
             if (!SetFilePointerEx_Native(fileHandle, distanceToMove, out newFileLocation, moveMethod))
+            {
                 throw new Win32ExportException(string.Format("SetFilePointerEx failed with error: {0}",
-                    Marshal.GetLastWin32Error()));
+                                Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "VirtualAlloc", SetLastError = true)]
-        private static extern IntPtr VirtualAlloc_Native(IntPtr lpAddress, UIntPtr sizeInBytes,
+        private static extern nint VirtualAlloc_Native(nint lpAddress, nuint sizeInBytes,
             AllocationType allocationType, MemoryProtection memoryProtection);
 
-        
-        public static IntPtr VirtualAlloc(UIntPtr sizeInBytes, AllocationType allocationType,
+
+        public static nint VirtualAlloc(nuint sizeInBytes, AllocationType allocationType,
             MemoryProtection memoryProtection)
         {
-            var num = VirtualAlloc_Native(IntPtr.Zero, sizeInBytes, allocationType, memoryProtection);
-            if (!(num == IntPtr.Zero))
-                return num;
-            throw new Win32ExportException(string.Format("{0} failed with error {1}",
+            nint num = VirtualAlloc_Native(nint.Zero, sizeInBytes, allocationType, memoryProtection);
+            return !(num == nint.Zero)
+                ? num
+                : throw new Win32ExportException(string.Format("{0} failed with error {1}",
                 MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
         }
 
         [DllImport("kernel32.dll", EntryPoint = "VirtualFree", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool VirtualFree_Native(IntPtr address, UIntPtr sizeInBytes, FreeType freeType);
+        private static extern bool VirtualFree_Native(nint address, nuint sizeInBytes, FreeType freeType);
 
-        
-        public static void VirtualFree(IntPtr address, FreeType freeType)
+
+        public static void VirtualFree(nint address, FreeType freeType)
         {
-            var zero = UIntPtr.Zero;
+            nuint zero = nuint.Zero;
             if (!VirtualFree_Native(address, zero, freeType))
+            {
                 throw new Win32ExportException(string.Format("{0} failed with error {1}",
-                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
+                                MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
+            }
         }
 
-        
+
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int memcmp(byte[] buffer1, IntPtr buffer2, UIntPtr count);
+        public static extern int memcmp(byte[] buffer1, nint buffer2, nuint count);
 
         [DllImport("kernel32.dll", EntryPoint = "FlushFileBuffers", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool FlushFileBuffers_Native(SafeFileHandle fileHandle);
 
-        
+
         public static void FlushFileBuffers(SafeFileHandle fileHandle)
         {
             if (!FlushFileBuffers_Native(fileHandle))
+            {
                 throw new Win32ExportException(string.Format("{0} failed: {1}", MethodBase.GetCurrentMethod().Name,
-                    Marshal.GetLastWin32Error()));
+                                Marshal.GetLastWin32Error()));
+            }
         }
 
         [DllImport("Kernel32.dll", EntryPoint = "DeviceIoControl", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DeviceIoControl_Native(IntPtr hDevice, uint controlCode, byte[] inBuffer,
-            int inBufferSize, byte[] outBuffer, int outBufferSize, out int bytesReturned, IntPtr lpOverlapped);
+        private static extern bool DeviceIoControl_Native(nint hDevice, uint controlCode, byte[] inBuffer,
+            int inBufferSize, byte[] outBuffer, int outBufferSize, out int bytesReturned, nint lpOverlapped);
 
-        
-        public static void DeviceIoControl(IntPtr handle, uint controlCode, byte[] inBuffer, int inBufferSize,
+
+        public static void DeviceIoControl(nint handle, uint controlCode, byte[] inBuffer, int inBufferSize,
             byte[] outBuffer, int outBufferSize, out int bytesReturned)
         {
             if (!DeviceIoControl_Native(handle, controlCode, inBuffer, inBufferSize, outBuffer, outBufferSize,
-                out bytesReturned, IntPtr.Zero))
+                out bytesReturned, nint.Zero))
+            {
                 throw new Win32ExportException(string.Format("{0}: Control code {1:x} failed with error code {2:x}.",
-                    MethodBase.GetCurrentMethod().Name, controlCode, Marshal.GetHRForLastWin32Error()));
+                                MethodBase.GetCurrentMethod().Name, controlCode, Marshal.GetHRForLastWin32Error()));
+            }
         }
 
         [DllImport("Kernel32.dll", EntryPoint = "DeviceIoControl", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DeviceIoControl_Native(IntPtr hDevice, uint controlCode, IntPtr inBuffer,
-            int inBufferSize, IntPtr outBuffer, int outBufferSize, out int bytesReturned, IntPtr lpOverlapped);
+        private static extern bool DeviceIoControl_Native(nint hDevice, uint controlCode, nint inBuffer,
+            int inBufferSize, nint outBuffer, int outBufferSize, out int bytesReturned, nint lpOverlapped);
 
-        
-        public static void DeviceIoControl(IntPtr handle, uint controlCode, IntPtr inBuffer, int inBufferSize,
-            IntPtr outBuffer, int outBufferSize, out int bytesReturned)
+
+        public static void DeviceIoControl(nint handle, uint controlCode, nint inBuffer, int inBufferSize,
+            nint outBuffer, int outBufferSize, out int bytesReturned)
         {
             if (!DeviceIoControl_Native(handle, controlCode, inBuffer, inBufferSize, outBuffer, outBufferSize,
-                out bytesReturned, IntPtr.Zero))
+                out bytesReturned, nint.Zero))
+            {
                 throw new Win32ExportException(string.Format("{0}: Control code {1:x} failed with error code {2:x}.",
-                    MethodBase.GetCurrentMethod().Name, controlCode, Marshal.GetHRForLastWin32Error()));
+                                MethodBase.GetCurrentMethod().Name, controlCode, Marshal.GetHRForLastWin32Error()));
+            }
         }
 
         [DllImport("kernel32.dll", EntryPoint = "GetCurrentProcess")]
-        private static extern IntPtr GetCurrentProcess_Native();
+        private static extern nint GetCurrentProcess_Native();
 
-        public static IntPtr GetCurrentProcess()
+        public static nint GetCurrentProcess()
         {
-            var currentProcessNative = GetCurrentProcess_Native();
-            var lastWin32Error = Marshal.GetLastWin32Error();
-            if (currentProcessNative.ToInt32() != -1)
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, lastWin32Error));
-            return currentProcessNative;
+            nint currentProcessNative = GetCurrentProcess_Native();
+            int lastWin32Error = Marshal.GetLastWin32Error();
+            return currentProcessNative.ToInt32() != -1
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, lastWin32Error))
+                : currentProcessNative;
         }
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -399,43 +420,43 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static LUID LookupPrivilegeValue(string privilegeName)
         {
-            var luid = new LUID();
-            if (!LookupPrivilegeValue(null, privilegeName, out luid))
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
-            return luid;
+            _ = new LUID();
+
+            return !LookupPrivilegeValue(null, privilegeName, out LUID luid)
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()))
+                : luid;
         }
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AdjustTokenPrivileges(IntPtr TokenHandle,
+        private static extern bool AdjustTokenPrivileges(nint TokenHandle,
             [MarshalAs(UnmanagedType.Bool)] bool disableAllPrivileges, ref TOKEN_PRIVILEGES newState,
             uint bufferLengthInBytes, ref TOKEN_PRIVILEGES previousState, out uint returnLengthInBytes);
 
-        public static TOKEN_PRIVILEGES AdjustTokenPrivileges(IntPtr tokenHandle, TOKEN_PRIVILEGES privileges)
+        public static TOKEN_PRIVILEGES AdjustTokenPrivileges(nint tokenHandle, TOKEN_PRIVILEGES privileges)
         {
-            var previousState = new TOKEN_PRIVILEGES();
-            uint returnLengthInBytes = 0;
-            if (!AdjustTokenPrivileges(tokenHandle, false, ref privileges, (uint) Marshal.SizeOf((object) privileges),
-                ref previousState, out returnLengthInBytes))
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
-            return previousState;
+            TOKEN_PRIVILEGES previousState = new();
+
+            return !AdjustTokenPrivileges(tokenHandle, false, ref privileges, (uint)Marshal.SizeOf((object)privileges),
+                ref previousState, out _)
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()))
+                : previousState;
         }
 
         [DllImport("advapi32.dll", EntryPoint = "OpenProcessToken", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool OpenProcessToken_Native(IntPtr processHandle, uint desiredAccess,
-            out IntPtr tokenHandle);
+        private static extern bool OpenProcessToken_Native(nint processHandle, uint desiredAccess,
+            out nint tokenHandle);
 
-        
-        public static IntPtr OpenProcessToken(IntPtr processHandle, uint desiredAccess)
+
+        public static nint OpenProcessToken(nint processHandle, uint desiredAccess)
         {
-            IntPtr tokenHandle;
-            if (!OpenProcessToken_Native(processHandle, desiredAccess, out tokenHandle))
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()));
-            return tokenHandle;
+            return !OpenProcessToken_Native(processHandle, desiredAccess, out nint tokenHandle)
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, Marshal.GetLastWin32Error()))
+                : tokenHandle;
         }
 
         [DllImport("advapi32.dll", EntryPoint = "RegLoadKey", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -444,10 +465,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static void RegLoadKey(SafeRegistryHandle registryKey, string subKeyName, string fileName)
         {
-            var num = RegLoadKey_Native(registryKey, subKeyName, fileName);
+            uint num = RegLoadKey_Native(registryKey, subKeyName, fileName);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num));
+                                MethodBase.GetCurrentMethod().Name, num));
+            }
         }
 
         [DllImport("advapi32.dll", EntryPoint = "RegUnLoadKey", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -455,161 +478,171 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static void RegUnloadKey(SafeRegistryHandle registryKey, string subKeyName)
         {
-            var num = RegUnLoadKey_Native(registryKey, subKeyName);
+            uint num = RegUnLoadKey_Native(registryKey, subKeyName);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num));
+                                MethodBase.GetCurrentMethod().Name, num));
+            }
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint OROpenHive(string hivePath, out IntPtr rootKey);
+        private static extern uint OROpenHive(string hivePath, out nint rootKey);
 
-        public static IntPtr OfflineRegistryOpenHive(string hivePath)
+        public static nint OfflineRegistryOpenHive(string hivePath)
         {
-            var rootKey = IntPtr.Zero;
-            var num = OROpenHive(hivePath, out rootKey);
-            if (num != ERROR_SUCCESS)
-                throw new Win32ExportException(string.Format(
+            uint num = OROpenHive(hivePath, out nint rootKey);
+            return num != ERROR_SUCCESS
+                ? throw new Win32ExportException(string.Format(
                     "{0}: This function failed with error 0x{1:x} for path: '{2}.", MethodBase.GetCurrentMethod().Name,
-                    num, hivePath));
-            return rootKey;
+                    num, hivePath))
+                : rootKey;
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORSaveHive(IntPtr hiveHandle, string hivePath, uint majorOsVersion,
+        private static extern uint ORSaveHive(nint hiveHandle, string hivePath, uint majorOsVersion,
             uint minorOSVersion);
 
-        public static void OfflineRegistrySaveHive(IntPtr hiveHandle, string hivePath)
+        public static void OfflineRegistrySaveHive(nint hiveHandle, string hivePath)
         {
-            var num = ORSaveHive(hiveHandle, hivePath, 6U, 1U);
+            uint num = ORSaveHive(hiveHandle, hivePath, 6U, 1U);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format(
-                    "{0}: This function failed with error 0x{1:x} for path: '{2}.", MethodBase.GetCurrentMethod().Name,
-                    num, hivePath));
+                                "{0}: This function failed with error 0x{1:x} for path: '{2}.", MethodBase.GetCurrentMethod().Name,
+                                num, hivePath));
+            }
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORCloseHive(IntPtr rootKey);
+        private static extern uint ORCloseHive(nint rootKey);
 
-        public static void OfflineRegistryCloseHive(IntPtr registryKey)
+        public static void OfflineRegistryCloseHive(nint registryKey)
         {
-            var num = ORCloseHive(registryKey);
+            uint num = ORCloseHive(registryKey);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num));
+                                MethodBase.GetCurrentMethod().Name, num));
+            }
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint OROpenKey(IntPtr keyHandle, string subKeyName, out IntPtr subKeyHandle);
+        private static extern uint OROpenKey(nint keyHandle, string subKeyName, out nint subKeyHandle);
 
-        public static IntPtr OfflineRegistryOpenSubKey(IntPtr keyHandle, string subKeyName)
+        public static nint OfflineRegistryOpenSubKey(nint keyHandle, string subKeyName)
         {
-            var subKeyHandle = IntPtr.Zero;
-            var num = OROpenKey(keyHandle, subKeyName, out subKeyHandle);
-            if (num == ERROR_SUCCESS)
-                return subKeyHandle;
-            if (num == 2U)
-                return IntPtr.Zero;
-            throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                MethodBase.GetCurrentMethod().Name, num));
+            uint num = OROpenKey(keyHandle, subKeyName, out nint subKeyHandle);
+            return num == ERROR_SUCCESS
+                ? subKeyHandle
+                : num == 2U
+                            ? nint.Zero
+                            : throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                            MethodBase.GetCurrentMethod().Name, num));
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORCloseKey(IntPtr keyHandle);
+        private static extern uint ORCloseKey(nint keyHandle);
 
-        public static void OfflineRegistryCloseSubKey(IntPtr keyHandle)
+        public static void OfflineRegistryCloseSubKey(nint keyHandle)
         {
-            var num = ORCloseKey(keyHandle);
+            uint num = ORCloseKey(keyHandle);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num));
+                                MethodBase.GetCurrentMethod().Name, num));
+            }
         }
 
         [DllImport("offreg.dll", EntryPoint = "OREnumKey", CharSet = CharSet.Unicode)]
-        private static extern uint OREnumKeySimple(IntPtr rootKey, uint index, StringBuilder subKeyName,
-            ref uint subKeyCharacterCount, IntPtr subKeyClass, IntPtr subKeyClassCharacterCount, IntPtr fileTime);
+        private static extern uint OREnumKeySimple(nint rootKey, uint index, StringBuilder subKeyName,
+            ref uint subKeyCharacterCount, nint subKeyClass, nint subKeyClassCharacterCount, nint fileTime);
 
-        
-        public static string OfflineRegistryEnumKey(IntPtr registryKey, uint index)
+
+        public static string OfflineRegistryEnumKey(nint registryKey, uint index)
         {
-            var subKeyName = new StringBuilder("keyName", (int) ImageConstants.RegistryKeyMaxNameSize);
-            var registryKeyMaxNameSize = ImageConstants.RegistryKeyMaxNameSize;
-            var num = OREnumKeySimple(registryKey, index, subKeyName, ref registryKeyMaxNameSize, IntPtr.Zero,
-                IntPtr.Zero, IntPtr.Zero);
-            if (num == ERROR_SUCCESS)
-                return subKeyName.ToString();
-            if (num == ERROR_NO_MORE_ITEMS)
-                return null;
-            throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                MethodBase.GetCurrentMethod().Name, num));
+            StringBuilder subKeyName = new("keyName", (int)ImageConstants.RegistryKeyMaxNameSize);
+            uint registryKeyMaxNameSize = ImageConstants.RegistryKeyMaxNameSize;
+            uint num = OREnumKeySimple(registryKey, index, subKeyName, ref registryKeyMaxNameSize, nint.Zero,
+                nint.Zero, nint.Zero);
+            return num == ERROR_SUCCESS
+                ? subKeyName.ToString()
+                : num == ERROR_NO_MORE_ITEMS
+                            ? null
+                            : throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                            MethodBase.GetCurrentMethod().Name, num));
         }
 
         [DllImport("offreg.dll", EntryPoint = "OREnumValue", CharSet = CharSet.Unicode)]
-        private static extern uint OREnumValueSimple(IntPtr rootKey, uint index, StringBuilder valueName,
-            ref uint valueCharacterCount, IntPtr valueType, IntPtr data, IntPtr dataSize);
+        private static extern uint OREnumValueSimple(nint rootKey, uint index, StringBuilder valueName,
+            ref uint valueCharacterCount, nint valueType, nint data, nint dataSize);
 
-        
-        public static string OfflineRegistryEnumValue(IntPtr registryKey, uint index)
+
+        public static string OfflineRegistryEnumValue(nint registryKey, uint index)
         {
-            var valueName = new StringBuilder("valueName", (int) ImageConstants.RegistryValueMaxNameSize);
-            var valueMaxNameSize = ImageConstants.RegistryValueMaxNameSize;
-            var num = OREnumValueSimple(registryKey, index, valueName, ref valueMaxNameSize, IntPtr.Zero, IntPtr.Zero,
-                IntPtr.Zero);
-            if (num == ERROR_SUCCESS)
-                return valueName.ToString();
-            if (num == ERROR_NO_MORE_ITEMS)
-                return null;
-            throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                MethodBase.GetCurrentMethod().Name, num));
+            StringBuilder valueName = new("valueName", (int)ImageConstants.RegistryValueMaxNameSize);
+            uint valueMaxNameSize = ImageConstants.RegistryValueMaxNameSize;
+            uint num = OREnumValueSimple(registryKey, index, valueName, ref valueMaxNameSize, nint.Zero, nint.Zero,
+                nint.Zero);
+            return num == ERROR_SUCCESS
+                ? valueName.ToString()
+                : num == ERROR_NO_MORE_ITEMS
+                            ? null
+                            : throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                            MethodBase.GetCurrentMethod().Name, num));
         }
 
         [DllImport("offreg.dll", EntryPoint = "ORGetValue", CharSet = CharSet.Unicode)]
-        private static extern uint ORGetValueKind(IntPtr keyHandle, IntPtr subKey, string valueName, out uint valueType,
-            IntPtr data, IntPtr dataLength);
+        private static extern uint ORGetValueKind(nint keyHandle, nint subKey, string valueName, out uint valueType,
+            nint data, nint dataLength);
 
-        
-        public static uint OfflineRegistryGetValueKind(IntPtr keyHandle, string valueName)
+
+        public static uint OfflineRegistryGetValueKind(nint keyHandle, string valueName)
         {
-            uint valueType = 0;
-            var valueKind = ORGetValueKind(keyHandle, IntPtr.Zero, valueName, out valueType, IntPtr.Zero, IntPtr.Zero);
-            if (valueKind != ERROR_SUCCESS)
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, valueKind));
-            return valueType;
+            uint valueKind = ORGetValueKind(keyHandle, nint.Zero, valueName, out uint valueType, nint.Zero, nint.Zero);
+            return valueKind != ERROR_SUCCESS
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, valueKind))
+                : valueType;
         }
 
         [DllImport("offreg.dll", EntryPoint = "ORGetValue", CharSet = CharSet.Unicode)]
-        private static extern uint ORGetValueSize(IntPtr keyHandle, IntPtr subKey, string valueName, IntPtr valueType,
-            IntPtr data, ref uint dataLength);
+        private static extern uint ORGetValueSize(nint keyHandle, nint subKey, string valueName, nint valueType,
+            nint data, ref uint dataLength);
 
-        
-        public static uint OfflineRegistryGetValueSize(IntPtr keyHandle, string valueName)
+
+        public static uint OfflineRegistryGetValueSize(nint keyHandle, string valueName)
         {
             uint dataLength = 0;
-            var valueSize = ORGetValueSize(keyHandle, IntPtr.Zero, valueName, IntPtr.Zero, IntPtr.Zero, ref dataLength);
-            if (valueSize != ERROR_SUCCESS)
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, valueSize));
-            return dataLength;
+            uint valueSize = ORGetValueSize(keyHandle, nint.Zero, valueName, nint.Zero, nint.Zero, ref dataLength);
+            return valueSize != ERROR_SUCCESS
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                    MethodBase.GetCurrentMethod().Name, valueSize))
+                : dataLength;
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORGetValue(IntPtr keyHandle, IntPtr subKey, string valueName, out uint valueType,
+        private static extern uint ORGetValue(nint keyHandle, nint subKey, string valueName, out uint valueType,
             byte[] data, ref uint dataLength);
 
-        public static object OfflineRegistryGetValue(IntPtr keyHandle, string valueName)
+        public static object OfflineRegistryGetValue(nint keyHandle, string valueName)
         {
             uint dataLength = 0;
-            var valueSize = ORGetValueSize(keyHandle, IntPtr.Zero, valueName, IntPtr.Zero, IntPtr.Zero, ref dataLength);
+            uint valueSize = ORGetValueSize(keyHandle, nint.Zero, valueName, nint.Zero, nint.Zero, ref dataLength);
             if (valueSize != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, valueSize));
-            var numArray = new byte[(int) dataLength];
-            uint valueType;
-            var num = ORGetValue(keyHandle, IntPtr.Zero, valueName, out valueType, numArray, ref dataLength);
+                                MethodBase.GetCurrentMethod().Name, valueSize));
+            }
+
+            byte[] numArray = new byte[(int)dataLength];
+            uint num = ORGetValue(keyHandle, nint.Zero, valueName, out uint valueType, numArray, ref dataLength);
             if (num != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num));
+                                MethodBase.GetCurrentMethod().Name, num));
+            }
+
             switch (valueType)
             {
                 case 1:
@@ -620,36 +653,57 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 case 3:
                     return numArray;
                 case 4:
-                    return (uint) ((numArray[3] << 24) | (numArray[2] << 16) | (numArray[1] << 8) | numArray[0]);
+                    return (uint)((numArray[3] << 24) | (numArray[2] << 16) | (numArray[1] << 8) | numArray[0]);
                 case 5:
-                    return (uint) ((numArray[0] << 24) | (numArray[1] << 16) | (numArray[2] << 8) | numArray[3]);
+                    return (uint)((numArray[0] << 24) | (numArray[1] << 16) | (numArray[2] << 8) | numArray[3]);
                 case 6:
                     return Encoding.Unicode.GetString(numArray).Split(new char[1])[0];
                 case 7:
-                    var stringList1 = new List<string>(Encoding.Unicode.GetString(numArray).Split(new char[1]));
-                    for (var index = 0; index < stringList1.Count; ++index)
+                    List<string> stringList1 = new(Encoding.Unicode.GetString(numArray).Split(new char[1]));
+                    for (int index = 0; index < stringList1.Count; ++index)
+                    {
                         if (string.IsNullOrEmpty(stringList1[index]))
+                        {
                             stringList1.RemoveAt(index--);
+                        }
                         else if (string.IsNullOrWhiteSpace(stringList1[index]))
+                        {
                             stringList1.RemoveAt(index--);
+                        }
+                    }
+
                     return stringList1.ToArray();
                 case 8:
-                    var stringList2 = new List<string>(Encoding.Unicode.GetString(numArray).Split(new char[1]));
-                    for (var index = 0; index < stringList2.Count; ++index)
+                    List<string> stringList2 = new(Encoding.Unicode.GetString(numArray).Split(new char[1]));
+                    for (int index = 0; index < stringList2.Count; ++index)
+                    {
                         if (string.IsNullOrEmpty(stringList2[index]))
+                        {
                             stringList2.RemoveAt(index--);
+                        }
                         else if (string.IsNullOrWhiteSpace(stringList2[index]))
+                        {
                             stringList2.RemoveAt(index--);
+                        }
+                    }
+
                     return stringList2.ToArray();
                 case 9:
                     return Encoding.Unicode.GetString(numArray).Split(new char[1])[0];
                 case 10:
-                    var stringList3 = new List<string>(Encoding.Unicode.GetString(numArray).Split(new char[1]));
-                    for (var index = 0; index < stringList3.Count; ++index)
+                    List<string> stringList3 = new(Encoding.Unicode.GetString(numArray).Split(new char[1]));
+                    for (int index = 0; index < stringList3.Count; ++index)
+                    {
                         if (string.IsNullOrEmpty(stringList3[index]))
+                        {
                             stringList3.RemoveAt(index--);
+                        }
                         else if (string.IsNullOrWhiteSpace(stringList3[index]))
+                        {
                             stringList3.RemoveAt(index--);
+                        }
+                    }
+
                     return stringList3.ToArray();
                 default:
                     return numArray;
@@ -657,41 +711,41 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORSetValue(IntPtr keyHandle, string valueName, uint valueType, byte[] data,
+        private static extern uint ORSetValue(nint keyHandle, string valueName, uint valueType, byte[] data,
             uint dataLength);
 
-        
-        public static void OfflineRegistrySetValue(IntPtr keyHandle, string valueName, uint valueType, byte[] data)
+
+        public static void OfflineRegistrySetValue(nint keyHandle, string valueName, uint valueType, byte[] data)
         {
-            var keyHandle1 = keyHandle;
-            var valueName1 = valueName;
-            var num1 = (int) valueType;
-            var data1 = data;
-            var length = data1.Length;
-            var num2 = ORSetValue(keyHandle1, valueName1, (uint) num1, data1, (uint) length);
+            nint keyHandle1 = keyHandle;
+            string valueName1 = valueName;
+            int num1 = (int)valueType;
+            byte[] data1 = data;
+            int length = data1.Length;
+            uint num2 = ORSetValue(keyHandle1, valueName1, (uint)num1, data1, (uint)length);
             if (num2 != ERROR_SUCCESS)
+            {
                 throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, num2));
+                                MethodBase.GetCurrentMethod().Name, num2));
+            }
         }
 
         [DllImport("offreg.dll", CharSet = CharSet.Unicode)]
-        private static extern uint ORCreateKey(IntPtr keyHandle, string subKeyName, string className, uint options,
-            IntPtr securityDescriptor, out IntPtr newKeyHandle, out uint creationDisposition);
+        private static extern uint ORCreateKey(nint keyHandle, string subKeyName, string className, uint options,
+            nint securityDescriptor, out nint newKeyHandle, out uint creationDisposition);
 
-        
-        public static IntPtr OfflineRegistryCreateKey(IntPtr keyHandle, string subKeyName)
+
+        public static nint OfflineRegistryCreateKey(nint keyHandle, string subKeyName)
         {
-            var newKeyHandle = IntPtr.Zero;
-            uint creationDisposition = 0;
-            var key = ORCreateKey(keyHandle, subKeyName, null, 0U, IntPtr.Zero, out newKeyHandle,
-                out creationDisposition);
-            if (key != ERROR_SUCCESS)
-                throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
-                    MethodBase.GetCurrentMethod().Name, key));
-            if (creationDisposition != 1U)
-                throw new ImageStorageException(string.Format("{0}: The key '{1}' already exists.",
-                    MethodBase.GetCurrentMethod().Name, subKeyName));
-            return newKeyHandle;
+            uint key = ORCreateKey(keyHandle, subKeyName, null, 0U, nint.Zero, out nint newKeyHandle,
+                out uint creationDisposition);
+            return key != ERROR_SUCCESS
+                ? throw new Win32ExportException(string.Format("{0}: This function failed with error 0x{1:x}.",
+                                MethodBase.GetCurrentMethod().Name, key))
+                : creationDisposition != 1U
+                            ? throw new ImageStorageException(string.Format("{0}: The key '{1}' already exists.",
+                                MethodBase.GetCurrentMethod().Name, subKeyName))
+                            : newKeyHandle;
         }
 
         private struct FILETIME
@@ -702,31 +756,31 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public struct LUID
         {
-             public uint LowPart;
+            public uint LowPart;
             public int HighPart;
         }
 
         public struct LUID_AND_ATTRIBUTES
         {
             public LUID Luid;
-             public uint Attributes;
+            public uint Attributes;
         }
 
         public struct TOKEN_PRIVILEGES
         {
-             public uint PrivilegeCount;
+            public uint PrivilegeCount;
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
             public LUID_AND_ATTRIBUTES[] Privileges;
         }
 
-        
+
         public struct DRIVE_LAYOUT_INFORMATION_MBR
         {
             public uint DiskSignature;
         }
 
-        
+
         public struct DRIVE_LAYOUT_INFORMATION_GPT
         {
             public Guid DiskId;
@@ -735,7 +789,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             public uint MaxPartitionCount;
         }
 
-        
+
         [StructLayout(LayoutKind.Explicit)]
         public struct DRIVE_LAYOUT_INFORMATION_UNION
         {
@@ -743,7 +797,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             [FieldOffset(0)] public DRIVE_LAYOUT_INFORMATION_GPT Gpt;
         }
 
-        
+
         public struct PARTITION_INFORMATION_MBR
         {
             public byte PartitionType;
@@ -752,7 +806,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             public uint HiddenSectors;
         }
 
-        
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct PARTITION_INFORMATION_GPT
         {
@@ -767,8 +821,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [StructLayout(LayoutKind.Explicit)]
         public struct PARTITION_INFORMATION_UNION
         {
-             [FieldOffset(0)] public PARTITION_INFORMATION_MBR Mbr;
-             [FieldOffset(0)] public PARTITION_INFORMATION_GPT Gpt;
+            [FieldOffset(0)] public PARTITION_INFORMATION_MBR Mbr;
+            [FieldOffset(0)] public PARTITION_INFORMATION_GPT Gpt;
         }
 
         public struct PARTITION_INFORMATION_EX
@@ -781,12 +835,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             public PARTITION_INFORMATION_UNION DriveLayoutInformaiton;
         }
 
-        
+
         public struct DRIVE_LAYOUT_INFORMATION_EX
         {
             public PARTITION_STYLE PartitionStyle;
             public int PartitionCount;
-             public DRIVE_LAYOUT_INFORMATION_UNION DriveLayoutInformation;
+            public DRIVE_LAYOUT_INFORMATION_UNION DriveLayoutInformation;
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128, ArraySubType = UnmanagedType.Struct)]
             public PARTITION_INFORMATION_EX[] PartitionEntry;

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DD2FFU.DiskManagement;
+using Microsoft.Win32.SafeHandles;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
-using DD2FFU.DiskManagement;
-using Microsoft.Win32.SafeHandles;
 
 namespace DeviceFileStream
 {
@@ -23,17 +23,17 @@ namespace DeviceFileStream
         private bool disposed;
         private SafeFileHandle handleValue;
 
-        private string PhysicalDiskId;
+        private readonly string PhysicalDiskId;
 
-        private long length;
+        private readonly long length;
 
         public DeviceFileStream(string PhysicalDiskId, FileAccess mode = FileAccess.Read)
         {
             this.PhysicalDiskId = PhysicalDiskId;
 
-            var diskHandle = CreateFile(@"\\.\PhysicalDrive" + PhysicalDiskId.ToLower().Replace(@"\\.\physicaldrive", ""),
-                GENERIC_READ | GENERIC_WRITE, READ | WRITE, IntPtr.Zero, OPEN_EXISTING,
-                DEVICE | NOBUFFERING | WRITE_THROUGH, IntPtr.Zero);
+            nint diskHandle = CreateFile(@"\\.\PhysicalDrive" + PhysicalDiskId.ToLower().Replace(@"\\.\physicaldrive", ""),
+                GENERIC_READ | GENERIC_WRITE, READ | WRITE, nint.Zero, OPEN_EXISTING,
+                DEVICE | NOBUFFERING | WRITE_THROUGH, nint.Zero);
             if (diskHandle.ToInt32() == -1)
             {
                 PrintWin32Error("Failed to open disk handle", Marshal.GetHRForLastWin32Error());
@@ -41,10 +41,10 @@ namespace DeviceFileStream
                 return;
             }
 
-            GetFileSize(diskHandle, out length);
+            _ = GetFileSize(diskHandle, out length);
 
             handleValue = new SafeFileHandle(diskHandle, true);
-            stream = new FileStream(handleValue, mode, 1024*2014, false);
+            stream = new FileStream(handleValue, mode, 1024 * 2014, false);
         }
 
         public override bool CanRead => stream.CanRead;
@@ -52,14 +52,8 @@ namespace DeviceFileStream
         public override bool CanSeek => stream.CanSeek;
 
         public override bool CanWrite => stream.CanWrite;
-        
-        public override long Length
-        {
-            get
-            {
-                return GetDiskSize.GetDiskLength(@"\\.\PhysicalDrive" + PhysicalDiskId.ToLower().Replace(@"\\.\physicaldrive", ""));
-            }
-        }
+
+        public override long Length => GetDiskSize.GetDiskLength(@"\\.\PhysicalDrive" + PhysicalDiskId.ToLower().Replace(@"\\.\physicaldrive", ""));
 
         public override long Position
         {
@@ -68,16 +62,16 @@ namespace DeviceFileStream
         }
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern IntPtr CreateFile(string lpFileName, uint dwDesiredAccess,
-            uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition,
-            uint dwFlagsAndAttributes, IntPtr hTemplateFile);
+        private static extern nint CreateFile(string lpFileName, uint dwDesiredAccess,
+            uint dwShareMode, nint lpSecurityAttributes, uint dwCreationDisposition,
+            uint dwFlagsAndAttributes, nint hTemplateFile);
 
         [DllImport("kernel32.dll")]
-        static extern bool GetFileSize(IntPtr hFile, out long lpFileSize);
+        private static extern bool GetFileSize(nint hFile, out long lpFileSize);
 
         private static void PrintWin32Error(string Message, int ErrorCode)
         {
-            var lpMsgBuf = new Win32Exception(ErrorCode).Message;
+            string lpMsgBuf = new Win32Exception(ErrorCode).Message;
             Console.WriteLine(Message + ": " + lpMsgBuf);
         }
 
@@ -93,9 +87,7 @@ namespace DeviceFileStream
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            if (origin == SeekOrigin.End)
-                return stream.Seek(Length - offset, SeekOrigin.Begin);
-            return stream.Seek(offset, origin);
+            return origin == SeekOrigin.End ? stream.Seek(Length - offset, SeekOrigin.Begin) : stream.Seek(offset, origin);
         }
 
         public override void SetLength(long value)
@@ -117,19 +109,20 @@ namespace DeviceFileStream
             base.Close();
         }
 
-        new void Dispose()
+        private new void Dispose()
         {
             Dispose(true);
             base.Dispose();
             GC.SuppressFinalize(this);
         }
 
-        new void Dispose(bool disposing)
+        private new void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.
             if (!disposed)
             {
                 if (disposing)
+                {
                     if (handleValue != null)
                     {
                         stream.Dispose();
@@ -137,6 +130,7 @@ namespace DeviceFileStream
                         handleValue.Dispose();
                         handleValue = null;
                     }
+                }
 
                 // Note disposing has been done.
                 disposed = true;

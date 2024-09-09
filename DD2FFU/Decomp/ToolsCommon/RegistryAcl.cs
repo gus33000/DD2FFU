@@ -23,7 +23,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public RegistryAcl(ORRegistryKey key)
         {
             if (key == null)
+            {
                 throw new ArgumentNullException(nameof(key));
+            }
+
             m_registrySecurity = key.RegistrySecurity;
             Initialize(key.RegistrySecurity, key.FullName, key.FullName, null, null);
         }
@@ -36,17 +39,19 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 if (Nos != null)
                 {
                     MacLabel = null;
-                    var stringSd = SecurityUtils.ConvertSDToStringSD(Nos.GetSecurityDescriptorBinaryForm(),
+                    string stringSd = SecurityUtils.ConvertSDToStringSD(Nos.GetSecurityDescriptorBinaryForm(),
                         SecurityInformationFlags.SACL_SECURITY_INFORMATION |
                         SecurityInformationFlags.MANDATORY_ACCESS_LABEL);
                     if (!string.IsNullOrEmpty(stringSd))
                     {
-                        var match = regexExtractMIL.Match(stringSd);
+                        System.Text.RegularExpressions.Match match = regexExtractMIL.Match(stringSd);
                         if (match.Success)
                         {
-                            var group = match.Groups["MIL"];
+                            System.Text.RegularExpressions.Group group = match.Groups["MIL"];
                             if (group != null)
+                            {
                                 MacLabel = SddlNormalizer.FixAceSddl(group.Value);
+                            }
                         }
                     }
                 }
@@ -61,12 +66,14 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             get
             {
                 if (m_objectSecurity == null)
+                {
                     if (Nos != null)
                     {
-                        var registrySecurity = new RegistrySecurity();
+                        RegistrySecurity registrySecurity = new();
                         registrySecurity.SetSecurityDescriptorBinaryForm(Nos.GetSecurityDescriptorBinaryForm());
                         m_objectSecurity = registrySecurity;
                     }
+                }
 
                 return m_objectSecurity;
             }
@@ -76,23 +83,30 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         protected override string ComputeExplicitDACL()
         {
-            var accessRules = m_registrySecurity.GetAccessRules(true, false, typeof(NTAccount));
-            var count = accessRules.Count;
+            AuthorizationRuleCollection accessRules = m_registrySecurity.GetAccessRules(true, false, typeof(NTAccount));
+            int count = accessRules.Count;
             foreach (RegistryAccessRule rule in accessRules)
+            {
                 if (rule.IsInherited)
                 {
-                    m_registrySecurity.RemoveAccessRule(rule);
+                    _ = m_registrySecurity.RemoveAccessRule(rule);
                     --count;
                 }
+            }
 
             if (DACLProtected && m_registrySecurity.AreAccessRulesCanonical)
+            {
                 m_registrySecurity.SetAccessRuleProtection(true, PreserveInheritance);
-            var str = (string) null;
+            }
+
+            string str = null;
             if (DACLProtected || count > 0)
             {
                 str = m_registrySecurity.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
                 if (!string.IsNullOrEmpty(str))
+                {
                     str = regexStripDacl.Replace(str, string.Empty);
+                }
             }
 
             return SddlNormalizer.FixAceSddl(str);

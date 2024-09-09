@@ -17,9 +17,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             SaveKeyToRegistry = true;
         }
 
-        [XmlElement("Element")] public BcdElementInput[] Elements { get; set; }
+        [XmlElement("Element")]
+        public BcdElementInput[] Elements
+        {
+            get; set;
+        }
 
-        [XmlAttribute] public bool SaveKeyToRegistry { get; set; }
+        [XmlAttribute]
+        public bool SaveKeyToRegistry
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(StreamWriter writer, string path)
         {
@@ -29,17 +37,24 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 writer.WriteLine();
             }
 
-            foreach (var element in Elements)
+            foreach (BcdElementInput element in Elements)
+            {
                 element.SaveAsRegFile(writer, path + "\\Elements");
+            }
         }
 
         public void SaveAsRegData(BcdRegData bcdRegData, string path)
         {
             if (SaveKeyToRegistry)
+            {
                 bcdRegData.AddRegKey(path);
-            var path1 = string.Format("{0}\\Elements", path);
-            foreach (var element in Elements)
+            }
+
+            string path1 = string.Format("{0}\\Elements", path);
+            foreach (BcdElementInput element in Elements)
+            {
                 element.SaveAsRegData(bcdRegData, path1);
+            }
         }
     }
 }

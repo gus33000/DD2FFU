@@ -4,7 +4,6 @@
 // MVID: E18B3E30-3683-4CE0-B9AC-BA2B871D9398
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\ImageCommon.dll
 
-using System;
 using System.Xml.Serialization;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
@@ -16,43 +15,40 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         private string[] _idArray;
 
-         public uint AdditionalMainOSFreeSectorsRequest;
+        public uint AdditionalMainOSFreeSectorsRequest;
 
         [XmlElement("BIOSMode")] public string BIOSMode = "UEFI";
 
-        [XmlArrayItem(ElementName = "Name")] [XmlArray("CompressedPartitions")]
+        [XmlArrayItem(ElementName = "Name")]
+        [XmlArray("CompressedPartitions")]
         public string[] CompressedPartitions;
 
         [XmlElement("DevicePlatformID")] public string DevicePlatformID;
 
-         [XmlElement("MainOSRTCDataReservedSectors")]
+        [XmlElement("MainOSRTCDataReservedSectors")]
         public uint MainOSRTCDataReservedSectors;
 
-         public uint MinSectorCount;
+        public uint MinSectorCount;
 
-         public uint MMOSPartitionTotalSectorsOverride;
+        public uint MMOSPartitionTotalSectorsOverride;
 
         [XmlElement("Rules")] public InputRules Rules;
 
-        [XmlArrayItem(ElementName = "Name")] [XmlArray("UncompressedPartitions")]
+        [XmlArrayItem(ElementName = "Name")]
+        [XmlArray("UncompressedPartitions")]
         public string[] UncompressedPartitions;
 
         [XmlArrayItem(ElementName = "ID")]
         [XmlArray("DevicePlatformIDs")]
         public string[] DevicePlatformIDs
         {
-            get
-            {
-                if (DevicePlatformID != null && _idArray != null)
-                    throw new ImageCommonException(
-                        "Please specify either a DevicePlatformID or a group of DevicePlatformIDs in the device platform package, but not both.");
-                if (DevicePlatformID == null && _idArray == null)
-                    throw new ImageCommonException(
-                        "Please specify either a DevicePlatformID or a group of DevicePlatformIDs in the device platform package. No platform ID is currently present.");
-                if (DevicePlatformID == null)
-                    return _idArray;
-                return new string[1] {DevicePlatformID};
-            }
+            get => DevicePlatformID != null && _idArray != null
+                    ? throw new ImageCommonException(
+                                        "Please specify either a DevicePlatformID or a group of DevicePlatformIDs in the device platform package, but not both.")
+                    : DevicePlatformID == null && _idArray == null
+                    ? throw new ImageCommonException(
+                                        "Please specify either a DevicePlatformID or a group of DevicePlatformIDs in the device platform package. No platform ID is currently present.")
+                    : DevicePlatformID == null ? _idArray : (new string[1] { DevicePlatformID });
             set => _idArray = value;
         }
     }

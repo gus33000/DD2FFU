@@ -13,12 +13,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         public static bool StringToUint(string valueAsString, out uint value)
         {
-            var flag = true;
+            bool flag = true;
             if (valueAsString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
             {
-                if (!uint.TryParse(valueAsString.Substring(2, valueAsString.Length - 2), NumberStyles.HexNumber,
+                if (!uint.TryParse(valueAsString[2..], NumberStyles.HexNumber,
                     CultureInfo.InvariantCulture, out value))
+                {
                     flag = false;
+                }
             }
             else if (!uint.TryParse(valueAsString, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
             {
@@ -30,12 +32,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static bool StringToUint64(string valueAsString, out ulong value)
         {
-            var flag = true;
+            bool flag = true;
             if (valueAsString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
             {
-                if (!ulong.TryParse(valueAsString.Substring(2, valueAsString.Length - 2), NumberStyles.HexNumber,
+                if (!ulong.TryParse(valueAsString[2..], NumberStyles.HexNumber,
                     CultureInfo.InvariantCulture, out value))
+                {
                     flag = false;
+                }
             }
             else if (!ulong.TryParse(valueAsString, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
             {
@@ -47,7 +51,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static bool IsPowerOfTwo(uint value)
         {
-            var num = (int) value;
+            int num = (int)value;
             return (num & (num - 1)) == 0;
         }
     }

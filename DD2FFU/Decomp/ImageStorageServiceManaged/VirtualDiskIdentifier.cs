@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -14,9 +13,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class VirtualDiskIdentifier : BaseIdentifier, IBlockIoIdentifier, IDeviceIdentifier
     {
-        public HardDiskIdentifier InternalIdentifer { get; set; }
+        public HardDiskIdentifier InternalIdentifer
+        {
+            get; set;
+        }
 
-        public BcdElementBootDevice FileDevice { get; set; }
+        public BcdElementBootDevice FileDevice
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
@@ -33,18 +38,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 MethodBase.GetCurrentMethod().Name));
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Identifier: Virtual Hard Disk");
             InternalIdentifer.LogInfo(logger, checked(indentLevel + 2));
             logger.LogInfo("");
             FileDevice.LogInfo(logger, checked(indentLevel + 2));
         }
 
-         public BlockIoType BlockType => BlockIoType.VirtualHardDisk;
+        public BlockIoType BlockType => BlockIoType.VirtualHardDisk;
 
-         public uint Size => InternalIdentifer.Size + FileDevice.Size;
+        public uint Size => InternalIdentifer.Size + FileDevice.Size;
     }
 }

@@ -20,13 +20,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             for (uint index1 = 0; index1 < 256U; ++index1)
             {
-                var num = index1;
-                for (var index2 = 0; index2 < 8; ++index2)
-                    if (((int) num & 1) != 0)
+                uint num = index1;
+                for (int index2 = 0; index2 < 8; ++index2)
+                {
+                    if (((int)num & 1) != 0)
+                    {
                         num = 3988292384U ^ (num >> 1);
+                    }
                     else
+                    {
                         num >>= 1;
-                _crc32Table[(int) index1] = num;
+                    }
+                }
+
+                _crc32Table[(int)index1] = num;
             }
         }
 
@@ -40,10 +47,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             get
             {
                 if (!_hashCoreCalled)
+                {
                     throw new NullReferenceException();
+                }
+
                 if (!_hashFinalCalled)
+                {
                     throw new CryptographicException("Hash must be finalized before the hash value is retrieved.");
-                var bytes = BitConverter.GetBytes(~_crc32Value);
+                }
+
+                byte[] bytes = BitConverter.GetBytes(~_crc32Value);
                 Array.Reverse(bytes);
                 return bytes;
             }
@@ -66,13 +79,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected override void HashCore(byte[] array, int ibStart, int cbSize)
         {
             if (array == null)
-                throw new ArgumentNullException(nameof(array));
-            if (_hashFinalCalled)
-                throw new CryptographicException("Hash not valid for use in specified state.");
-            _hashCoreCalled = true;
-            for (var index = ibStart; index < ibStart + cbSize; ++index)
             {
-                var num = (byte) (_crc32Value ^ array[index]);
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (_hashFinalCalled)
+            {
+                throw new CryptographicException("Hash not valid for use in specified state.");
+            }
+
+            _hashCoreCalled = true;
+            for (int index = ibStart; index < ibStart + cbSize; ++index)
+            {
+                byte num = (byte)(_crc32Value ^ array[index]);
                 _crc32Value = _crc32Table[num] ^ ((_crc32Value >> 8) & 16777215U);
             }
         }

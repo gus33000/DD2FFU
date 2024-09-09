@@ -25,7 +25,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _logger = logger;
             _storeHeaderVersion = storeHeaderVersion;
             _numOfStores = numOfStores;
-            _generators = new List<Tuple<VirtualDiskPayloadGenerator, ImageStorage>>();
+            _generators = [];
             _recovery = recovery;
         }
 
@@ -38,21 +38,24 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void AddStore(ImageStorage storage)
         {
             if (_storeHeaderVersion < 2 && _generators.Count > 1)
+            {
                 throw new ImageStorageException(string.Format(
-                    "{0}: Cannot add more than one store to a FFU using v1 store header.",
-                    MethodBase.GetCurrentMethod().Name));
+                                "{0}: Cannot add more than one store to a FFU using v1 store header.",
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
             _generators.Add(new Tuple<VirtualDiskPayloadGenerator, ImageStorage>(
-                new VirtualDiskPayloadGenerator(_logger, ImageConstants.PAYLOAD_BLOCK_SIZE, storage,
-                    _storeHeaderVersion, _numOfStores, (ushort) (_generators.Count + 1), _recovery), storage));
+                            new VirtualDiskPayloadGenerator(_logger, ImageConstants.PAYLOAD_BLOCK_SIZE, storage,
+                                _storeHeaderVersion, _numOfStores, (ushort)(_generators.Count + 1), _recovery), storage));
         }
 
         public void Write(IPayloadWrapper payloadWrapper)
         {
             long payloadSize = 0;
-            foreach (var generator in _generators)
+            foreach (Tuple<VirtualDiskPayloadGenerator, ImageStorage> generator in _generators)
             {
-                var payloadGenerator = generator.Item1;
-                var storage = generator.Item2;
+                VirtualDiskPayloadGenerator payloadGenerator = generator.Item1;
+                ImageStorage storage = generator.Item2;
                 payloadGenerator.GenerateStorePayload(storage);
                 payloadSize += payloadGenerator.TotalSize;
             }
@@ -71,7 +74,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected virtual void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
+            }
+
             if (isDisposing)
             {
                 _generators.ForEach(t => t.Item1.Dispose());

@@ -4,7 +4,6 @@
 // MVID: E18B3E30-3683-4CE0-B9AC-BA2B871D9398
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\ImageCommon.dll
 
-using System;
 using System.Globalization;
 using System.Xml.Serialization;
 
@@ -15,20 +14,32 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         Namespace = "http://schemas.microsoft.com/embedded/2004/10/ImageUpdate")]
     public class DeviceLayoutInput
     {
-        [XmlArrayItem(ElementName = "Partition", IsNullable = false, Type = typeof(InputPartition))] [XmlArray]
+        [XmlArrayItem(ElementName = "Partition", IsNullable = false, Type = typeof(InputPartition))]
+        [XmlArray]
         public InputPartition[] Partitions;
 
         [XmlElement("SectorSize")]
-        
-        public uint SectorSize { get; set; }
+
+        public uint SectorSize
+        {
+            get; set;
+        }
 
         [XmlElement("ChunkSize")]
-        
+
         public uint ChunkSize { get; set; } = 256;
 
-        [XmlIgnore] public uint DefaultPartitionByteAlignment { get; set; }
+        [XmlIgnore]
+        public uint DefaultPartitionByteAlignment
+        {
+            get; set;
+        }
 
-        [XmlElement("VersionTag")] public string VersionTag { get; set; }
+        [XmlElement("VersionTag")]
+        public string VersionTag
+        {
+            get; set;
+        }
 
         [XmlElement("DefaultPartitionByteAlignment")]
         public string DefaultPartitionByteAlignmentAsString
@@ -36,10 +47,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             get => DefaultPartitionByteAlignment.ToString(CultureInfo.InvariantCulture);
             set
             {
-                uint num = 0;
-                if (!InputHelpers.StringToUint(value, out num))
+                if (!InputHelpers.StringToUint(value, out uint num))
+                {
                     throw new ImageCommonException(string.Format("The default byte alignment cannot be parsed: {0}",
-                        value));
+                                        value));
+                }
+
                 DefaultPartitionByteAlignment = num;
             }
         }

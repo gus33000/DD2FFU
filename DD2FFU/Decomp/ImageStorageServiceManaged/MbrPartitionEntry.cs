@@ -14,48 +14,55 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         public const int SizeInBytes = 16;
 
-        public bool Bootable { get; set; }
-
-        public byte PartitionType { get; set; }
-
-        public uint StartingSector { get; set; }
-
-        public uint SectorCount { get; set; }
-
-        public bool TypeIsContainer
+        public bool Bootable
         {
-            get
-            {
-                if (PartitionType != 5)
-                    return PartitionType == 19;
-                return true;
-            }
+            get; set;
         }
 
-        public uint StartingSectorOffset { get; set; }
+        public byte PartitionType
+        {
+            get; set;
+        }
+
+        public uint StartingSector
+        {
+            get; set;
+        }
+
+        public uint SectorCount
+        {
+            get; set;
+        }
+
+        public bool TypeIsContainer => PartitionType is 5 or 19;
+
+        public uint StartingSectorOffset
+        {
+            get; set;
+        }
 
         public uint AbsoluteStartingSector => StartingSectorOffset + StartingSector;
 
         public void ReadFromStream(BinaryReader reader)
         {
             Bootable = (reader.ReadByte() & 128U) > 0U;
-            reader.ReadBytes(3);
+            _ = reader.ReadBytes(3);
             PartitionType = reader.ReadByte();
-            reader.ReadBytes(3);
+            _ = reader.ReadBytes(3);
             StartingSector = reader.ReadUInt32();
             SectorCount = reader.ReadUInt32();
         }
 
         public void WriteToStream(BinaryWriter writer)
         {
-            writer.Write(Bootable ? (byte) 128 : (byte) 0);
-            writer.Write((byte) 0);
-            writer.Write((byte) 0);
-            writer.Write((byte) 0);
+            writer.Write(Bootable ? (byte)128 : (byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
             writer.Write(PartitionType);
-            writer.Write((byte) 0);
-            writer.Write((byte) 0);
-            writer.Write((byte) 0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
             writer.Write(StartingSector);
             writer.Write(SectorCount);
         }
@@ -71,17 +78,26 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void LogInfo(IULogger logger, MasterBootRecord masterBootRecord, ushort indentLevel = 0)
         {
             if (StartingSector == 0U || SectorCount == 0U || PartitionType == 0)
+            {
                 return;
-            var str1 = new StringBuilder().Append(' ', indentLevel).ToString();
-            var str2 = "<EBR>";
+            }
+
+            string str1 = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str2 = "<EBR>";
             if (!TypeIsContainer)
+            {
                 str2 = masterBootRecord.GetPartitionName(this);
-            logger.LogInfo(str1 + "Partition Name : {0}", (object) str2);
-            logger.LogInfo(str1 + "Partition Type : 0x{0:x}", (object) PartitionType);
-            logger.LogInfo(str1 + "Starting Sector: 0x{0:x}", (object) StartingSector);
-            logger.LogInfo(str1 + "Sector Count   : 0x{0:x}", (object) SectorCount);
+            }
+
+            logger.LogInfo(str1 + "Partition Name : {0}", str2);
+            logger.LogInfo(str1 + "Partition Type : 0x{0:x}", PartitionType);
+            logger.LogInfo(str1 + "Starting Sector: 0x{0:x}", StartingSector);
+            logger.LogInfo(str1 + "Sector Count   : 0x{0:x}", SectorCount);
             if (masterBootRecord.IsExtendedBootRecord())
-                logger.LogInfo(str1 + "Absolute Starting Sector: 0x{0:x}", (object) AbsoluteStartingSector);
+            {
+                logger.LogInfo(str1 + "Absolute Starting Sector: 0x{0:x}", AbsoluteStartingSector);
+            }
+
             logger.LogInfo("");
         }
     }

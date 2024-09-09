@@ -14,18 +14,23 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private bool _disposed;
 
         public NativeServiceHandle(LogFunction logError)
-            : base(IntPtr.Zero, true)
+            : base(nint.Zero, true)
         {
             ServiceHandle = NativeImaging.CreateImageStorageService(logError);
-            if (ServiceHandle == IntPtr.Zero)
+            if (ServiceHandle == nint.Zero)
+            {
                 throw new ImageStorageException("Unable to create the image storage service.");
+            }
         }
 
-        public IntPtr ServiceHandle { get; }
+        public nint ServiceHandle
+        {
+            get;
+        }
 
         public override bool IsInvalid => _disposed;
 
-        public static implicit operator IntPtr(NativeServiceHandle virtualServiceHandle)
+        public static implicit operator nint(NativeServiceHandle virtualServiceHandle)
         {
             return virtualServiceHandle.ServiceHandle;
         }
@@ -36,8 +41,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 _disposed = true;
                 GC.SuppressFinalize(this);
-                if (ServiceHandle != IntPtr.Zero)
+                if (ServiceHandle != nint.Zero)
+                {
                     NativeImaging.CloseImageStorageService(ServiceHandle);
+                }
             }
 
             return true;

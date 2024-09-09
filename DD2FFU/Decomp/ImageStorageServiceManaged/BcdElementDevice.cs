@@ -26,12 +26,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             AdditionalFlags = Guid.Empty;
             BootDevice = bootDevice;
-            var numArray = new byte[(int) BinarySize];
-            using (var memoryStream = new MemoryStream(numArray))
-            {
-                WriteToStream(memoryStream);
-                SetBinaryData(numArray);
-            }
+            byte[] numArray = new byte[(int)BinarySize];
+            using MemoryStream memoryStream = new(numArray);
+            WriteToStream(memoryStream);
+            SetBinaryData(numArray);
         }
 
         public BcdElementDevice(BcdElementBootDevice bootDevice, BcdElementDataType dataType, Guid Flags)
@@ -39,18 +37,22 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             AdditionalFlags = Flags;
             BootDevice = bootDevice;
-            using (var memoryStream = new MemoryStream())
-            {
-                WriteToStream(memoryStream);
-                SetBinaryData(memoryStream.ToArray());
-            }
+            using MemoryStream memoryStream = new();
+            WriteToStream(memoryStream);
+            SetBinaryData(memoryStream.ToArray());
         }
 
-        public Guid AdditionalFlags { get; set; }
+        public Guid AdditionalFlags
+        {
+            get; set;
+        }
 
-        public BcdElementBootDevice BootDevice { get; set; }
+        public BcdElementBootDevice BootDevice
+        {
+            get; set;
+        }
 
-         public uint BinarySize => 16U + BootDevice.Size;
+        public uint BinarySize => 16U + BootDevice.Size;
 
         public static BcdElementDevice CreateBaseBootDevice()
         {
@@ -66,7 +68,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void ReadFromStream(Stream stream)
         {
-            var reader = new BinaryReader(stream);
+            BinaryReader reader = new(stream);
             AdditionalFlags = new Guid(reader.ReadBytes(16));
             BootDevice = new BcdElementBootDevice();
             BootDevice.ReadFromStream(reader);
@@ -74,33 +76,36 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void WriteToStream(Stream stream)
         {
-            var writer = new BinaryWriter(stream);
-            var byteArray = AdditionalFlags.ToByteArray();
+            BinaryWriter writer = new(stream);
+            byte[] byteArray = AdditionalFlags.ToByteArray();
             writer.Write(byteArray);
             BootDevice.WriteToStream(writer);
         }
 
-        
+
         public override void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             base.LogInfo(logger, indentLevel);
-            logger.LogInfo(str + "Additional Flags:   {{{0}}}", (object) AdditionalFlags);
+            logger.LogInfo(str + "Additional Flags:   {{{0}}}", AdditionalFlags);
             logger.LogInfo("");
             BootDevice.LogInfo(logger, checked(indentLevel + 2));
         }
 
-        
+
         public void ReplaceRamDiskDeviceIdentifier(IDeviceIdentifier identifier)
         {
-            var identifier1 = (RamDiskIdentifier) BootDevice.Identifier;
+            RamDiskIdentifier identifier1 = (RamDiskIdentifier)BootDevice.Identifier;
             if (identifier1 == null)
+            {
                 throw new ImageStorageException(string.Format("{0}: The device's identifier is not a ramdisk.",
-                    MethodBase.GetCurrentMethod().Name));
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
             identifier1.ReplaceParentDeviceIdentifier(identifier);
             BootDevice.ReplaceIdentifier(identifier1);
-            var numArray = new byte[(int) BinarySize];
-            using (var memoryStream = new MemoryStream(numArray))
+            byte[] numArray = new byte[(int)BinarySize];
+            using (MemoryStream memoryStream = new(numArray))
             {
                 WriteToStream(memoryStream);
                 memoryStream.Flush();
@@ -110,12 +115,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             SetBinaryData(numArray);
         }
 
-        
+
         public void ReplaceBootDeviceIdentifier(IDeviceIdentifier identifier)
         {
             BootDevice.ReplaceIdentifier(identifier);
-            var numArray = new byte[(int) BinarySize];
-            var memoryStream = new MemoryStream(numArray);
+            byte[] numArray = new byte[(int)BinarySize];
+            MemoryStream memoryStream = new(numArray);
             WriteToStream(memoryStream);
             SetBinaryData(numArray);
             memoryStream.Close();

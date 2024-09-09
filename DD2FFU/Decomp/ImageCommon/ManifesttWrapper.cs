@@ -19,7 +19,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void InitializeWrapper(long payloadSize)
         {
-            var manifestRegion = ffuImage.GetManifestRegion();
+            byte[] manifestRegion = ffuImage.GetManifestRegion();
             innerWrapper.InitializeWrapper(payloadSize + manifestRegion.Length);
             innerWrapper.Write(manifestRegion);
         }

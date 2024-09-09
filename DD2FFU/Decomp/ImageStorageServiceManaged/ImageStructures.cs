@@ -21,14 +21,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode)]
         public struct PARTITION_ENTRY
         {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 36)] [FieldOffset(0)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 36)]
+            [FieldOffset(0)]
             private string name;
 
             [FieldOffset(72)] private ulong sectorCount;
             [FieldOffset(80)] private uint alignmentSizeInBytes;
             [FieldOffset(84)] private uint clusterSize;
 
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] [FieldOffset(88)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            [FieldOffset(88)]
             private string fileSystem;
 
             [FieldOffset(152)] private Guid id;
@@ -44,21 +46,21 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set => name = value;
             }
 
-            
+
             public ulong SectorCount
             {
                 get => sectorCount;
                 set => sectorCount = value;
             }
 
-            
+
             public uint AlignmentSizeInBytes
             {
                 get => alignmentSizeInBytes;
                 set => alignmentSizeInBytes = value;
             }
 
-            
+
             public uint ClusterSize
             {
                 get => clusterSize;
@@ -83,7 +85,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set => type = value;
             }
 
-            
+
             public ulong PartitionFlags
             {
                 get => flags;
@@ -102,7 +104,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set => mbrType = value;
             }
 
-            
+
             public ulong OffsetInSectors
             {
                 get => offsetInSectors;
@@ -110,7 +112,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-        
+
         [StructLayout(LayoutKind.Explicit)]
         public struct STORE_ID
         {
@@ -136,18 +138,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set => storeId_MBR = value;
             }
 
-            public bool IsEmpty
-            {
-                get
-                {
-                    if (storeId_GPT == Guid.Empty)
-                        return storeId_MBR == 0U;
-                    return false;
-                }
-            }
+            public bool IsEmpty => storeId_GPT == Guid.Empty && storeId_MBR == 0U;
         }
 
-        
+
         [StructLayout(LayoutKind.Explicit)]
         public struct PartitionAttributes
         {
@@ -166,12 +160,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             public uint Version;
             public byte Persist;
-            private byte dummy1;
-            private byte dummy2;
-            private byte dummy3;
+            private readonly byte dummy1;
+            private readonly byte dummy2;
+            private readonly byte dummy3;
             public DiskAttributes Attributes;
             public DiskAttributes AttributesMask;
-            private Guid Reserved;
+            private readonly Guid Reserved;
         }
     }
 }

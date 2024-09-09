@@ -16,23 +16,30 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [XmlChoiceIdentifier("PartitionSpecifier")]
         [XmlElement("Name", typeof(string))]
         [XmlElement("Id", typeof(string))]
-        public object DataType { get; set; }
+        public object DataType
+        {
+            get; set;
+        }
 
-        [XmlIgnore] public GptPartitionTypeChoice PartitionSpecifier { get; set; }
+        [XmlIgnore]
+        public GptPartitionTypeChoice PartitionSpecifier
+        {
+            get; set;
+        }
 
         [XmlIgnore]
         public Guid PartitionId
         {
             get
             {
-                var guid = Guid.Empty;
+                Guid guid;
                 if (PartitionSpecifier == GptPartitionTypeChoice.Id)
                 {
                     guid = new Guid(DataType as string);
                 }
                 else
                 {
-                    var dataType = DataType as string;
+                    string dataType = DataType as string;
                     if (string.Compare(ImageConstants.MAINOS_PARTITION_NAME, dataType, true,
                             CultureInfo.InvariantCulture) == 0)
                     {
@@ -47,9 +54,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     {
                         if (string.Compare(ImageConstants.MMOS_PARTITION_NAME, dataType, true,
                                 CultureInfo.InvariantCulture) != 0)
+                        {
                             throw new ImageStorageException(string.Format(
-                                "{0}: The partition name {1} is not currently supported.",
-                                MethodBase.GetCurrentMethod().Name, dataType));
+                                                        "{0}: The partition name {1} is not currently supported.",
+                                                        MethodBase.GetCurrentMethod().Name, dataType));
+                        }
+
                         guid = ImageConstants.MMOS_PARTITION_ID;
                     }
                 }

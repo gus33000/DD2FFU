@@ -12,172 +12,172 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     public static class BcdElementDataTypes
     {
         public static readonly BcdElementDataType DefaultObject =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Object, 3U);
+            new(ElementClass.Application, ElementFormat.Object, 3U);
 
         public static readonly BcdElementDataType ResumeObject =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Object, 6U);
+            new(ElementClass.Application, ElementFormat.Object, 6U);
 
         public static readonly BcdElementDataType DisplayOrder =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.ObjectList, 1U);
+            new(ElementClass.Application, ElementFormat.ObjectList, 1U);
 
         public static readonly BcdElementDataType BootSequence =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.ObjectList, 2U);
+            new(ElementClass.Application, ElementFormat.ObjectList, 2U);
 
         public static readonly BcdElementDataType ToolsDisplayOrder =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.ObjectList, 16U);
+            new(ElementClass.Application, ElementFormat.ObjectList, 16U);
 
         public static readonly BcdElementDataType TimeoutValue =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 4U);
+            new(ElementClass.Application, ElementFormat.Integer, 4U);
 
         public static readonly BcdElementDataType NXPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 32U);
+            new(ElementClass.Application, ElementFormat.Integer, 32U);
 
         public static readonly BcdElementDataType PAEPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 33U);
+            new(ElementClass.Application, ElementFormat.Integer, 33U);
 
         public static readonly BcdElementDataType DebuggingEnabled =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 6U);
+            new(ElementClass.Application, ElementFormat.Boolean, 6U);
 
         public static readonly BcdElementDataType DisplayBootMenu =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 32U);
+            new(ElementClass.Application, ElementFormat.Boolean, 32U);
 
         public static readonly BcdElementDataType WinPEImage =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 34U);
+            new(ElementClass.Application, ElementFormat.Boolean, 34U);
 
         public static readonly BcdElementDataType RemoveMemory =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 49U);
+            new(ElementClass.Application, ElementFormat.Integer, 49U);
 
         public static readonly BcdElementDataType KernelDebuggerEnabled =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 160U);
+            new(ElementClass.Application, ElementFormat.Boolean, 160U);
 
         public static readonly BcdElementDataType KernelEmsEnabled =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 176U);
+            new(ElementClass.Application, ElementFormat.Boolean, 176U);
 
         public static readonly BcdElementDataType SystemRoot =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 2U);
+            new(ElementClass.Application, ElementFormat.String, 2U);
 
         public static readonly BcdElementDataType FilePath =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 35U);
+            new(ElementClass.Application, ElementFormat.String, 35U);
 
         public static readonly BcdElementDataType OsLoaderType =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Device, 1U);
+            new(ElementClass.Application, ElementFormat.Device, 1U);
 
         public static readonly BcdElementDataType BcdDevice =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Device, 34U);
+            new(ElementClass.Application, ElementFormat.Device, 34U);
 
         public static readonly BcdElementDataType BootMenuPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 194U);
+            new(ElementClass.Application, ElementFormat.Integer, 194U);
 
         public static readonly BcdElementDataType DetectKernelAndHal =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 16U);
+            new(ElementClass.Application, ElementFormat.Boolean, 16U);
 
         public static readonly BcdElementDataType PersistBootSequence =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 49U);
+            new(ElementClass.Application, ElementFormat.Boolean, 49U);
 
         public static readonly BcdElementDataType FfuUpdateMode =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 513U);
+            new(ElementClass.Application, ElementFormat.Boolean, 513U);
 
         public static readonly BcdElementDataType ForceFfu =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 515U);
+            new(ElementClass.Application, ElementFormat.Boolean, 515U);
 
         public static readonly BcdElementDataType CheckPlatformId =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 516U);
+            new(ElementClass.Application, ElementFormat.Boolean, 516U);
 
         public static readonly BcdElementDataType DisableCheckPlatformId =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 517U);
+            new(ElementClass.Application, ElementFormat.Boolean, 517U);
 
         public static readonly BcdElementDataType EnableUFPMode =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 519U);
+            new(ElementClass.Application, ElementFormat.Boolean, 519U);
 
         public static readonly BcdElementDataType UFPMincryplHashingSupport =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 520U);
+            new(ElementClass.Application, ElementFormat.Boolean, 520U);
 
         public static readonly BcdElementDataType UFPLogLocation =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 521U);
+            new(ElementClass.Application, ElementFormat.Integer, 521U);
 
         public static readonly BcdElementDataType CustomActionsList =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.IntegerList, 48U);
+            new(ElementClass.Application, ElementFormat.IntegerList, 48U);
 
         public static readonly BcdElementDataType DebugTransportPath =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 19U);
+            new(ElementClass.Application, ElementFormat.String, 19U);
 
         public static readonly BcdElementDataType HypervisorDebuggerType =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 243U);
+            new(ElementClass.Application, ElementFormat.Integer, 243U);
 
         public static readonly BcdElementDataType HypervisorDebuggerPortNumber =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 244U);
+            new(ElementClass.Application, ElementFormat.Integer, 244U);
 
         public static readonly BcdElementDataType HypervisorDebuggerBaudRate =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 245U);
+            new(ElementClass.Application, ElementFormat.Integer, 245U);
 
         public static readonly BcdElementDataType MemoryCaptureModeAddress =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 1280U);
+            new(ElementClass.Application, ElementFormat.Integer, 1280U);
 
         public static readonly BcdElementDataType WpDmpSettingsFile =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 1281U);
+            new(ElementClass.Application, ElementFormat.String, 1281U);
 
         public static readonly BcdElementDataType WpDmpLogFile =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 1282U);
+            new(ElementClass.Application, ElementFormat.String, 1282U);
 
         public static readonly BcdElementDataType OemChargingBootThreshold =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 1296U);
+            new(ElementClass.Application, ElementFormat.Integer, 1296U);
 
         public static readonly BcdElementDataType OemChargingModeThreshold =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 1297U);
+            new(ElementClass.Application, ElementFormat.Integer, 1297U);
 
         public static readonly BcdElementDataType OemChargingModeEnabled =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 1298U);
+            new(ElementClass.Application, ElementFormat.Boolean, 1298U);
 
         public static readonly BcdElementDataType BootFlowVariableGlobal =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 2730U);
+            new(ElementClass.Application, ElementFormat.Integer, 2730U);
 
         public static readonly BcdElementDataType ProcessCustomActionsFirst =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 40U);
+            new(ElementClass.Application, ElementFormat.Boolean, 40U);
 
         public static readonly BcdElementDataType BootStatusPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Integer, 224U);
+            new(ElementClass.Application, ElementFormat.Integer, 224U);
 
         public static readonly BcdElementDataType AllowUserToResetPhone =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 518U);
+            new(ElementClass.Application, ElementFormat.Boolean, 518U);
 
         public static readonly BcdElementDataType ManufacturingMode =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.String, 320U);
+            new(ElementClass.Application, ElementFormat.String, 320U);
 
         public static readonly BcdElementDataType MSEBootDebugPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 325U);
+            new(ElementClass.Application, ElementFormat.Boolean, 325U);
 
         public static readonly BcdElementDataType MSEBootOrderClean =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 326U);
+            new(ElementClass.Application, ElementFormat.Boolean, 326U);
 
         public static readonly BcdElementDataType MSEDeviceId =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 327U);
+            new(ElementClass.Application, ElementFormat.Boolean, 327U);
 
         public static readonly BcdElementDataType MSEFfuLoader =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 328U);
+            new(ElementClass.Application, ElementFormat.Boolean, 328U);
 
         public static readonly BcdElementDataType MSEIuLoader =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 329U);
+            new(ElementClass.Application, ElementFormat.Boolean, 329U);
 
         public static readonly BcdElementDataType MSEMassStorage =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 330U);
+            new(ElementClass.Application, ElementFormat.Boolean, 330U);
 
         public static readonly BcdElementDataType MSERpmbProvisioning =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 331U);
+            new(ElementClass.Application, ElementFormat.Boolean, 331U);
 
         public static readonly BcdElementDataType MSESecureBootPolicy =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 332U);
+            new(ElementClass.Application, ElementFormat.Boolean, 332U);
 
         public static readonly BcdElementDataType MSEStartCharge =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 333U);
+            new(ElementClass.Application, ElementFormat.Boolean, 333U);
 
         public static readonly BcdElementDataType MSEResetTPM =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 334U);
+            new(ElementClass.Application, ElementFormat.Boolean, 334U);
 
         public static readonly BcdElementDataType QuietBootEnable =
-            new BcdElementDataType(ElementClass.Application, ElementFormat.Boolean, 65U);
+            new(ElementClass.Application, ElementFormat.Boolean, 65U);
 
         public static readonly Dictionary<BcdElementDataType, string> ApplicationTypes =
-            new Dictionary<BcdElementDataType, string>
+            new()
             {
                 {
                     DefaultObject,
@@ -402,121 +402,121 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             };
 
         public static readonly BcdElementDataType OsLoaderDevice =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Device, 1U);
+            new(ElementClass.Library, ElementFormat.Device, 1U);
 
         public static readonly BcdElementDataType ApplicationPath =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 2U);
+            new(ElementClass.Library, ElementFormat.String, 2U);
 
         public static readonly BcdElementDataType Description =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 4U);
+            new(ElementClass.Library, ElementFormat.String, 4U);
 
         public static readonly BcdElementDataType PreferredLocale =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 5U);
+            new(ElementClass.Library, ElementFormat.String, 5U);
 
         public static readonly BcdElementDataType AutoRecoveryEnabled =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 9U);
+            new(ElementClass.Library, ElementFormat.Boolean, 9U);
 
         public static readonly BcdElementDataType DebuggerEnabled =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 16U);
+            new(ElementClass.Library, ElementFormat.Boolean, 16U);
 
         public static readonly BcdElementDataType EmsEnabled =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 32U);
+            new(ElementClass.Library, ElementFormat.Boolean, 32U);
 
         public static readonly BcdElementDataType DisplayAdvanceOptions =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 64U);
+            new(ElementClass.Library, ElementFormat.Boolean, 64U);
 
         public static readonly BcdElementDataType DisplayOptionsEdit =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 65U);
+            new(ElementClass.Library, ElementFormat.Boolean, 65U);
 
         public static readonly BcdElementDataType DisableIntegrityChecks =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 72U);
+            new(ElementClass.Library, ElementFormat.Boolean, 72U);
 
         public static readonly BcdElementDataType AllowPreReleaseSignatures =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 73U);
+            new(ElementClass.Library, ElementFormat.Boolean, 73U);
 
         public static readonly BcdElementDataType AllowFlightSignatures =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 126U);
+            new(ElementClass.Library, ElementFormat.Boolean, 126U);
 
         public static readonly BcdElementDataType ConsoleExtendedInput =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 80U);
+            new(ElementClass.Library, ElementFormat.Boolean, 80U);
 
         public static readonly BcdElementDataType Inherit =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.ObjectList, 6U);
+            new(ElementClass.Library, ElementFormat.ObjectList, 6U);
 
         public static readonly BcdElementDataType RecoverySequence =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.ObjectList, 8U);
+            new(ElementClass.Library, ElementFormat.ObjectList, 8U);
 
         public static readonly BcdElementDataType DebuggerType =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 17U);
+            new(ElementClass.Library, ElementFormat.Integer, 17U);
 
         public static readonly BcdElementDataType DebuggerPortAddress =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 18U);
+            new(ElementClass.Library, ElementFormat.Integer, 18U);
 
         public static readonly BcdElementDataType PortNumber =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 19U);
+            new(ElementClass.Library, ElementFormat.Integer, 19U);
 
         public static readonly BcdElementDataType DebuggerUsbTargetName =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 22U);
+            new(ElementClass.Library, ElementFormat.String, 22U);
 
         public static readonly BcdElementDataType DebuggerBusParameters =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 25U);
+            new(ElementClass.Library, ElementFormat.String, 25U);
 
         public static readonly BcdElementDataType DebuggerIgnoreUsermodeExceptions =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 23U);
+            new(ElementClass.Library, ElementFormat.Boolean, 23U);
 
         public static readonly BcdElementDataType DebuggerStartPolicy =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 24U);
+            new(ElementClass.Library, ElementFormat.Integer, 24U);
 
         public static readonly BcdElementDataType DebuggerNetworkKey =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 29U);
+            new(ElementClass.Library, ElementFormat.String, 29U);
 
         public static readonly BcdElementDataType DebuggerNetworkHostIp =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 26U);
+            new(ElementClass.Library, ElementFormat.Integer, 26U);
 
         public static readonly BcdElementDataType DebuggerNetworkPort =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 27U);
+            new(ElementClass.Library, ElementFormat.Integer, 27U);
 
         public static readonly BcdElementDataType DebuggerNetworkDhcp =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 28U);
+            new(ElementClass.Library, ElementFormat.Boolean, 28U);
 
         public static readonly BcdElementDataType DebuggerBaudRate =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 20U);
+            new(ElementClass.Library, ElementFormat.Integer, 20U);
 
         public static readonly BcdElementDataType ForceNoKeyboard =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 114U);
+            new(ElementClass.Library, ElementFormat.Boolean, 114U);
 
         public static readonly BcdElementDataType BootUxFadeDisable =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 106U);
+            new(ElementClass.Library, ElementFormat.Boolean, 106U);
 
         public static readonly BcdElementDataType BootUxLogoTransitionEnable =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 122U);
+            new(ElementClass.Library, ElementFormat.Boolean, 122U);
 
         public static readonly BcdElementDataType BootUxLogoTransitionTime =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 121U);
+            new(ElementClass.Library, ElementFormat.Integer, 121U);
 
         public static readonly BcdElementDataType BootUxProgressAnimationDisable =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 105U);
+            new(ElementClass.Library, ElementFormat.Boolean, 105U);
 
         public static readonly BcdElementDataType BootUxTextDisable =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 104U);
+            new(ElementClass.Library, ElementFormat.Boolean, 104U);
 
         public static readonly BcdElementDataType BootUxErrorScreen =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Integer, 125U);
+            new(ElementClass.Library, ElementFormat.Integer, 125U);
 
         public static readonly BcdElementDataType BsdFilepath =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 68U);
+            new(ElementClass.Library, ElementFormat.String, 68U);
 
         public static readonly BcdElementDataType BsdPreservePreviousEntries =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 69U);
+            new(ElementClass.Library, ElementFormat.Boolean, 69U);
 
         public static readonly BcdElementDataType LoadOptions =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.String, 48U);
+            new(ElementClass.Library, ElementFormat.String, 48U);
 
         public static readonly BcdElementDataType GraphicsModeDisable =
-            new BcdElementDataType(ElementClass.Library, ElementFormat.Boolean, 70U);
+            new(ElementClass.Library, ElementFormat.Boolean, 70U);
 
         public static readonly Dictionary<BcdElementDataType, string> LibraryTypes =
-            new Dictionary<BcdElementDataType, string>
+            new()
             {
                 {
                     OsLoaderDevice,
@@ -673,13 +673,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             };
 
         public static readonly BcdElementDataType RamDiskSdiPath =
-            new BcdElementDataType(ElementClass.Device, ElementFormat.String, 4U);
+            new(ElementClass.Device, ElementFormat.String, 4U);
 
         public static readonly BcdElementDataType RamDiskSdiDevice =
-            new BcdElementDataType(ElementClass.Device, ElementFormat.Device, 3U);
+            new(ElementClass.Device, ElementFormat.Device, 3U);
 
         public static readonly Dictionary<BcdElementDataType, string> DeviceTypes =
-            new Dictionary<BcdElementDataType, string>
+            new()
             {
                 {
                     RamDiskSdiPath,
@@ -692,16 +692,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             };
 
         public static readonly BcdElementDataType FlashingAction =
-            new BcdElementDataType(ElementClass.Oem, ElementFormat.ObjectList, 1U);
+            new(ElementClass.Oem, ElementFormat.ObjectList, 1U);
 
         public static readonly BcdElementDataType ResetMyPhoneAction =
-            new BcdElementDataType(ElementClass.Oem, ElementFormat.ObjectList, 2U);
+            new(ElementClass.Oem, ElementFormat.ObjectList, 2U);
 
         public static readonly BcdElementDataType DeveloperMenuAction =
-            new BcdElementDataType(ElementClass.Oem, ElementFormat.ObjectList, 3U);
+            new(ElementClass.Oem, ElementFormat.ObjectList, 3U);
 
         public static readonly Dictionary<BcdElementDataType, string> OEMTypes =
-            new Dictionary<BcdElementDataType, string>
+            new()
             {
                 {
                     FlashingAction,
@@ -719,37 +719,51 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static BcdElementDataType GetWellKnownDataType(string dataTypeName)
         {
-            var bcdElementDataType = (BcdElementDataType) null;
-            foreach (var key in LibraryTypes.Keys)
+            BcdElementDataType bcdElementDataType = null;
+            foreach (BcdElementDataType key in LibraryTypes.Keys)
+            {
                 if (string.Compare(LibraryTypes[key], dataTypeName, true, CultureInfo.InvariantCulture) == 0)
                 {
                     bcdElementDataType = key;
                     break;
                 }
+            }
 
             if (bcdElementDataType == null)
-                foreach (var key in ApplicationTypes.Keys)
+            {
+                foreach (BcdElementDataType key in ApplicationTypes.Keys)
+                {
                     if (string.Compare(ApplicationTypes[key], dataTypeName, true, CultureInfo.InvariantCulture) == 0)
                     {
                         bcdElementDataType = key;
                         break;
                     }
+                }
+            }
 
             if (bcdElementDataType == null)
-                foreach (var key in DeviceTypes.Keys)
+            {
+                foreach (BcdElementDataType key in DeviceTypes.Keys)
+                {
                     if (string.Compare(DeviceTypes[key], dataTypeName, true, CultureInfo.InvariantCulture) == 0)
                     {
                         bcdElementDataType = key;
                         break;
                     }
+                }
+            }
 
             if (bcdElementDataType == null)
-                foreach (var key in OEMTypes.Keys)
+            {
+                foreach (BcdElementDataType key in OEMTypes.Keys)
+                {
                     if (string.Compare(OEMTypes[key], dataTypeName, true, CultureInfo.InvariantCulture) == 0)
                     {
                         bcdElementDataType = key;
                         break;
                     }
+                }
+            }
 
             return bcdElementDataType;
         }

@@ -15,7 +15,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             if (!(type == "REG_BINARY"))
             {
                 if (type == "REG_DWORD")
+                {
                     value = string.Format("0x{0}", value.ToUpper(CultureInfo.InvariantCulture));
+                }
             }
             else
             {
@@ -27,11 +29,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Type = type;
         }
 
-        public string Name { get; }
+        public string Name
+        {
+            get;
+        }
 
-        public string Value { get; }
+        public string Value
+        {
+            get;
+        }
 
-        public string Type { get; }
+        public string Type
+        {
+            get;
+        }
 
         private string TrimBinary(string regBinaryStr)
         {

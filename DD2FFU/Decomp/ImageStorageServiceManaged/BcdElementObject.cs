@@ -21,23 +21,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public Guid ElementObject
         {
-            get
-            {
-                var result = Guid.Empty;
-                if (!Guid.TryParse(StringData, out result))
-                    throw new ImageStorageException(string.Format("{0}: The string data isn't a valid Guid.",
-                        MethodBase.GetCurrentMethod().Name));
-                return result;
-            }
+            get => !Guid.TryParse(StringData, out Guid result)
+                    ? throw new ImageStorageException(string.Format("{0}: The string data isn't a valid Guid.",
+                        MethodBase.GetCurrentMethod().Name))
+                    : result;
             set => StringData = value.ToString();
         }
 
-        
+
         public override void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             base.LogInfo(logger, indentLevel);
-            logger.LogInfo(str + "Object ID: {{{0}}}", (object) ElementObject);
+            logger.LogInfo(str + "Object ID: {{{0}}}", ElementObject);
         }
     }
 }

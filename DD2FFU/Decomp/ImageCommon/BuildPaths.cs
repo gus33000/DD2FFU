@@ -35,17 +35,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static string GetImagingTempPath(string defaultPath)
         {
-            var environmentVariable = Environment.GetEnvironmentVariable("BUILD_PRODUCT");
-            var dir = Environment.GetEnvironmentVariable("OBJECT_ROOT");
-            if (!string.IsNullOrEmpty(environmentVariable) &&
-                environmentVariable.Equals("nt", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(dir))
+            string environmentVariable = Environment.GetEnvironmentVariable("BUILD_PRODUCT");
+            string dir = Environment.GetEnvironmentVariable("OBJECT_ROOT");
+            if ((!string.IsNullOrEmpty(environmentVariable) &&
+                environmentVariable.Equals("nt", StringComparison.OrdinalIgnoreCase)) || string.IsNullOrEmpty(dir))
             {
                 dir = Environment.GetEnvironmentVariable("TEMP");
                 if (string.IsNullOrEmpty(dir))
                 {
                     dir = Environment.GetEnvironmentVariable("TMP");
                     if (string.IsNullOrEmpty(dir))
+                    {
                         dir = defaultPath;
+                    }
                 }
             }
 

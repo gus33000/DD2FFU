@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.IO;
 using System.Text;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
@@ -13,30 +12,51 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class SerialPortIdentifier : BaseIdentifier, IDeviceIdentifier
     {
-         public uint Type { get; set; }
+        public uint Type
+        {
+            get; set;
+        }
 
-         public uint PortNumber { get; set; }
+        public uint PortNumber
+        {
+            get; set;
+        }
 
-        public byte GenericAddressSpaceId { get; set; }
+        public byte GenericAddressSpaceId
+        {
+            get; set;
+        }
 
-        public byte GenericAddressWidth { get; set; }
+        public byte GenericAddressWidth
+        {
+            get; set;
+        }
 
-        public byte GenericAddressBitOffset { get; set; }
+        public byte GenericAddressBitOffset
+        {
+            get; set;
+        }
 
-        public byte GenericAddressAccessSize { get; set; }
+        public byte GenericAddressAccessSize
+        {
+            get; set;
+        }
 
-         public ulong GenericAddressPhysicalAddress { get; set; }
+        public ulong GenericAddressPhysicalAddress
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
             Type = reader.ReadUInt32();
-            var numArray = reader.ReadBytes(12);
-            PortNumber = (uint) ((numArray[0] << 24) | (numArray[1] << 16) | (numArray[2] << 8)) | numArray[3];
+            byte[] numArray = reader.ReadBytes(12);
+            PortNumber = (uint)((numArray[0] << 24) | (numArray[1] << 16) | (numArray[2] << 8)) | numArray[3];
             GenericAddressSpaceId = numArray[0];
             GenericAddressWidth = numArray[1];
             GenericAddressBitOffset = numArray[2];
             GenericAddressAccessSize = numArray[3];
-            GenericAddressPhysicalAddress = (ulong) ((numArray[4] << 24) | (numArray[5] << 16) | (numArray[6] << 8) |
+            GenericAddressPhysicalAddress = (ulong)((numArray[4] << 24) | (numArray[5] << 16) | (numArray[6] << 8) |
                                                      numArray[7] | (numArray[8] << 24) | (numArray[9] << 16) |
                                                      (numArray[10] << 8) | numArray[11]);
         }
@@ -45,13 +65,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Identifier: Serial Port");
         }
 
-         public uint Size => 0;
+        public uint Size => 0;
     }
 }

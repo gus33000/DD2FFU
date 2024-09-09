@@ -16,7 +16,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private readonly byte[] _blockAllocationBitmap;
         private readonly uint _blockCount;
         private readonly uint _blockSize;
-        private string _partitionName;
+        private readonly string _partitionName;
         private readonly ulong _partitionOffset;
         private readonly ImageStorage _storage;
 
@@ -27,19 +27,25 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _blockSize = blockSize;
             _partitionOffset = partitionOffset;
             _partitionName = partitionName;
-            var partitionSize =
-                NativeImaging.GetPartitionSize((IntPtr) _storage.ServiceHandle, _storage.StoreId, partitionName);
-            var sectorSize = NativeImaging.GetSectorSize((IntPtr) _storage.ServiceHandle, _storage.StoreId);
-            var num = partitionSize * sectorSize;
-            if ((long) (num / sectorSize) != (long) partitionSize)
+            ulong partitionSize =
+                NativeImaging.GetPartitionSize((nint)_storage.ServiceHandle, _storage.StoreId, partitionName);
+            uint sectorSize = NativeImaging.GetSectorSize((nint)_storage.ServiceHandle, _storage.StoreId);
+            ulong num = partitionSize * sectorSize;
+            if ((long)(num / sectorSize) != (long)partitionSize)
+            {
                 throw new ImageStorageException(
-                    string.Format("Volume {0} is too large to be byte-addressed with a 64-bit value.", partitionName));
-            _blockCount = (uint) ((num + blockSize - 1UL) / blockSize);
-            if (_blockCount * (ulong) blockSize < num)
+                                string.Format("Volume {0} is too large to be byte-addressed with a 64-bit value.", partitionName));
+            }
+
+            _blockCount = (uint)((num + blockSize - 1UL) / blockSize);
+            if (_blockCount * (ulong)blockSize < num)
+            {
                 throw new ImageStorageException(
-                    string.Format("Volume {0} is too large to access with a 32-bit block count.", partitionName));
-            _blockAllocationBitmap = new byte[(int) ((_blockCount + 7U) / 8U)];
-            NativeImaging.GetBlockAllocationBitmap((IntPtr) _storage.ServiceHandle, _storage.StoreId, partitionName,
+                                string.Format("Volume {0} is too large to access with a 32-bit block count.", partitionName));
+            }
+
+            _blockAllocationBitmap = new byte[(int)((_blockCount + 7U) / 8U)];
+            NativeImaging.GetBlockAllocationBitmap((nint)_storage.ServiceHandle, _storage.StoreId, partitionName,
                 _blockSize, _blockAllocationBitmap);
         }
 
@@ -47,8 +53,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             get
             {
-                var num = (byte) (1 << ((int) blockIndex & 7));
-                return (_blockAllocationBitmap[(int) (blockIndex / 8U)] & (uint) num) > 0U;
+                byte num = (byte)(1 << ((int)blockIndex & 7));
+                return (_blockAllocationBitmap[(int)(blockIndex / 8U)] & (uint)num) > 0U;
             }
         }
 
@@ -59,23 +65,25 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public bool BlockIsAllocated(ulong diskByteOffset)
         {
-            return this[(uint) ((diskByteOffset - _partitionOffset) / _blockSize)];
+            return this[(uint)((diskByteOffset - _partitionOffset) / _blockSize)];
         }
 
         public List<DataBlockEntry> GenerateDataEntries()
         {
-            var dataBlockEntryList = new List<DataBlockEntry>();
-            var num = (uint) (_partitionOffset / _blockSize);
+            List<DataBlockEntry> dataBlockEntryList = [];
+            uint num = (uint)(_partitionOffset / _blockSize);
             for (uint index = 0; index < _blockCount; ++index)
+            {
                 if (this[index])
                 {
-                    var dataBlockEntry = new DataBlockEntry(_blockSize);
+                    DataBlockEntry dataBlockEntry = new(_blockSize);
                     dataBlockEntry.BlockLocationsOnDisk.Add(new DiskLocation(index + num));
-                    var dataSource = dataBlockEntry.DataSource;
+                    DataBlockSource dataSource = dataBlockEntry.DataSource;
                     dataSource.Source = DataBlockSource.DataSource.Disk;
-                    dataSource.StorageOffset = (num + index) * (ulong) _blockSize;
+                    dataSource.StorageOffset = (num + index) * (ulong)_blockSize;
                     dataBlockEntryList.Add(dataBlockEntry);
                 }
+            }
 
             return dataBlockEntryList;
         }
@@ -83,20 +91,24 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [Conditional("DEBUG")]
         public void ValidateDataEntries(List<DataBlockEntry> entries)
         {
-            var numArray = new byte[(int) ((_blockCount + 7U) / 8U)];
-            Array.Clear(numArray, 0, ((int) _blockCount & 7) / 8);
-            var num1 = (uint) (_partitionOffset / _blockSize);
-            foreach (var entry in entries)
+            byte[] numArray = new byte[(int)((_blockCount + 7U) / 8U)];
+            Array.Clear(numArray, 0, ((int)_blockCount & 7) / 8);
+            uint num1 = (uint)(_partitionOffset / _blockSize);
+            foreach (DataBlockEntry entry in entries)
             {
-                var num2 = entry.BlockLocationsOnDisk[0].BlockIndex - num1;
-                numArray[(int) (num2 / 8U)] = (byte) (numArray[(int) (num2 / 8U)] | (1U << (int) (num2 % 8U)));
+                uint num2 = entry.BlockLocationsOnDisk[0].BlockIndex - num1;
+                numArray[(int)(num2 / 8U)] = (byte)(numArray[(int)(num2 / 8U)] | (1U << (int)(num2 % 8U)));
             }
 
-            for (var index = 0; index < numArray.Length; ++index)
+            for (int index = 0; index < numArray.Length; ++index)
+            {
                 if (numArray[index] != _blockAllocationBitmap[index])
+                {
                     throw new ImageStorageException(string.Format(
-                        "The block bitmap generated from the volume doesn't match the bitmap generated from the data entries at offset {0}",
-                        index));
+                                        "The block bitmap generated from the volume doesn't match the bitmap generated from the data entries at offset {0}",
+                                        index));
+                }
+            }
         }
     }
 }

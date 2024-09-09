@@ -12,11 +12,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     internal class MetadataPartitionHeader
     {
-        public uint Signature { get; private set; }
+        public uint Signature
+        {
+            get; private set;
+        }
 
-        public uint MaxPartitionCount { get; private set; }
+        public uint MaxPartitionCount
+        {
+            get; private set;
+        }
 
-        public uint PartitionCount { get; private set; }
+        public uint PartitionCount
+        {
+            get; private set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
@@ -27,10 +36,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void LogInfo(IULogger logger, ushort indentLevel = 0)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo(str + "Signature          : {0}", (object) Signature);
-            logger.LogInfo(str + "Max Partition Count: {0}", (object) MaxPartitionCount);
-            logger.LogInfo(str + "Partition Count    : {0}", (object) PartitionCount);
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo(str + "Signature          : {0}", Signature);
+            logger.LogInfo(str + "Max Partition Count: {0}", MaxPartitionCount);
+            logger.LogInfo(str + "Partition Count    : {0}", PartitionCount);
         }
     }
 }

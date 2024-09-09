@@ -18,10 +18,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public VirtualDiskStream(DynamicHardDisk virtualDisk)
         {
             VirtualDisk = virtualDisk;
-            _sectorBuffer = new byte[(int) virtualDisk.SectorSize];
+            _sectorBuffer = new byte[(int)virtualDisk.SectorSize];
         }
 
-        private DynamicHardDisk VirtualDisk { get; }
+        private DynamicHardDisk VirtualDisk
+        {
+            get;
+        }
 
         public override bool CanRead => true;
 
@@ -31,7 +34,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override bool CanTimeout => false;
 
-        public override long Length => (long) VirtualDisk.SectorCount * VirtualDisk.SectorSize;
+        public override long Length => (long)VirtualDisk.SectorCount * VirtualDisk.SectorSize;
 
         public override long Position
         {
@@ -39,7 +42,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (value > Length)
+                {
                     throw new ImageStorageException("The given position is beyond the end of the image payload.");
+                }
+
                 _position = value;
             }
         }
@@ -52,7 +58,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public override long Seek(long offset, SeekOrigin origin)
         {
             if (offset > Length)
+            {
                 throw new ImageStorageException("The  offset is beyond the end of the image.");
+            }
+
             switch (origin)
             {
                 case SeekOrigin.Begin:
@@ -60,20 +69,38 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     return _position;
                 case SeekOrigin.Current:
                     if (offset == 0L)
+                    {
                         return _position;
+                    }
+
                     if (offset < 0L)
+                    {
                         throw new ImageStorageException("Negative offsets are not implemented.");
+                    }
+
                     if (_position >= Length)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     if (Length - _position < offset)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     _position = offset;
                     return _position;
                 case SeekOrigin.End:
                     if (offset > 0L)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     if (Length + offset < 0L)
+                    {
                         throw new ImageStorageException("The offset is invalid.");
+                    }
+
                     _position = Length + offset;
                     return _position;
                 default:
@@ -88,38 +115,44 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var num1 = 0;
+            int num1 = 0;
             while (count > 0)
             {
-                var num2 = (uint) ((ulong) Position / VirtualDisk.SectorSize);
-                var num3 = (uint) ((ulong) Position % VirtualDisk.SectorSize);
-                var num4 = Math.Min(count, (int) VirtualDisk.SectorSize - (int) num3);
-                if ((int) _sectorBufferIndex != (int) num2)
+                uint num2 = (uint)((ulong)Position / VirtualDisk.SectorSize);
+                uint num3 = (uint)((ulong)Position % VirtualDisk.SectorSize);
+                int num4 = Math.Min(count, (int)VirtualDisk.SectorSize - (int)num3);
+                if ((int)_sectorBufferIndex != (int)num2)
                 {
                     if (VirtualDisk.SectorIsAllocated(num2))
                     {
                         if (num4 == VirtualDisk.SectorSize)
                         {
-                            VirtualDisk.ReadSector(num2, buffer, (uint) offset);
+                            VirtualDisk.ReadSector(num2, buffer, (uint)offset);
                         }
                         else
                         {
                             VirtualDisk.ReadSector(num2, _sectorBuffer, 0U);
                             _sectorBufferIndex = num2;
-                            for (var index = 0; index < num4; ++index)
+                            for (int index = 0; index < num4; ++index)
+                            {
                                 buffer[offset + index] = _sectorBuffer[num3 + index];
+                            }
                         }
                     }
                     else
                     {
-                        for (var index = 0; index < num4; ++index)
+                        for (int index = 0; index < num4; ++index)
+                        {
                             buffer[offset + index] = 0;
+                        }
                     }
                 }
                 else
                 {
-                    for (var index = 0; index < num4; ++index)
+                    for (int index = 0; index < num4; ++index)
+                    {
                         buffer[offset + index] = _sectorBuffer[num3 + index];
+                    }
                 }
 
                 offset += num4;
@@ -134,29 +167,38 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (offset + Position > Length)
+            {
                 throw new EndOfStreamException("Cannot write past the end of the stream.");
+            }
+
             while (count > 0)
             {
-                var num1 = (uint) ((ulong) Position / VirtualDisk.SectorSize);
-                var num2 = (uint) ((ulong) Position % VirtualDisk.SectorSize);
-                var num3 = Math.Min(count, (int) VirtualDisk.SectorSize - (int) num2);
+                uint num1 = (uint)((ulong)Position / VirtualDisk.SectorSize);
+                uint num2 = (uint)((ulong)Position % VirtualDisk.SectorSize);
+                int num3 = Math.Min(count, (int)VirtualDisk.SectorSize - (int)num2);
                 if (!VirtualDisk.SectorIsAllocated(num1))
+                {
                     throw new ImageStorageException(
-                        "Writing to an unallocated virtual disk location is not supported.");
+                                        "Writing to an unallocated virtual disk location is not supported.");
+                }
+
                 if (num2 == 0U && num3 == VirtualDisk.SectorSize)
                 {
-                    VirtualDisk.WriteSector(num1, buffer, (uint) offset);
+                    VirtualDisk.WriteSector(num1, buffer, (uint)offset);
                 }
                 else
                 {
-                    if ((int) _sectorBufferIndex != (int) num1)
+                    if ((int)_sectorBufferIndex != (int)num1)
                     {
                         VirtualDisk.ReadSector(num1, _sectorBuffer, 0U);
                         _sectorBufferIndex = num1;
                     }
 
-                    for (var index = 0; index < num3; ++index)
+                    for (int index = 0; index < num3; ++index)
+                    {
                         _sectorBuffer[num2 + index] = buffer[offset + index];
+                    }
+
                     VirtualDisk.WriteSector(num1, _sectorBuffer, 0U);
                 }
 

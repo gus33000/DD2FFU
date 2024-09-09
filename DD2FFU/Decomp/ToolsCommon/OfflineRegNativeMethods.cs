@@ -4,7 +4,6 @@
 // MVID: 8A4E8FCA-4522-42C3-A670-4E93952F2307
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\ToolsCommon.dll
 
-using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,78 +13,78 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
     {
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORCreateHive(ref IntPtr handle);
+        public static extern int ORCreateHive(ref nint handle);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int OROpenHive([MarshalAs(UnmanagedType.LPWStr)] string Path, ref IntPtr handle);
+        public static extern int OROpenHive([MarshalAs(UnmanagedType.LPWStr)] string Path, ref nint handle);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORCloseHive(IntPtr handle);
+        public static extern int ORCloseHive(nint handle);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORSaveHive(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string path, int osMajor,
+        public static extern int ORSaveHive(nint handle, [MarshalAs(UnmanagedType.LPWStr)] string path, int osMajor,
             int osMinor);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int OROpenKey(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string subKeyName,
-            ref IntPtr subkeyHandle);
+        public static extern int OROpenKey(nint handle, [MarshalAs(UnmanagedType.LPWStr)] string subKeyName,
+            ref nint subkeyHandle);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORCreateKey(IntPtr handle, string subKeyName, string className, uint dwOptions,
-            byte[] secbuf, ref IntPtr keyHandle, ref uint dwDisposition);
+        public static extern int ORCreateKey(nint handle, string subKeyName, string className, uint dwOptions,
+            byte[] secbuf, ref nint keyHandle, ref uint dwDisposition);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORCloseKey(IntPtr handle);
+        public static extern int ORCloseKey(nint handle);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int OREnumKey(IntPtr handle, uint dwIndex, StringBuilder name, ref uint count,
-            StringBuilder classname, ref uint classnamecount, ref IntPtr filetimeptr);
+        public static extern int OREnumKey(nint handle, uint dwIndex, StringBuilder name, ref uint count,
+            StringBuilder classname, ref uint classnamecount, ref nint filetimeptr);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-        public static extern int ORQueryInfoKey(IntPtr handle, StringBuilder classname, ref uint lpcClass,
+        public static extern int ORQueryInfoKey(nint handle, StringBuilder classname, ref uint lpcClass,
             out uint lpcSubKeys, out uint lpcMaxSubKeyLen, out uint lpcMaxClassLen, out uint lpcValues,
-            out uint lpcMaxValueNameLen, out uint lpcMaxValueLen, out uint lpcbSecurityDescriptor, IntPtr filetimeptr);
+            out uint lpcMaxValueNameLen, out uint lpcMaxValueLen, out uint lpcbSecurityDescriptor, nint filetimeptr);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORGetValue(IntPtr Handle, string lpSubKey, string lpValue, out uint pdwType,
+        public static extern int ORGetValue(nint Handle, string lpSubKey, string lpValue, out uint pdwType,
             byte[] pvData, ref uint pcbData);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORSetValue(IntPtr Handle, string lpValueName, uint dwType, byte[] pvData, uint cbData);
+        public static extern int ORSetValue(nint Handle, string lpValueName, uint dwType, byte[] pvData, uint cbData);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORDeleteValue(IntPtr Handle, string lpValueName);
+        public static extern int ORDeleteValue(nint Handle, string lpValueName);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORDeleteKey(IntPtr Handle, string lpKeyName);
+        public static extern int ORDeleteKey(nint Handle, string lpKeyName);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORGetVirtualFlags(IntPtr Handle, ref int pbFlags);
+        public static extern int ORGetVirtualFlags(nint Handle, ref int pbFlags);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int OREnumValue(IntPtr Handle, uint index, StringBuilder lpValueName,
-            ref uint lpcValueName, out uint lpType, IntPtr pvData, IntPtr lpcbData);
+        public static extern int OREnumValue(nint Handle, uint index, StringBuilder lpValueName,
+            ref uint lpcValueName, out uint lpType, nint pvData, nint lpcbData);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORGetKeySecurity(IntPtr handle, SecurityInformationFlags secinfo, byte[] lpSecBuf,
+        public static extern int ORGetKeySecurity(nint handle, SecurityInformationFlags secinfo, byte[] lpSecBuf,
             ref uint size);
 
         [DllImport("Offreg.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall,
             SetLastError = true)]
-        public static extern int ORSetKeySecurity(IntPtr handle, SecurityInformationFlags secinfo, byte[] lpSecBuf);
+        public static extern int ORSetKeySecurity(nint handle, SecurityInformationFlags secinfo, byte[] lpSecBuf);
     }
 }

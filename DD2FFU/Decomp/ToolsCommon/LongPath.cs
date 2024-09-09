@@ -19,27 +19,29 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static string GetDirectoryName(string path)
         {
             if (path == null)
-                throw new ArgumentNullException(nameof(path), "Path cannot be null.");
-            if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                throw new ArgumentException("Path cannot contain invalid characters.", nameof(path));
-            var length = path.LastIndexOfAny(new char[2]
             {
+                throw new ArgumentNullException(nameof(path), "Path cannot be null.");
+            }
+
+            if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                throw new ArgumentException("Path cannot contain invalid characters.", nameof(path));
+            }
+
+            int length = path.LastIndexOfAny(new char[2]
+                        {
                 Path.DirectorySeparatorChar,
                 Path.VolumeSeparatorChar
-            });
-            if (length == -1)
-                return null;
-            return path.Substring(0, length);
+                        });
+            return length == -1 ? null : path[..length];
         }
 
         public static string GetFullPath(string path)
         {
-            var str = LongPathCommon.NormalizeLongPath(path);
-            if (str.StartsWith("\\\\?\\UNC\\", StringComparison.OrdinalIgnoreCase))
-                return "\\\\" + str.Substring("\\\\?\\UNC\\".Length);
-            if (str.StartsWith("\\\\?\\", StringComparison.OrdinalIgnoreCase))
-                return str.Substring("\\\\?\\".Length);
-            return str;
+            string str = LongPathCommon.NormalizeLongPath(path);
+            return str.StartsWith("\\\\?\\UNC\\", StringComparison.OrdinalIgnoreCase)
+                ? "\\\\" + str["\\\\?\\UNC\\".Length..]
+                : str.StartsWith("\\\\?\\", StringComparison.OrdinalIgnoreCase) ? str["\\\\?\\".Length..] : str;
         }
 
         public static string GetFullPathUNC(string path)
@@ -50,27 +52,35 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static string GetPathRoot(string path)
         {
             if (path == null)
-                return null;
-            if (path == string.Empty || path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                throw new ArgumentException("Path cannot be empty or contain invalid characters.", nameof(path));
-            if (!Path.IsPathRooted(path))
-                return string.Empty;
-            if (path.StartsWith("\\\\", StringComparison.OrdinalIgnoreCase))
             {
-                var num = path.IndexOf(Path.DirectorySeparatorChar, "\\\\".Length);
-                if (num == -1)
-                    return path;
-                var length = path.IndexOf(Path.DirectorySeparatorChar, num + 1);
-                if (length == -1)
-                    return path;
-                return path.Substring(0, length);
+                return null;
             }
 
-            if (path.IndexOf(Path.VolumeSeparatorChar) != 1)
+            if (path == string.Empty || path.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                throw new ArgumentException("Path cannot be empty or contain invalid characters.", nameof(path));
+            }
+
+            if (!Path.IsPathRooted(path))
+            {
                 return string.Empty;
-            if (path.Length <= 2 || path[2] != Path.DirectorySeparatorChar)
-                return path.Substring(0, 2);
-            return path.Substring(0, 3);
+            }
+
+            if (path.StartsWith("\\\\", StringComparison.OrdinalIgnoreCase))
+            {
+                int num = path.IndexOf(Path.DirectorySeparatorChar, "\\\\".Length);
+                if (num == -1)
+                {
+                    return path;
+                }
+
+                int length = path.IndexOf(Path.DirectorySeparatorChar, num + 1);
+                return length == -1 ? path : path[..length];
+            }
+
+            return path.IndexOf(Path.VolumeSeparatorChar) != 1
+                ? string.Empty
+                : path.Length <= 2 || path[2] != Path.DirectorySeparatorChar ? path[..2] : path[..3];
         }
 
         public static string Combine(string path, string file)
@@ -86,11 +96,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static string GetExtension(string path)
         {
             if (path == null)
+            {
                 return null;
-            var str = Regex.Match(path.ToLowerInvariant(), "\\.[^\\.]+$").Value.TrimStart('.');
-            if (string.IsNullOrEmpty(str))
-                return string.Empty;
-            return "." + str;
+            }
+
+            string str = Regex.Match(path.ToLowerInvariant(), "\\.[^\\.]+$").Value.TrimStart('.');
+            return string.IsNullOrEmpty(str) ? string.Empty : "." + str;
         }
     }
 }

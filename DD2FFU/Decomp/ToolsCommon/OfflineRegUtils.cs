@@ -22,76 +22,98 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             '\\'
         };
 
-        public static IntPtr CreateHive()
+        public static nint CreateHive()
         {
-            var zero = IntPtr.Zero;
-            var hive = OffRegNativeMethods.ORCreateHive(ref zero);
-            if (hive != 0)
-                throw new Win32Exception(hive);
-            return zero;
+            nint zero = nint.Zero;
+            int hive = OffRegNativeMethods.ORCreateHive(ref zero);
+            return hive != 0 ? throw new Win32Exception(hive) : zero;
         }
 
-        public static IntPtr CreateKey(IntPtr handle, string keyName)
+        public static nint CreateKey(nint handle, string keyName)
         {
-            if (handle == IntPtr.Zero)
-                throw new ArgumentNullException(nameof(handle));
-            if (string.IsNullOrEmpty(nameof(keyName)))
-                throw new ArgumentNullException(nameof(keyName));
-            var zero = IntPtr.Zero;
-            uint dwDisposition = 0;
-            foreach (var str in keyName.Split(BSLASH_DELIMITER))
+            if (handle == nint.Zero)
             {
-                var key = OffRegNativeMethods.ORCreateKey(handle, keyName, null, 0U, null, ref zero, ref dwDisposition);
+                throw new ArgumentNullException(nameof(handle));
+            }
+
+            if (string.IsNullOrEmpty(nameof(keyName)))
+            {
+                throw new ArgumentNullException(nameof(keyName));
+            }
+
+            nint zero = nint.Zero;
+            uint dwDisposition = 0;
+            foreach (string str in keyName.Split(BSLASH_DELIMITER))
+            {
+                int key = OffRegNativeMethods.ORCreateKey(handle, keyName, null, 0U, null, ref zero, ref dwDisposition);
                 if (key != 0)
+                {
                     throw new Win32Exception(key);
+                }
             }
 
             return zero;
         }
 
-        public static void SetValue(IntPtr handle, string valueName, RegistryValueType type, byte[] value)
+        public static void SetValue(nint handle, string valueName, RegistryValueType type, byte[] value)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            if (valueName == null)
-                valueName = string.Empty;
-            var Handle = handle;
-            var lpValueName = valueName;
-            var num = (int) type;
-            var pvData = value;
-            var length = pvData.Length;
-            var error = OffRegNativeMethods.ORSetValue(Handle, lpValueName, (uint) num, pvData, (uint) length);
+            }
+
+            valueName ??= string.Empty;
+            nint Handle = handle;
+            string lpValueName = valueName;
+            int num = (int)type;
+            byte[] pvData = value;
+            int length = pvData.Length;
+            int error = OffRegNativeMethods.ORSetValue(Handle, lpValueName, (uint)num, pvData, (uint)length);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static void DeleteValue(IntPtr handle, string valueName)
+        public static void DeleteValue(nint handle, string valueName)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            if (valueName == null)
-                valueName = string.Empty;
-            var error = OffRegNativeMethods.ORDeleteValue(handle, valueName);
+            }
+
+            valueName ??= string.Empty;
+            int error = OffRegNativeMethods.ORDeleteValue(handle, valueName);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static void DeleteKey(IntPtr handle, string keyName)
+        public static void DeleteKey(nint handle, string keyName)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var error = OffRegNativeMethods.ORDeleteKey(handle, keyName);
+            }
+
+            int error = OffRegNativeMethods.ORDeleteKey(handle, keyName);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static IntPtr OpenHive(string hivefile)
+        public static nint OpenHive(string hivefile)
         {
             if (string.IsNullOrEmpty(hivefile))
+            {
                 throw new ArgumentNullException(nameof(hivefile));
-            var zero = IntPtr.Zero;
-            var num = 10;
-            var error = 0;
+            }
+
+            nint zero = nint.Zero;
+            int num = 10;
+            int error = 0;
             while (num > 0)
             {
                 error = OffRegNativeMethods.OROpenHive(hivefile, ref zero);
@@ -106,53 +128,76 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 }
             }
 
-            if (error != 0)
-                throw new Win32Exception(error);
-            return zero;
+            return error != 0 ? throw new Win32Exception(error) : zero;
         }
 
-        public static void SaveHive(IntPtr handle, string path, int osMajor, int osMinor)
+        public static void SaveHive(nint handle, string path, int osMajor, int osMinor)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
+            }
+
             if (string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
+
             if (File.Exists(path))
+            {
                 FileUtils.DeleteFile(path);
-            var error = OffRegNativeMethods.ORSaveHive(handle, path, osMajor, osMinor);
+            }
+
+            int error = OffRegNativeMethods.ORSaveHive(handle, path, osMajor, osMinor);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static void CloseHive(IntPtr handle)
+        public static void CloseHive(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var error = OffRegNativeMethods.ORCloseHive(handle);
+            }
+
+            int error = OffRegNativeMethods.ORCloseHive(handle);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static IntPtr OpenKey(IntPtr handle, string subKeyName)
+        public static nint OpenKey(nint handle, string subKeyName)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
+            }
+
             if (string.IsNullOrEmpty(nameof(subKeyName)))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
-            var zero = IntPtr.Zero;
-            var error = OffRegNativeMethods.OROpenKey(handle, subKeyName, ref zero);
-            if (error != 0)
-                throw new Win32Exception(error);
-            return zero;
+            }
+
+            nint zero = nint.Zero;
+            int error = OffRegNativeMethods.OROpenKey(handle, subKeyName, ref zero);
+            return error != 0 ? throw new Win32Exception(error) : zero;
         }
 
-        public static void CloseKey(IntPtr handle)
+        public static void CloseKey(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var error = OffRegNativeMethods.ORCloseKey(handle);
+            }
+
+            int error = OffRegNativeMethods.ORCloseKey(handle);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
         public static void ConvertHiveToReg(string inputHiveFile, string outputRegFile)
@@ -178,7 +223,6 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string ConvertByteArrayToRegStrings(byte[] data, int maxOnALine)
         {
-            var empty = string.Empty;
             string str1;
             if (-1 == maxOnALine)
             {
@@ -186,21 +230,21 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             }
             else
             {
-                var startIndex = 0;
-                var length1 = data.Length;
-                var stringBuilder = new StringBuilder();
+                int startIndex = 0;
+                int length1 = data.Length;
+                StringBuilder stringBuilder = new();
                 while (length1 > 0)
                 {
-                    var length2 = length1 > maxOnALine ? maxOnALine : length1;
-                    var str2 = BitConverter.ToString(data, startIndex, length2);
+                    int length2 = length1 > maxOnALine ? maxOnALine : length1;
+                    string str2 = BitConverter.ToString(data, startIndex, length2);
                     startIndex += length2;
                     length1 -= length2;
-                    var str3 = str2.Replace('-', ',');
-                    stringBuilder.Append(str3);
+                    string str3 = str2.Replace('-', ',');
+                    _ = stringBuilder.Append(str3);
                     if (length1 > 0)
                     {
-                        stringBuilder.Append(",\\");
-                        stringBuilder.AppendLine();
+                        _ = stringBuilder.Append(",\\");
+                        _ = stringBuilder.AppendLine();
                     }
                 }
 
@@ -210,39 +254,40 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             return str1;
         }
 
-        public static RegistryValueType GetValueType(IntPtr handle, string valueName)
+        public static RegistryValueType GetValueType(nint handle, string valueName)
         {
-            uint pdwType = 0;
             uint pcbData = 0;
-            var error = OffRegNativeMethods.ORGetValue(handle, null, valueName, out pdwType, null, ref pcbData);
-            if (error != 0)
-                throw new Win32Exception(error);
-            return (RegistryValueType) pdwType;
+            int error = OffRegNativeMethods.ORGetValue(handle, null, valueName, out uint pdwType, null, ref pcbData);
+            return error != 0 ? throw new Win32Exception(error) : (RegistryValueType)pdwType;
         }
 
-        public static List<KeyValuePair<string, RegistryValueType>> GetValueNamesAndTypes(IntPtr handle)
+        public static List<KeyValuePair<string, RegistryValueType>> GetValueNamesAndTypes(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
+            }
+
             uint index = 0;
-            var lpValueName = new StringBuilder(1024);
-            var keyValuePairList = new List<KeyValuePair<string, RegistryValueType>>();
+            StringBuilder lpValueName = new(1024);
+            List<KeyValuePair<string, RegistryValueType>> keyValuePairList = [];
             int error;
             do
             {
-                var capacity = (uint) lpValueName.Capacity;
-                uint lpType = 0;
-                error = OffRegNativeMethods.OREnumValue(handle, index, lpValueName, ref capacity, out lpType,
-                    IntPtr.Zero, IntPtr.Zero);
+                uint capacity = (uint)lpValueName.Capacity;
+                error = OffRegNativeMethods.OREnumValue(handle, index, lpValueName, ref capacity, out uint lpType,
+                    nint.Zero, nint.Zero);
                 if (error != 0)
                 {
                     if (error != 259)
+                    {
                         throw new Win32Exception(error);
+                    }
                 }
                 else
                 {
-                    var key = lpValueName.ToString();
-                    var registryValueType = (RegistryValueType) lpType;
+                    string key = lpValueName.ToString();
+                    RegistryValueType registryValueType = (RegistryValueType)lpType;
                     keyValuePairList.Add(new KeyValuePair<string, RegistryValueType>(key, registryValueType));
                     ++index;
                 }
@@ -251,73 +296,83 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             return keyValuePairList;
         }
 
-        public static string[] GetValueNames(IntPtr handle)
+        public static string[] GetValueNames(nint handle)
         {
-            if (handle == IntPtr.Zero)
-                throw new ArgumentNullException(nameof(handle), "Handle cannot be empty.");
-            return GetValueNamesAndTypes(handle).Select(a => a.Key).ToArray();
+            return handle == nint.Zero
+                ? throw new ArgumentNullException(nameof(handle), "Handle cannot be empty.")
+                : GetValueNamesAndTypes(handle).Select(a => a.Key).ToArray();
         }
 
-        public static string GetClass(IntPtr handle)
+        public static string GetClass(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle), "Handle cannot be empty.");
-            var classname = new StringBuilder(128);
-            var capacity = (uint) classname.Capacity;
-            var numArray = new uint[8];
-            var zero = IntPtr.Zero;
-            var error = OffRegNativeMethods.ORQueryInfoKey(handle, classname, ref capacity, out numArray[0],
+            }
+
+            StringBuilder classname = new(128);
+            uint capacity = (uint)classname.Capacity;
+            uint[] numArray = new uint[8];
+            nint zero = nint.Zero;
+            int error = OffRegNativeMethods.ORQueryInfoKey(handle, classname, ref capacity, out numArray[0],
                 out numArray[1], out numArray[3], out numArray[4], out numArray[5], out numArray[6], out numArray[7],
                 zero);
             if (error == 234)
             {
                 ++capacity;
-                classname.Capacity = (int) capacity;
+                classname.Capacity = (int)capacity;
                 error = OffRegNativeMethods.ORQueryInfoKey(handle, classname, ref capacity, out numArray[0],
                     out numArray[1], out numArray[3], out numArray[4], out numArray[5], out numArray[6],
                     out numArray[7], zero);
             }
 
-            if (error != 0)
-                throw new Win32Exception(error);
-            return classname.ToString();
+            return error != 0 ? throw new Win32Exception(error) : classname.ToString();
         }
 
-        public static byte[] GetValue(IntPtr handle, string valueName)
+        public static byte[] GetValue(nint handle, string valueName)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle), "Handle cannot be empty.");
-            uint pdwType = 0;
+            }
+
             uint pcbData = 0;
-            var error1 = OffRegNativeMethods.ORGetValue(handle, null, valueName, out pdwType, null, ref pcbData);
+
+            int error1 = OffRegNativeMethods.ORGetValue(handle, null, valueName, out _, null, ref pcbData);
             if (error1 != 0)
+            {
                 throw new Win32Exception(error1);
-            var pvData = new byte[(int) pcbData];
-            var error2 = OffRegNativeMethods.ORGetValue(handle, null, valueName, out pdwType, pvData, ref pcbData);
-            if (error2 != 0)
-                throw new Win32Exception(error2);
-            return pvData;
+            }
+
+            byte[] pvData = new byte[(int)pcbData];
+            int error2 = OffRegNativeMethods.ORGetValue(handle, null, valueName, out _, pvData, ref pcbData);
+            return error2 != 0 ? throw new Win32Exception(error2) : pvData;
         }
 
-        public static string[] GetSubKeys(IntPtr registryKey)
+        public static string[] GetSubKeys(nint registryKey)
         {
-            if (registryKey == IntPtr.Zero)
+            if (registryKey == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(registryKey), "registryKey pointer cannot be empty.");
+            }
+
             uint dwIndex = 0;
-            var name = new StringBuilder(1024);
-            var stringList = new List<string>();
+            StringBuilder name = new(1024);
+            List<string> stringList = [];
             int error;
             do
             {
                 uint classnamecount = 0;
-                var zero = IntPtr.Zero;
-                var capacity = (uint) name.Capacity;
+                nint zero = nint.Zero;
+                uint capacity = (uint)name.Capacity;
                 error = OffRegNativeMethods.OREnumKey(registryKey, dwIndex, name, ref capacity, null,
                     ref classnamecount, ref zero);
                 if (error != 0)
                 {
                     if (error != 259)
+                    {
                         throw new Win32Exception(error);
+                    }
                 }
                 else
                 {
@@ -329,85 +384,111 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             return stringList.ToArray();
         }
 
-        public static byte[] GetRawRegistrySecurity(IntPtr handle)
+        public static byte[] GetRawRegistrySecurity(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
+            }
+
             uint size = 0;
-            var num1 = 234;
-            var keySecurity1 = OffRegNativeMethods.ORGetKeySecurity(handle,
+            int num1 = 234;
+            int keySecurity1 = OffRegNativeMethods.ORGetKeySecurity(handle,
                 SecurityInformationFlags.DACL_SECURITY_INFORMATION |
                 SecurityInformationFlags.SACL_SECURITY_INFORMATION | SecurityInformationFlags.MANDATORY_ACCESS_LABEL,
                 null, ref size);
-            var num2 = keySecurity1;
+            int num2 = keySecurity1;
             if (num1 != num2)
+            {
                 throw new Win32Exception(keySecurity1);
-            var lpSecBuf = new byte[(int) size];
-            var keySecurity2 = OffRegNativeMethods.ORGetKeySecurity(handle,
+            }
+
+            byte[] lpSecBuf = new byte[(int)size];
+            int keySecurity2 = OffRegNativeMethods.ORGetKeySecurity(handle,
                 SecurityInformationFlags.DACL_SECURITY_INFORMATION |
                 SecurityInformationFlags.SACL_SECURITY_INFORMATION | SecurityInformationFlags.MANDATORY_ACCESS_LABEL,
                 lpSecBuf, ref size);
-            if (keySecurity2 != 0)
-                throw new Win32Exception(keySecurity2);
-            return lpSecBuf;
+            return keySecurity2 != 0 ? throw new Win32Exception(keySecurity2) : lpSecBuf;
         }
 
-        public static void SetRawRegistrySecurity(IntPtr handle, byte[] buf)
+        public static void SetRawRegistrySecurity(nint handle, byte[] buf)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var error = OffRegNativeMethods.ORSetKeySecurity(handle,
-                SecurityInformationFlags.DACL_SECURITY_INFORMATION |
-                SecurityInformationFlags.SACL_SECURITY_INFORMATION | SecurityInformationFlags.MANDATORY_ACCESS_LABEL,
-                buf);
+            }
+
+            int error = OffRegNativeMethods.ORSetKeySecurity(handle,
+                            SecurityInformationFlags.DACL_SECURITY_INFORMATION |
+                            SecurityInformationFlags.SACL_SECURITY_INFORMATION | SecurityInformationFlags.MANDATORY_ACCESS_LABEL,
+                            buf);
             if (error != 0)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
-        public static RegistrySecurity GetRegistrySecurity(IntPtr handle)
+        public static RegistrySecurity GetRegistrySecurity(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var registrySecurity1 = GetRawRegistrySecurity(handle);
-            SecurityUtils.ConvertSDToStringSD(registrySecurity1,
+            }
+
+            byte[] registrySecurity1 = GetRawRegistrySecurity(handle);
+            _ = SecurityUtils.ConvertSDToStringSD(registrySecurity1,
                 SecurityInformationFlags.SACL_SECURITY_INFORMATION | SecurityInformationFlags.MANDATORY_ACCESS_LABEL);
-            var registrySecurity2 = new RegistrySecurity();
+            RegistrySecurity registrySecurity2 = new();
             registrySecurity2.SetSecurityDescriptorBinaryForm(registrySecurity1);
             return registrySecurity2;
         }
 
-        public static int GetVirtualFlags(IntPtr handle)
+        public static int GetVirtualFlags(nint handle)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
+            {
                 throw new ArgumentNullException(nameof(handle));
-            var pbFlags = 0;
-            var virtualFlags = OffRegNativeMethods.ORGetVirtualFlags(handle, ref pbFlags);
-            if (virtualFlags != 0)
-                throw new Win32Exception(virtualFlags);
-            return pbFlags;
+            }
+
+            int pbFlags = 0;
+            int virtualFlags = OffRegNativeMethods.ORGetVirtualFlags(handle, ref pbFlags);
+            return virtualFlags != 0 ? throw new Win32Exception(virtualFlags) : pbFlags;
         }
 
         public static int ExtractFromHive(string hivePath, RegistryValueType type, string targetPath)
         {
             if (string.IsNullOrEmpty(nameof(hivePath)))
-                throw new ArgumentNullException(nameof(hivePath));
-            if (string.IsNullOrEmpty(nameof(targetPath)))
-                throw new ArgumentNullException(nameof(targetPath));
-            if (!File.Exists(hivePath))
-                throw new FileNotFoundException("Hive file {0} does not exist", hivePath);
-            var num = 0;
-            var flag = false;
-            using (var srcHiveRoot = ORRegistryKey.OpenHive(hivePath))
             {
-                using (var emptyHive = ORRegistryKey.CreateEmptyHive())
+                throw new ArgumentNullException(nameof(hivePath));
+            }
+
+            if (string.IsNullOrEmpty(nameof(targetPath)))
+            {
+                throw new ArgumentNullException(nameof(targetPath));
+            }
+
+            if (!File.Exists(hivePath))
+            {
+                throw new FileNotFoundException("Hive file {0} does not exist", hivePath);
+            }
+
+            int num = 0;
+            bool flag = false;
+            using (ORRegistryKey srcHiveRoot = ORRegistryKey.OpenHive(hivePath))
+            {
+                using (ORRegistryKey emptyHive = ORRegistryKey.CreateEmptyHive())
                 {
                     flag = 0 < (num = ExtractFromHiveRecursive(srcHiveRoot, type, emptyHive));
                     if (flag)
+                    {
                         emptyHive.SaveHive(targetPath);
+                    }
                 }
 
                 if (flag)
+                {
                     srcHiveRoot.SaveHive(hivePath);
+                }
             }
 
             return num;
@@ -416,14 +497,14 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         private static int ExtractFromHiveRecursive(ORRegistryKey srcHiveRoot, RegistryValueType type,
             ORRegistryKey dstHiveRoot)
         {
-            var num = 0;
-            var fullName = srcHiveRoot.FullName;
-            foreach (var str in srcHiveRoot.ValueNameAndTypes.Where(p => p.Value == RegistryValueType.MultiString)
+            int num = 0;
+            string fullName = srcHiveRoot.FullName;
+            foreach (string str in srcHiveRoot.ValueNameAndTypes.Where(p => p.Value == RegistryValueType.MultiString)
                 .Select(q => q.Key))
             {
-                var valueName = string.IsNullOrEmpty(str) ? null : str;
-                var multiStringValue = srcHiveRoot.GetMultiStringValue(valueName);
-                using (var subKey = dstHiveRoot.CreateSubKey(fullName))
+                string valueName = string.IsNullOrEmpty(str) ? null : str;
+                string[] multiStringValue = srcHiveRoot.GetMultiStringValue(valueName);
+                using (ORRegistryKey subKey = dstHiveRoot.CreateSubKey(fullName))
                 {
                     subKey.SetValue(valueName, multiStringValue);
                     ++num;
@@ -432,11 +513,11 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 srcHiveRoot.DeleteValue(valueName);
             }
 
-            foreach (var subKey in srcHiveRoot.SubKeys)
-                using (var srcHiveRoot1 = srcHiveRoot.OpenSubKey(subKey))
-                {
-                    num += ExtractFromHiveRecursive(srcHiveRoot1, type, dstHiveRoot);
-                }
+            foreach (string subKey in srcHiveRoot.SubKeys)
+            {
+                using ORRegistryKey srcHiveRoot1 = srcHiveRoot.OpenSubKey(subKey);
+                num += ExtractFromHiveRecursive(srcHiveRoot1, type, dstHiveRoot);
+            }
 
             return num;
         }

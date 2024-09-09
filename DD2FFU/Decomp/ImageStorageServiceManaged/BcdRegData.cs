@@ -12,13 +12,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     public class BcdRegData
     {
         private readonly Dictionary<string, List<BcdRegValue>> _regKeys =
-            new Dictionary<string, List<BcdRegValue>>(StringComparer.OrdinalIgnoreCase);
+            new(StringComparer.OrdinalIgnoreCase);
 
         public void AddRegKey(string regKey)
         {
             if (_regKeys.ContainsKey(regKey))
+            {
                 return;
-            _regKeys.Add(regKey, new List<BcdRegValue>());
+            }
+
+            _regKeys.Add(regKey, []);
         }
 
         public Dictionary<string, List<BcdRegValue>> RegKeys()
@@ -29,8 +32,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void AddRegValue(string regKey, string name, string value, string type)
         {
             if (!_regKeys.ContainsKey(regKey))
+            {
                 AddRegKey(regKey);
-            var bcdRegValue = new BcdRegValue(name, value, type);
+            }
+
+            BcdRegValue bcdRegValue = new(name, value, type);
             _regKeys[regKey].Add(bcdRegValue);
         }
     }

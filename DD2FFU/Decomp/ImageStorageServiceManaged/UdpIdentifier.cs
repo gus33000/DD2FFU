@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -15,9 +14,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class UdpIdentifier : BaseIdentifier, IDeviceIdentifier
     {
-         public uint HardwareType { get; set; }
+        public uint HardwareType
+        {
+            get; set;
+        }
 
-        public List<byte> HardwareAddress { get; private set; }
+        public List<byte> HardwareAddress
+        {
+            get; private set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
@@ -31,13 +36,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 MethodBase.GetCurrentMethod().Name));
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Identifier: UDP");
         }
 
-         public uint Size => 0;
+        public uint Size => 0;
     }
 }

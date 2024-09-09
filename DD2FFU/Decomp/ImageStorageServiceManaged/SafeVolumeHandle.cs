@@ -4,9 +4,9 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
@@ -16,17 +16,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private ImageStorage _storage;
 
         public SafeVolumeHandle(ImageStorage storage, string partitionName)
-            : base(IntPtr.Zero, true)
+            : base(nint.Zero, true)
         {
             _storage = storage;
             VolumeHandle = storage.OpenVolumeHandle(partitionName);
         }
 
-        public SafeFileHandle VolumeHandle { get; private set; }
+        public SafeFileHandle VolumeHandle
+        {
+            get; private set;
+        }
 
         public override bool IsInvalid => _disposed;
 
-        public static implicit operator IntPtr(SafeVolumeHandle safeVolumeHandle)
+        public static implicit operator nint(SafeVolumeHandle safeVolumeHandle)
         {
             return safeVolumeHandle.VolumeHandle.DangerousGetHandle();
         }

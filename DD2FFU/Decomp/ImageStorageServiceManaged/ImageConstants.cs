@@ -8,7 +8,7 @@ using System;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
-    
+
     public sealed class ImageConstants
     {
         public const uint ONE_MEGABYTE = 1048576;
@@ -22,10 +22,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public static readonly uint DefaultVirtualHardDiskSectorSize = 512;
         public static readonly uint RegistryKeyMaxNameSize = byte.MaxValue;
         public static readonly uint RegistryValueMaxNameSize = 16383;
-        public static readonly Guid PARTITION_SYSTEM_GUID = new Guid("{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}");
-        public static readonly Guid PARTITION_BASIC_DATA_GUID = new Guid("{ebd0a0a2-b9e5-4433-87c0-68b6b72699c7}");
-        public static readonly Guid PARTITION_MSFT_RECOVERY_GUID = new Guid("{de94bba4-06d1-4d40-a16a-bfd50179d6ac}");
-        public static readonly Guid SYSTEM_STORE_GUID = new Guid("{AE420040-13DD-41F2-AE7F-0DC35854C8D7}");
+        public static readonly Guid PARTITION_SYSTEM_GUID = new("{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}");
+        public static readonly Guid PARTITION_BASIC_DATA_GUID = new("{ebd0a0a2-b9e5-4433-87c0-68b6b72699c7}");
+        public static readonly Guid PARTITION_MSFT_RECOVERY_GUID = new("{de94bba4-06d1-4d40-a16a-bfd50179d6ac}");
+        public static readonly Guid SYSTEM_STORE_GUID = new("{AE420040-13DD-41F2-AE7F-0DC35854C8D7}");
         public static readonly ulong GPT_ATTRIBUTE_NO_DRIVE_LETTER = 9223372036854775808;
         public static readonly uint SYSTEM_STORE_SIGNATURE = 2923561024;
         public static readonly uint MINIMUM_NTFS_PARTITION_SIZE = 7340032;
@@ -39,14 +39,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public static readonly string MBR_METADATA_PARTITION_NAME = "MBR_META";
         public static readonly uint PAYLOAD_BLOCK_SIZE = 131072;
         public static readonly string MAINOS_PARTITION_NAME = "MainOS";
-        public static readonly Guid MAINOS_PARTITION_ID = new Guid("{A76B8CE2-0187-4C13-8FCA-8651C9B0620A}");
+        public static readonly Guid MAINOS_PARTITION_ID = new("{A76B8CE2-0187-4C13-8FCA-8651C9B0620A}");
         public static readonly string DATA_PARTITION_NAME = "Data";
         public static readonly string SYSTEM_PARTITION_NAME = "EFIESP";
         public static readonly string DPP_PARTITION_NAME = "DPP";
-        public static readonly Guid SYSTEM_PARTITION_ID = new Guid("{8183040A-8B44-4592-92F7-C6D9EE0560F7}");
+        public static readonly Guid SYSTEM_PARTITION_ID = new("{8183040A-8B44-4592-92F7-C6D9EE0560F7}");
         public static readonly string BCD_FILE_PATH = "boot\\bcd";
         public static readonly string EFI_BCD_FILE_PATH = "efi\\microsoft\\boot\\bcd";
         public static readonly string MMOS_PARTITION_NAME = "MMOS";
-        public static readonly Guid MMOS_PARTITION_ID = new Guid("{27A47557-8243-4C8E-9D30-846844C29C52}");
+        public static readonly Guid MMOS_PARTITION_ID = new("{27A47557-8243-4C8E-9D30-846844C29C52}");
     }
 }

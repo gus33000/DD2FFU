@@ -20,7 +20,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         private const string STR_REGEXE = "%windir%\\System32\\REG.EXE";
 
         private static readonly Dictionary<string, SystemRegistryHiveFiles> hiveMap =
-            new Dictionary<string, SystemRegistryHiveFiles>(StringComparer.InvariantCultureIgnoreCase)
+            new(StringComparer.InvariantCultureIgnoreCase)
             {
                 {
                     "SOFTWARE",
@@ -56,7 +56,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 }
             };
 
-        public static Dictionary<SystemRegistryHiveFiles, string> KnownMountPoints { get; } =
+        public static Dictionary<SystemRegistryHiveFiles, string> KnownMountPoints
+        {
+            get;
+        } =
             new Dictionary<SystemRegistryHiveFiles, string>
             {
                 {
@@ -109,31 +112,39 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static void LoadHive(string inputhive, string mountpoint)
         {
-            var error = CommonUtils.RunProcess(Environment.CurrentDirectory,
+            int error = CommonUtils.RunProcess(Environment.CurrentDirectory,
                 Environment.ExpandEnvironmentVariables("%windir%\\System32\\REG.EXE"),
                 string.Format("LOAD {0} {1}", mountpoint, inputhive), true);
             if (0 < error)
+            {
                 throw new Win32Exception(error);
+            }
+
             Thread.Sleep(500);
         }
 
         public static void ExportHive(string mountpoint, string outputfile)
         {
-            var error = CommonUtils.RunProcess(Environment.CurrentDirectory,
+            int error = CommonUtils.RunProcess(Environment.CurrentDirectory,
                 Environment.ExpandEnvironmentVariables("%windir%\\System32\\REG.EXE"),
                 string.Format("EXPORT {0} {1}", mountpoint, outputfile), true);
             if (0 < error)
+            {
                 throw new Win32Exception(error);
+            }
+
             Thread.Sleep(500);
         }
 
         public static void UnloadHive(string mountpoint)
         {
-            var error = CommonUtils.RunProcess(Environment.CurrentDirectory,
+            int error = CommonUtils.RunProcess(Environment.CurrentDirectory,
                 Environment.ExpandEnvironmentVariables("%windir%\\System32\\REG.EXE"),
                 string.Format("UNLOAD {0}", mountpoint), true);
             if (0 < error)
+            {
                 throw new Win32Exception(error);
+            }
         }
 
         public static string MapHiveToMountPoint(SystemRegistryHiveFiles hive)
@@ -143,12 +154,9 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string MapHiveFileToMountPoint(string hiveFile)
         {
-            if (string.IsNullOrEmpty(hiveFile))
-                throw new InvalidOperationException("hiveFile cannot be empty");
-            SystemRegistryHiveFiles hive;
-            if (!hiveMap.TryGetValue(Path.GetFileName(hiveFile), out hive))
-                return "";
-            return MapHiveToMountPoint(hive);
+            return string.IsNullOrEmpty(hiveFile)
+                ? throw new InvalidOperationException("hiveFile cannot be empty")
+                : !hiveMap.TryGetValue(Path.GetFileName(hiveFile), out SystemRegistryHiveFiles hive) ? "" : MapHiveToMountPoint(hive);
         }
     }
 }

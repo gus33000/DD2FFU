@@ -25,20 +25,26 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             this.innerWrapper = innerWrapper;
         }
 
-        public byte[] CatalogData { get; private set; }
+        public byte[] CatalogData
+        {
+            get; private set;
+        }
 
         public void InitializeWrapper(long payloadSize)
         {
             if (payloadSize % ffuImage.ChunkSizeInBytes != 0L)
+            {
                 throw new ImageCommonException("Data size not aligned with hash chunk size.");
+            }
+
             sha = new SHA256CryptoServiceProvider();
             sha.Initialize();
             bytesHashed = 0;
             hashOffset = 0;
-            hashData = new byte[(int) ((uint) ((ulong) payloadSize / ffuImage.ChunkSizeInBytes) *
-                                       ((uint) sha.HashSize / 8U))];
+            hashData = new byte[(int)((uint)((ulong)payloadSize / ffuImage.ChunkSizeInBytes) *
+                                       ((uint)sha.HashSize / 8U))];
             CatalogData = ImageSigner.GenerateCatalogFile(hashData);
-            var securityHeader = ffuImage.GetSecurityHeader(CatalogData, hashData);
+            byte[] securityHeader = ffuImage.GetSecurityHeader(CatalogData, hashData);
             innerWrapper.InitializeWrapper(payloadSize + securityHeader.Length);
             innerWrapper.Write(securityHeader);
         }
@@ -59,11 +65,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             hashTask.Wait();
             hashTask = null;
             if (hashOffset != hashData.Length)
+            {
                 throw new ImageCommonException(string.Format(
-                    "Failed to hash all data in the stream. hashOffset = {0}, hashData.Length = {1}, bytesHashed = {2}.",
-                    hashOffset, hashData.Length, bytesHashed));
+                                "Failed to hash all data in the stream. hashOffset = {0}, hashData.Length = {1}, bytesHashed = {2}.",
+                                hashOffset, hashData.Length, bytesHashed));
+            }
+
             CatalogData = ImageSigner.GenerateCatalogFile(hashData);
-            var securityHeader = ffuImage.GetSecurityHeader(CatalogData, hashData);
+            byte[] securityHeader = ffuImage.GetSecurityHeader(CatalogData, hashData);
             innerWrapper.ResetPosition();
             innerWrapper.Write(securityHeader);
             ffuImage.CatalogData = CatalogData;
@@ -73,26 +82,31 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private void HashBufferAsync(byte[] data)
         {
-            if (hashTask != null)
-                hashTask.Wait();
+            hashTask?.Wait();
             hashTask = Task.Factory.StartNew(() => HashBuffer(data));
         }
 
         private void HashBuffer(byte[] data)
         {
-            var chunkSizeInBytes = (int) ffuImage.ChunkSizeInBytes;
-            var num = chunkSizeInBytes - bytesHashed;
-            var offset = 0;
+            int chunkSizeInBytes = (int)ffuImage.ChunkSizeInBytes;
+            int num = chunkSizeInBytes - bytesHashed;
+            int offset = 0;
             while (offset < data.Length)
             {
-                var count = num;
+                int count = num;
                 if (data.Length - offset < num)
+                {
                     count = data.Length;
-                var hash = sha.ComputeHash(data, offset, count);
+                }
+
+                byte[] hash = sha.ComputeHash(data, offset, count);
                 bytesHashed += count;
                 bytesHashed %= chunkSizeInBytes;
                 if (bytesHashed == 0)
+                {
                     CommitHashToTable(hash);
+                }
+
                 num = chunkSizeInBytes;
                 offset += chunkSizeInBytes;
             }

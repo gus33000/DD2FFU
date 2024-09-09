@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.IO;
 using System.Text;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
@@ -15,25 +14,28 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         public void ReadFromStream(BinaryReader reader)
         {
-            reader.ReadBytes((int) Size);
+            _ = reader.ReadBytes((int)Size);
         }
 
         public void WriteToStream(BinaryWriter writer)
         {
-            var buffer = new byte[(int) Size];
-            for (var index = 0; index < buffer.Length; ++index)
+            byte[] buffer = new byte[(int)Size];
+            for (int index = 0; index < buffer.Length; ++index)
+            {
                 buffer[index] = 0;
+            }
+
             writer.Write(buffer, 0, buffer.Length);
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Boot Identifier");
         }
 
-        
+
         public uint Size => BcdElementBootDevice.BaseBootDeviceSizeInBytes - BcdElementBootDevice.BaseSize;
     }
 }

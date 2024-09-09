@@ -18,13 +18,13 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
     public abstract class ResourceAcl
     {
         protected static readonly Regex regexExtractMIL =
-            new Regex("(?<MIL>\\(ML[^\\)]*\\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            new("(?<MIL>\\(ML[^\\)]*\\))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         protected static readonly Regex regexStripDacl =
-            new Regex("^D:", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            new("^D:", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         protected static readonly Regex regexStripDriveLetter =
-            new Regex("^[A-Z]:", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            new("^[A-Z]:", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly HashAlgorithm Sha256Algorithm = HashAlgorithm.Create("SHA256");
         private string m_attributeHash;
@@ -34,13 +34,25 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         private string m_path;
         private string m_protected;
 
-        protected AuthorizationRuleCollection AccessRules { get; private set; }
+        protected AuthorizationRuleCollection AccessRules
+        {
+            get; private set;
+        }
 
-        protected NativeObjectSecurity Nos { get; private set; }
+        protected NativeObjectSecurity Nos
+        {
+            get; private set;
+        }
 
-        public abstract string TypeString { get; }
+        public abstract string TypeString
+        {
+            get;
+        }
 
-        protected string MacLabel { get; set; }
+        protected string MacLabel
+        {
+            get; set;
+        }
 
         protected string FullPath { get; private set; } = string.Empty;
 
@@ -51,12 +63,19 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_explicitDacl != null)
+                {
                     return;
+                }
+
                 m_explicitDacl = value;
             }
         }
 
-        [XmlAttribute("SACL")] public abstract string MandatoryIntegrityLabel { get; set; }
+        [XmlAttribute("SACL")]
+        public abstract string MandatoryIntegrityLabel
+        {
+            get; set;
+        }
 
         [XmlAttribute("Owner")]
         public string Owner
@@ -65,7 +84,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_owner != null)
+                {
                     return;
+                }
+
                 m_owner = value;
             }
         }
@@ -77,7 +99,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_elementId != null)
+                {
                     return;
+                }
+
                 m_elementId = value;
             }
         }
@@ -89,7 +114,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_attributeHash != null)
+                {
                     return;
+                }
+
                 m_attributeHash = value;
             }
         }
@@ -101,7 +129,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_path != null)
+                {
                     return;
+                }
+
                 m_path = value;
             }
         }
@@ -113,24 +144,45 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             set
             {
                 if (m_protected != null)
+                {
                     return;
+                }
+
                 m_protected = value;
             }
         }
 
-        public string DACL { get; private set; }
+        public string DACL
+        {
+            get; private set;
+        }
 
-        public bool DACLProtected { get; private set; }
+        public bool DACLProtected
+        {
+            get; private set;
+        }
 
-        public string FullACL { get; private set; }
+        public string FullACL
+        {
+            get; private set;
+        }
 
-        public bool PreserveInheritance { get; private set; }
+        public bool PreserveInheritance
+        {
+            get; private set;
+        }
 
-        public bool IsEmpty { get; private set; }
+        public bool IsEmpty
+        {
+            get; private set;
+        }
 
         public static ResourceAclComparer Comparer { get; } = new ResourceAclComparer();
 
-        public abstract NativeObjectSecurity ObjectSecurity { get; }
+        public abstract NativeObjectSecurity ObjectSecurity
+        {
+            get;
+        }
 
         protected void Initialize(NativeObjectSecurity nos, string path, string fullPath, string explicitDacl,
             string owner)
@@ -140,13 +192,13 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             m_path = path;
             m_protected = StrProtected(Nos);
             m_elementId = StrElementId(m_path, TypeString);
-            m_owner = owner == null ? StrOwner(Nos) : owner;
+            m_owner = owner ?? StrOwner(Nos);
             DACL = StrDacl(Nos);
             AccessRules = RuleCollection(Nos);
             DACLProtected = IsDaclProtected(Nos);
             FullACL = StrFullAcl(Nos);
             PreserveInheritance = IsInheritancePreserved(Nos);
-            m_explicitDacl = explicitDacl == null ? ComputeExplicitDACL() : explicitDacl;
+            m_explicitDacl = explicitDacl ?? ComputeExplicitDACL();
             IsEmpty = IsDaclEmpty(DACLProtected, MandatoryIntegrityLabel, m_explicitDacl);
             m_attributeHash = StrAttributeHash(TypeString, m_path, m_protected, m_owner, m_explicitDacl,
                 MandatoryIntegrityLabel);
@@ -159,9 +211,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         private string StrProtected(NativeObjectSecurity nos)
         {
-            var str = "No";
+            string str = "No";
             if (nos != null)
+            {
                 str = !nos.AreAccessRulesProtected ? "No" : "Yes";
+            }
+
             return str;
         }
 
@@ -169,19 +224,24 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         {
             string str = null;
             if (nos != null)
+            {
                 str = SddlNormalizer.FixOwnerSddl(
-                    nos.GetSecurityDescriptorSddlForm(AccessControlSections.Owner | AccessControlSections.Group));
+                                nos.GetSecurityDescriptorSddlForm(AccessControlSections.Owner | AccessControlSections.Group));
+            }
+
             return str;
         }
 
         private string StrDacl(NativeObjectSecurity nos)
         {
-            var str = string.Empty;
+            string str = string.Empty;
             if (nos != null)
             {
                 str = nos.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
                 if (!string.IsNullOrEmpty(str))
+                {
                     str = regexStripDacl.Replace(str, string.Empty);
+                }
             }
 
             return SddlNormalizer.FixAceSddl(str);
@@ -189,12 +249,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         private string StrElementId(string path, string typeString)
         {
-            var str = (string) null;
+            string str = null;
             if (!string.IsNullOrEmpty(path))
             {
-                var stringBuilder = new StringBuilder();
-                stringBuilder.Append(typeString);
-                stringBuilder.Append(path.ToUpper(new CultureInfo("en-US", false)));
+                StringBuilder stringBuilder = new();
+                _ = stringBuilder.Append(typeString);
+                _ = stringBuilder.Append(path.ToUpper(new CultureInfo("en-US", false)));
                 str = GetSha256Hash(Encoding.Unicode.GetBytes(stringBuilder.ToString()));
             }
 
@@ -203,56 +263,71 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         private AuthorizationRuleCollection RuleCollection(NativeObjectSecurity nos)
         {
-            var authorizationRuleCollection = (AuthorizationRuleCollection) null;
+            AuthorizationRuleCollection authorizationRuleCollection = null;
             if (nos != null)
+            {
                 authorizationRuleCollection = nos.GetAccessRules(true, false, typeof(NTAccount));
+            }
+
             return authorizationRuleCollection;
         }
 
         private bool IsDaclProtected(NativeObjectSecurity nos)
         {
-            if (nos != null)
-                return nos.AreAccessRulesProtected;
-            return false;
+            return nos != null && nos.AreAccessRulesProtected;
         }
 
         private string StrFullAcl(NativeObjectSecurity nos)
         {
-            var str = string.Empty;
+            string str = string.Empty;
             if (nos != null)
+            {
                 str = nos.GetSecurityDescriptorSddlForm(AccessControlSections.All);
+            }
+
             return str;
         }
 
         private bool IsInheritancePreserved(NativeObjectSecurity nos)
         {
-            if (nos != null)
-                return nos.GetAccessRules(false, true, typeof(NTAccount)).Count > 0;
-            return false;
+            return nos != null && nos.GetAccessRules(false, true, typeof(NTAccount)).Count > 0;
         }
 
         private bool IsDaclEmpty(bool isDaclProtected, string mandatoryIntegrityLabel, string explicitDacl)
         {
-            if (string.IsNullOrEmpty(explicitDacl) && string.IsNullOrEmpty(mandatoryIntegrityLabel))
-                return !isDaclProtected;
-            return false;
+            return string.IsNullOrEmpty(explicitDacl) && string.IsNullOrEmpty(mandatoryIntegrityLabel) && !isDaclProtected;
         }
 
         private string StrAttributeHash(string strType, string strPath, string strProtected, string strOwner,
             string strExplicitDacl, string strMandatoryIntegrityLabel)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.Append(strType);
+            StringBuilder stringBuilder = new();
+            _ = stringBuilder.Append(strType);
             if (!string.IsNullOrEmpty(strPath))
-                stringBuilder.Append(strPath.ToUpper(new CultureInfo("en-US", false)));
+            {
+                _ = stringBuilder.Append(strPath.ToUpper(new CultureInfo("en-US", false)));
+            }
+
             if (!string.IsNullOrEmpty(strProtected))
-                stringBuilder.Append(strProtected);
+            {
+                _ = stringBuilder.Append(strProtected);
+            }
+
             if (!string.IsNullOrEmpty(strOwner))
-                stringBuilder.Append(strOwner);
+            {
+                _ = stringBuilder.Append(strOwner);
+            }
+
             if (!string.IsNullOrEmpty(strExplicitDacl))
-                stringBuilder.Append(strExplicitDacl);
+            {
+                _ = stringBuilder.Append(strExplicitDacl);
+            }
+
             if (!string.IsNullOrEmpty(strMandatoryIntegrityLabel))
-                stringBuilder.Append(strMandatoryIntegrityLabel);
+            {
+                _ = stringBuilder.Append(strMandatoryIntegrityLabel);
+            }
+
             return GetSha256Hash(Encoding.Unicode.GetBytes(stringBuilder.ToString()));
         }
 

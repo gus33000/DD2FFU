@@ -4,9 +4,9 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
@@ -22,21 +22,23 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _blockSize = blockSize;
             _handle = diskHandle;
             _buffer = new VirtualMemoryPtr(blockSize);
-            Length = (long) NativeImaging.GetSectorCount(IntPtr.Zero, _handle) *
-                     NativeImaging.GetSectorSize(IntPtr.Zero, _handle);
+            Length = (long)NativeImaging.GetSectorCount(nint.Zero, _handle) *
+                     NativeImaging.GetSectorSize(nint.Zero, _handle);
         }
 
         public void ReadBlock(uint blockIndex, byte[] buffer, int bufferIndex)
         {
-            uint bytesRead = 0;
-            long newFileLocation = 0;
-            Win32Exports.SetFilePointerEx(_handle, blockIndex * (int) _blockSize, out newFileLocation,
+            Win32Exports.SetFilePointerEx(_handle, blockIndex * (int)_blockSize, out _,
                 Win32Exports.MoveMethod.FILE_BEGIN);
-            Win32Exports.ReadFile(_handle, (IntPtr) _buffer, _blockSize, out bytesRead);
-            Marshal.Copy(_buffer.AllocatedPointer, buffer, bufferIndex, (int) _blockSize);
+
+            Win32Exports.ReadFile(_handle, (nint)_buffer, _blockSize, out _);
+            Marshal.Copy(_buffer.AllocatedPointer, buffer, bufferIndex, (int)_blockSize);
         }
 
-        public long Length { get; }
+        public long Length
+        {
+            get;
+        }
 
         public void Dispose()
         {
@@ -52,11 +54,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected virtual void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
+            }
+
             if (isDisposing)
             {
                 if (_handle != null)
+                {
                     _handle = null;
+                }
+
                 if (_buffer != null)
                 {
                     _buffer.Dispose();

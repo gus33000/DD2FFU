@@ -1,334 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CA57DA6A-2A35-4CA0-A620-A93FE63BB0F8}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DD2FFU</RootNamespace>
-    <AssemblyName>DD2FFU</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
+	<Platforms>x86</Platforms>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>DD2FFU.ico</ApplicationIcon>
+    <AssemblyTitle>DD2FFU</AssemblyTitle>
+    <Description>Converts DD raw image files into FFU files for flashing.</Description>
+    <Company>Proto Beta Test</Company>
+    <Product>DD2FFU</Product>
+    <Copyright>Copyright Proto Beta Test %28c%29 2018</Copyright>
+    <AssemblyVersion>1.0.0.5</AssemblyVersion>
+    <FileVersion>1.0.0.5</FileVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Chimp.Logging.Core, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chimp.Logging.Core.0.2.0-alpha\lib\net45\Chimp.Logging.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CommandLine, Version=2.3.0.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommandLineParser.2.3.0\lib\net45\CommandLine.dll</HintPath>
-    </Reference>
-    <Reference Include="Costura, Version=3.1.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Costura.Fody.3.1.0\lib\net46\Costura.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Containers, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Containers.0.13.0-alpha\lib\net45\DiscUtils.Containers.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Core, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Core.0.13.0-alpha\lib\net45\DiscUtils.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Dmg, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Dmg.0.13.0-alpha\lib\net45\DiscUtils.Dmg.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Iso9660, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Iso9660.0.13.0-alpha\lib\net45\DiscUtils.Iso9660.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Net, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Net.0.13.0-alpha\lib\net45\DiscUtils.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.OpticalDiscSharing, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.OpticalDiscSharing.0.13.0-alpha\lib\net45\DiscUtils.OpticalDiscSharing.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Registry, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Registry.0.13.0-alpha\lib\net45\DiscUtils.Registry.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Streams, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Streams.0.13.0-alpha\lib\net45\DiscUtils.Streams.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Vhd, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Vhd.0.13.0-alpha\lib\net45\DiscUtils.Vhd.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Vhdx, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Vhdx.0.13.0-alpha\lib\net45\DiscUtils.Vhdx.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Vmdk, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Vmdk.0.13.0-alpha\lib\net45\DiscUtils.Vmdk.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Wim, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Wim.0.13.0-alpha\lib\net45\DiscUtils.Wim.dll</HintPath>
-    </Reference>
-    <Reference Include="DiscUtils.Xva, Version=0.13.0.0, Culture=neutral, PublicKeyToken=5fa5b410cc9c6289, processorArchitecture=MSIL">
-      <HintPath>..\packages\DiscUtils.Xva.0.13.0-alpha\lib\net45\DiscUtils.Xva.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Console, Version=4.0.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Console.4.3.1\lib\net46\System.Console.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Reflection.TypeExtensions, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.TypeExtensions.4.5.1\lib\net461\System.Reflection.TypeExtensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UsbEject, Version=3.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UsbEject.3.2.1-alpha\lib\net45\UsbEject.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Decomp\ImageCommon\BuildPaths.cs" />
-    <Compile Include="Decomp\ImageCommon\DeviceLayoutInput.cs" />
-    <Compile Include="Decomp\ImageCommon\DeviceLayoutInputv2.cs" />
-    <Compile Include="Decomp\ImageCommon\FullFlashUpdateHeaders.cs" />
-    <Compile Include="Decomp\ImageCommon\FullFlashUpdateImage.cs" />
-    <Compile Include="Decomp\ImageCommon\ImageCommonException.cs" />
-    <Compile Include="Decomp\ImageCommon\ImageGenerator.cs" />
-    <Compile Include="Decomp\ImageCommon\ImageGeneratorParameters.cs" />
-    <Compile Include="Decomp\ImageCommon\ImageSigner.cs" />
-    <Compile Include="Decomp\ImageCommon\InputHelpers.cs" />
-    <Compile Include="Decomp\ImageCommon\InputIntegerRule.cs" />
-    <Compile Include="Decomp\ImageCommon\InputPartition.cs" />
-    <Compile Include="Decomp\ImageCommon\InputRule.cs" />
-    <Compile Include="Decomp\ImageCommon\InputRules.cs" />
-    <Compile Include="Decomp\ImageCommon\InputStore.cs" />
-    <Compile Include="Decomp\ImageCommon\InputStringRule.cs" />
-    <Compile Include="Decomp\ImageCommon\IPayloadWrapper.cs" />
-    <Compile Include="Decomp\ImageCommon\ManifesttWrapper.cs" />
-    <Compile Include="Decomp\ImageCommon\OEMDevicePlatformInput.cs" />
-    <Compile Include="Decomp\ImageCommon\OutputWrapper.cs" />
-    <Compile Include="Decomp\ImageCommon\SecurityWrapper.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ApplicationTypeValue.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BaseIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdConverter.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElement.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementBoolean.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementBootDevice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDataType.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDataTypeInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDataTypes.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDevice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDeviceGptInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDeviceInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDeviceMbrInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementDeviceRamdiskInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementInteger.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementIntegerList.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementIntegerListInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementObject.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementObjectList.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementObjectListInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementRawDataTypeInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementsInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementString.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdElementValueTypeInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdObject.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdObjectInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdObjects.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdObjectsInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdRegData.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BcdRegValue.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BCDXsdValidator.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BCDXsdValidatorException.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BlockAllocationTable.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BlockIoIdentifierFactory.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BlockIoType.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BootConfigurationDatabase.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\BootIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\CdRomIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\CRC32.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DataBlockEntry.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DataBlockSource.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DataBlockStream.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DataTypeChoice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DeviceTypeChoice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DiskLocation.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DiskStream.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DiskStreamSource.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\DynamicHardDisk.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ElementClass.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ElementDeviceType.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ElementFormat.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\FileIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\FileSystemSourceAllocation.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\FullFlashUpdateType.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GptDataEntryGenerator.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GptPartitionInput.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GptPartitionTypeChoice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GuidPartitionTable.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GuidPartitionTableEntry.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\GuidPartitionTableHeader.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\HardDiskIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IBlockIoIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IBlockStreamSource.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IDeviceIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IEntryGenerator.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageConstants.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImagePayloadSource.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageStorage.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageStorageException.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageStorageManager.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageStoreHeader.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ImageStructures.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IntPtrExtensions.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ISourceAllocation.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\IVirtualHardDisk.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\LocateIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\LogFunction.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MasterBootRecord.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MasterBootRecordMetadataPartition.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MbrDataEntryGenerator.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MbrPartitionEntry.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MetadataPartitionEntry.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\MetadataPartitionHeader.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\NativeImaging.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\NativeServiceHandle.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\OfflineRegistryHandle.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\PartitionFormat.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\PartitionIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\PartitionIdentifierEx.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\PayloadReader.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\RamDiskIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\RemovableDiskIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\SafeVolumeHandle.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\SerialPortIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\StorePayload.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\StructVersionAttribute.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\UdpIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ValidationEntry.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\ValueTypeChoice.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VhdCommon.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VhdExtensions.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VhdFooter.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VhdHeader.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VhdType.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualDiskIdentifier.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualDiskPayloadGenerator.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualDiskPayloadManager.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualDiskSourceAllocation.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualDiskStream.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\VirtualMemoryPtr.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\Win32ExportException.cs" />
-    <Compile Include="Decomp\ImageStorageServiceManaged\Win32Exports.cs" />
-    <Compile Include="Decomp\ToolsCommon\AclCollection.cs" />
-    <Compile Include="Decomp\ToolsCommon\ATTACH_VIRTUAL_DISK_FLAG.cs" />
-    <Compile Include="Decomp\ToolsCommon\ATTACH_VIRTUAL_DISK_PARAMETERS.cs" />
-    <Compile Include="Decomp\ToolsCommon\ATTACH_VIRTUAL_DISK_VERSION.cs" />
-    <Compile Include="Decomp\ToolsCommon\CommonUtils.cs" />
-    <Compile Include="Decomp\ToolsCommon\CREATE_VIRTUAL_DISK_FLAG.cs" />
-    <Compile Include="Decomp\ToolsCommon\CREATE_VIRTUAL_DISK_PARAMETERS.cs" />
-    <Compile Include="Decomp\ToolsCommon\CREATE_VIRTUAL_DISK_PARAMETERS_V1.cs" />
-    <Compile Include="Decomp\ToolsCommon\CREATE_VIRTUAL_DISK_VERSION.cs" />
-    <Compile Include="Decomp\ToolsCommon\DETACH_VIRTUAL_DISK_TYPE.cs" />
-    <Compile Include="Decomp\ToolsCommon\DevicePaths.cs" />
-    <Compile Include="Decomp\ToolsCommon\DirectoryAcl.cs" />
-    <Compile Include="Decomp\ToolsCommon\FileAcl.cs" />
-    <Compile Include="Decomp\ToolsCommon\FileUtils.cs" />
-    <Compile Include="Decomp\ToolsCommon\HiveToRegConverter.cs" />
-    <Compile Include="Decomp\ToolsCommon\IDeploymentLogger.cs" />
-    <Compile Include="Decomp\ToolsCommon\IUException.cs" />
-    <Compile Include="Decomp\ToolsCommon\IULogger.cs" />
-    <Compile Include="Decomp\ToolsCommon\LoggingLevel.cs" />
-    <Compile Include="Decomp\ToolsCommon\LogString.cs" />
-    <Compile Include="Decomp\ToolsCommon\LongPath.cs" />
-    <Compile Include="Decomp\ToolsCommon\LongPathCommon.cs" />
-    <Compile Include="Decomp\ToolsCommon\LongPathDirectory.cs" />
-    <Compile Include="Decomp\ToolsCommon\LongPathFile.cs" />
-    <Compile Include="Decomp\ToolsCommon\NativeMethods.cs" />
-    <Compile Include="Decomp\ToolsCommon\NativeSecurityMethods.cs" />
-    <Compile Include="Decomp\ToolsCommon\OfflineRegNativeMethods.cs" />
-    <Compile Include="Decomp\ToolsCommon\OfflineRegUtils.cs" />
-    <Compile Include="Decomp\ToolsCommon\OPEN_VIRTUAL_DISK_FLAG.cs" />
-    <Compile Include="Decomp\ToolsCommon\OPEN_VIRTUAL_DISK_PARAMETERS.cs" />
-    <Compile Include="Decomp\ToolsCommon\OPEN_VIRTUAL_DISK_VERSION.cs" />
-    <Compile Include="Decomp\ToolsCommon\ORegistryKey.cs" />
-    <Compile Include="Decomp\ToolsCommon\RegistryAcl.cs" />
-    <Compile Include="Decomp\ToolsCommon\RegistryUtils.cs" />
-    <Compile Include="Decomp\ToolsCommon\RegistryValueType.cs" />
-    <Compile Include="Decomp\ToolsCommon\ResourceAcl.cs" />
-    <Compile Include="Decomp\ToolsCommon\ResourceAclComparer.cs" />
-    <Compile Include="Decomp\ToolsCommon\SddNormalizer.cs" />
-    <Compile Include="Decomp\ToolsCommon\SecurityInformationFlags.cs" />
-    <Compile Include="Decomp\ToolsCommon\SecurityUtils.cs" />
-    <Compile Include="Decomp\ToolsCommon\SystemRegistryHiveFiles.cs" />
-    <Compile Include="Decomp\ToolsCommon\VHD_STORAGE_TYPE_DEVICE.cs" />
-    <Compile Include="Decomp\ToolsCommon\VirtualDiskLib.cs" />
-    <Compile Include="Decomp\ToolsCommon\VIRTUAL_DISK_ACCESS_MASK.cs" />
-    <Compile Include="Decomp\ToolsCommon\VIRTUAL_DISK_STORAGE_TYPE_VENDOR.cs" />
-    <Compile Include="Decomp\ToolsCommon\VIRTUAL_STORAGE_TYPE.cs" />
-    <Compile Include="Decomp\ToolsCommon\XsdValidator.cs" />
-    <Compile Include="Decomp\ToolsCommon\XsdValidatorException.cs" />
-    <Compile Include="DiskManagement\GetDiskSize.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="ImageUtils.cs" />
-    <Compile Include="Logging.cs" />
-    <Compile Include="OEMDevicePlatform.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Streams\ADeviceStream.cs" />
-    <Compile Include="Streams\DeviceStream.cs" />
-    <Compile Include="Streams\EPartitionStream.cs" />
-    <Compile Include="WPImageCleaning.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
     <Content Include="DD2FFU.ico" />
-    <Content Include="FodyWeavers.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="makecat.exe.manifest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -347,7 +35,6 @@
     <EmbeddedResource Include="Microsoft\WindowsPhone\Imaging\OEMDevicePlatform.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <Content Include="wintrust.dll.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -366,14 +53,22 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Costura.Fody.3.1.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.1.0\build\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Fody.3.2.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.3.2.2\build\Fody.targets'))" />
-  </Target>
-  <Import Project="..\packages\Costura.Fody.3.1.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.3.1.0\build\Costura.Fody.targets')" />
-  <Import Project="..\packages\Fody.3.2.2\build\Fody.targets" Condition="Exists('..\packages\Fody.3.2.2\build\Fody.targets')" />
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="DiscUtils.Containers" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Core" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Dmg" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Net" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.OpticalDiscSharing" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Registry" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Streams" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Vhd" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Vhdx" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Vmdk" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Wim" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Xva" Version="0.16.13" />
+	<PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="UsbEject.NetCore" Version="1.0.4" />
+  </ItemGroup>
 </Project>

@@ -26,20 +26,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             _recovery = recovery;
             StoreHeader = new ImageStoreHeader();
-            Phase1DataEntries = new List<DataBlockEntry>();
-            Phase2DataEntries = new List<DataBlockEntry>();
-            Phase3DataEntries = new List<DataBlockEntry>();
+            Phase1DataEntries = [];
+            Phase2DataEntries = [];
+            Phase3DataEntries = [];
         }
 
-        public ImageStoreHeader StoreHeader { get; set; }
+        public ImageStoreHeader StoreHeader
+        {
+            get; set;
+        }
 
-        public List<ValidationEntry> ValidationEntries { get; set; }
+        public List<ValidationEntry> ValidationEntries
+        {
+            get; set;
+        }
 
-        public List<DataBlockEntry> Phase1DataEntries { get; set; }
+        public List<DataBlockEntry> Phase1DataEntries
+        {
+            get; set;
+        }
 
-        public List<DataBlockEntry> Phase2DataEntries { get; set; }
+        public List<DataBlockEntry> Phase2DataEntries
+        {
+            get; set;
+        }
 
-        public List<DataBlockEntry> Phase3DataEntries { get; set; }
+        public List<DataBlockEntry> Phase3DataEntries
+        {
+            get; set;
+        }
 
         public List<DataBlockEntry> GetPhaseEntries(BlockPhase phase)
         {
@@ -62,11 +77,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private int GetDescriptorSize()
         {
-            var num = 0;
-            var phase = BlockPhase.Phase1;
-            for (var blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
-                foreach (var phaseEntry in GetPhaseEntries(phase))
+            int num = 0;
+            BlockPhase phase = BlockPhase.Phase1;
+            for (BlockPhase blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
+            {
+                foreach (DataBlockEntry phaseEntry in GetPhaseEntries(phase))
+                {
                     num += phaseEntry.SizeInBytes;
+                }
+            }
+
             return num;
         }
 
@@ -77,18 +97,26 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public byte[] GetMetadata(uint alignment)
         {
-            var memoryStream1 = new MemoryStream();
+            MemoryStream memoryStream1 = new();
             if (StoreHeader.StoreDataSizeInBytes == 0U)
-                StoreHeader.StoreDataSizeInBytes = (uint) GetDescriptorSize();
+            {
+                StoreHeader.StoreDataSizeInBytes = (uint)GetDescriptorSize();
+            }
+
             StoreHeader.WriteToStream(memoryStream1);
-            var phase = BlockPhase.Phase1;
-            for (var blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
-                foreach (var phaseEntry in GetPhaseEntries(phase))
+            BlockPhase phase = BlockPhase.Phase1;
+            for (BlockPhase blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
+            {
+                foreach (DataBlockEntry phaseEntry in GetPhaseEntries(phase))
+                {
                     phaseEntry.WriteEntryToStream(memoryStream1);
-            var num = memoryStream1.Length % alignment;
+                }
+            }
+
+            long num = memoryStream1.Length % alignment;
             if (num != 0L)
             {
-                var memoryStream2 = memoryStream1;
+                MemoryStream memoryStream2 = memoryStream1;
                 memoryStream2.SetLength(memoryStream2.Length + alignment - num);
             }
 
@@ -98,28 +126,28 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void ReadMetadataFromStream(Stream sourceStream)
         {
             StoreHeader = ImageStoreHeader.ReadFromStream(sourceStream);
-            var num1 = StoreHeader.InitialPartitionTableBlockIndex + StoreHeader.InitialPartitionTableBlockCount;
-            var num2 = StoreHeader.FlashOnlyPartitionTableBlockIndex + StoreHeader.FlashOnlyPartitionTableBlockCount;
-            var num3 = StoreHeader.FinalPartitionTableBlockIndex + StoreHeader.FinalPartitionTableBlockCount;
-            var reader = new BinaryReader(sourceStream);
+            uint num1 = StoreHeader.InitialPartitionTableBlockIndex + StoreHeader.InitialPartitionTableBlockCount;
+            uint num2 = StoreHeader.FlashOnlyPartitionTableBlockIndex + StoreHeader.FlashOnlyPartitionTableBlockCount;
+            uint num3 = StoreHeader.FinalPartitionTableBlockIndex + StoreHeader.FinalPartitionTableBlockCount;
+            BinaryReader reader = new(sourceStream);
             uint index;
             for (index = 0U; index < num1; ++index)
             {
-                var dataBlockEntry = new DataBlockEntry(StoreHeader.BytesPerBlock);
+                DataBlockEntry dataBlockEntry = new(StoreHeader.BytesPerBlock);
                 dataBlockEntry.ReadEntryFromStream(reader, index);
                 Phase1DataEntries.Add(dataBlockEntry);
             }
 
             for (; index < num2; ++index)
             {
-                var dataBlockEntry = new DataBlockEntry(StoreHeader.BytesPerBlock);
+                DataBlockEntry dataBlockEntry = new(StoreHeader.BytesPerBlock);
                 dataBlockEntry.ReadEntryFromStream(reader, index);
                 Phase2DataEntries.Add(dataBlockEntry);
             }
 
             for (; index < num3; ++index)
             {
-                var dataBlockEntry = new DataBlockEntry(StoreHeader.BytesPerBlock);
+                DataBlockEntry dataBlockEntry = new(StoreHeader.BytesPerBlock);
                 dataBlockEntry.ReadEntryFromStream(reader, index);
                 Phase3DataEntries.Add(dataBlockEntry);
             }
@@ -128,15 +156,24 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void LogInfo(IULogger logger, bool logStoreHeader, bool logDataEntries)
         {
             if (logStoreHeader)
-                StoreHeader.LogInfo(logger);
-            if (!logDataEntries)
-                return;
-            var phase = BlockPhase.Phase1;
-            for (var blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
             {
-                logger.LogInfo("  {0} entries", (object) phase);
-                foreach (var phaseEntry in GetPhaseEntries(phase))
+                StoreHeader.LogInfo(logger);
+            }
+
+            if (!logDataEntries)
+            {
+                return;
+            }
+
+            BlockPhase phase = BlockPhase.Phase1;
+            for (BlockPhase blockPhase = _recovery ? BlockPhase.Phase3 : BlockPhase.Invalid; phase != blockPhase; ++phase)
+            {
+                logger.LogInfo("  {0} entries", phase);
+                foreach (DataBlockEntry phaseEntry in GetPhaseEntries(phase))
+                {
                     phaseEntry.LogInfo(logger, false, 4);
+                }
+
                 logger.LogInfo("");
             }
         }

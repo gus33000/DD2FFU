@@ -4,11 +4,11 @@
 // MVID: 8A4E8FCA-4522-42C3-A670-4E93952F2307
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\toolscommon.dll
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32.SafeHandles;
 
 namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 {
@@ -37,7 +37,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         internal static extern int IU_GetCanonicalUNCPath(string strPath, StringBuilder pathBuffer, int cchPathBuffer);
 
         [DllImport("UpdateDLL.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int IU_FreeStringList(IntPtr rgFiles, int cFiles);
+        internal static extern int IU_FreeStringList(nint rgFiles, int cFiles);
 
         [DllImport("UpdateDLL.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -56,11 +56,11 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         [DllImport("UpdateDLL.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int IU_GetAllFiles(string strFolder, string strSearchPattern,
-            [MarshalAs(UnmanagedType.Bool)] bool fRecursive, out IntPtr rgFiles, out int cFiles);
+            [MarshalAs(UnmanagedType.Bool)] bool fRecursive, out nint rgFiles, out int cFiles);
 
         [DllImport("UpdateDLL.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int IU_GetAllDirectories(string strFolder, string strSearchPattern,
-            [MarshalAs(UnmanagedType.Bool)] bool fRecursive, out IntPtr rgDirectories, out int cDirectories);
+            [MarshalAs(UnmanagedType.Bool)] bool fRecursive, out nint rgDirectories, out int cDirectories);
 
         internal static int MakeHRFromErrorCode(int errorCode)
         {
@@ -68,8 +68,8 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern int FormatMessage(int dwFlags, IntPtr lpSource, int dwMessageId, int dwLanguageId,
-            StringBuilder lpBuffer, int nSize, IntPtr va_list_arguments);
+        internal static extern int FormatMessage(int dwFlags, nint lpSource, int dwMessageId, int dwLanguageId,
+            StringBuilder lpBuffer, int nSize, nint va_list_arguments);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -89,8 +89,8 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern SafeFileHandle CreateFile(string lpFileName, EFileAccess dwDesiredAccess,
-            uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes,
-            IntPtr hTemplateFile);
+            uint dwShareMode, nint lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes,
+            nint hTemplateFile);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern FileAttributes GetFileAttributes(string lpFileName);

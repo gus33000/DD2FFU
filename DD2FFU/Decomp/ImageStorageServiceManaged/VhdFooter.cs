@@ -44,14 +44,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Features = 0U;
             FileFormatVersion = 65536U;
             DataOffset = dataOffset;
-            TimeStamp = (uint) (DateTime.UtcNow - new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            TimeStamp = (uint)(DateTime.UtcNow - new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
             CreatorApplication = 1987278701U;
             CreatorVersion = 65536U;
             CreatorHostOs = 1466511979U;
             OriginalSize = vhdFileSize;
             CurrentSize = vhdFileSize;
             UniqueId = new Guid();
-            DriveType = (uint) vhdType;
+            DriveType = (uint)vhdType;
             SavedState = 0;
             Reserved = new byte[427];
             DriveGeometry = GetDriveGeometry(vhdFileSize);
@@ -80,7 +80,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static VhdFooter Read(FileStream reader)
         {
-            var vhdFooter = reader.ReadStruct<VhdFooter>();
+            VhdFooter vhdFooter = reader.ReadStruct<VhdFooter>();
             vhdFooter.ChangeByteOrder();
             return vhdFooter;
         }
@@ -103,10 +103,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private static uint GetDriveGeometry(ulong vhdFileSize)
         {
-            var num1 = (uint) (vhdFileSize / VhdCommon.VHDSectorSize);
-            var num2 = 0;
+            uint num1 = (uint)(vhdFileSize / VhdCommon.VHDSectorSize);
+            int num2 = 0;
             if (num1 > 267382800U)
+            {
                 num1 = 267382800U;
+            }
+
             uint num3;
             uint num4;
             uint num5;
@@ -119,10 +122,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             else
             {
                 num3 = 17U;
-                var num6 = num1 / num3;
+                uint num6 = num1 / num3;
                 num4 = (num6 + 1023U) / 1024U;
                 if (num4 < 4U)
+                {
                     num4 = 4U;
+                }
+
                 if (num6 >= num4 * 1024U || num4 > 16U)
                 {
                     num3 = 31U;
@@ -140,8 +146,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 num5 = num6 / num4;
             }
 
-            var num7 = (int) num5 << 16;
-            return (uint) (num2 | num7 | ((int) num4 << 8)) | num3;
+            int num7 = (int)num5 << 16;
+            return (uint)(num2 | num7 | ((int)num4 << 8)) | num3;
         }
 
         private enum VhdFooterFeatures : uint

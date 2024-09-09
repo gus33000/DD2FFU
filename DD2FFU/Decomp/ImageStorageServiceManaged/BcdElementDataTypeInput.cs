@@ -15,9 +15,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [XmlChoiceIdentifier("TypeIdentifier")]
         [XmlElement("WellKnownType", typeof(string))]
         [XmlElement("RawType", typeof(string))]
-        public object DataType { get; set; }
+        public object DataType
+        {
+            get; set;
+        }
 
-        [XmlIgnore] public DataTypeChoice TypeIdentifier { get; set; }
+        [XmlIgnore]
+        public DataTypeChoice TypeIdentifier
+        {
+            get; set;
+        }
 
         [XmlIgnore]
         public BcdElementDataType Type
@@ -25,12 +32,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             get
             {
                 if (TypeIdentifier != DataTypeChoice.WellKnownType)
+                {
                     throw new ImageStorageException(string.Format("{0}: Only WellKnownTypes are currently supported.",
-                        MethodBase.GetCurrentMethod().Name));
-                var wellKnownDataType = BcdElementDataTypes.GetWellKnownDataType(DataType as string);
-                if (wellKnownDataType != null)
-                    return wellKnownDataType;
-                throw new ImageStorageException(string.Format(
+                                        MethodBase.GetCurrentMethod().Name));
+                }
+
+                BcdElementDataType wellKnownDataType = BcdElementDataTypes.GetWellKnownDataType(DataType as string);
+                return wellKnownDataType ?? throw new ImageStorageException(string.Format(
                     "{0}: The element for well known type '{1}' cannot be translated.",
                     MethodBase.GetCurrentMethod().Name, DataType as string));
             }

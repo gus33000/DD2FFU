@@ -8,7 +8,7 @@ using System;
 
 namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 {
-    
+
     public struct VIRTUAL_STORAGE_TYPE
     {
         public VHD_STORAGE_TYPE_DEVICE DeviceId;

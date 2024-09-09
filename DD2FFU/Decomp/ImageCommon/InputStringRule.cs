@@ -10,7 +10,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class InputStringRule : InputRule
     {
-        [XmlArrayItem(ElementName = "Value", IsNullable = false, Type = typeof(string))] [XmlArray("List")]
+        [XmlArrayItem(ElementName = "Value", IsNullable = false, Type = typeof(string))]
+        [XmlArray("List")]
         public string[] Values;
     }
 }

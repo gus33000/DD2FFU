@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.IO;
 using System.Text;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
@@ -18,17 +17,29 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Source = new FileIdentifier(filePath, parentDevice);
         }
 
-         public ulong ImageBase { get; set; }
+        public ulong ImageBase
+        {
+            get; set;
+        }
 
-         public ulong ImageSize { get; set; }
+        public ulong ImageSize
+        {
+            get; set;
+        }
 
-         public uint ImageOffset { get; set; }
+        public uint ImageOffset
+        {
+            get; set;
+        }
 
-        public FileIdentifier Source { get; set; }
+        public FileIdentifier Source
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
-            var num = (int) reader.ReadUInt32();
+            _ = (int)reader.ReadUInt32();
             ImageBase = reader.ReadUInt32();
             ImageSize = reader.ReadUInt64();
             ImageOffset = reader.ReadUInt32();
@@ -44,25 +55,28 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Source.WriteToStream(writer);
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Block IO Type: RamDisk");
-            logger.LogInfo(str + "ImageBase:     0x{0:x}", (object) ImageBase);
-            logger.LogInfo(str + "ImageSize:     0x{0:x}", (object) ImageSize);
-            logger.LogInfo(str + "ImageOffset:   0x{0:x}", (object) ImageOffset);
-            logger.LogInfo(str + "File Path:     {0}", (object) Source.Path);
+            logger.LogInfo(str + "ImageBase:     0x{0:x}", ImageBase);
+            logger.LogInfo(str + "ImageSize:     0x{0:x}", ImageSize);
+            logger.LogInfo(str + "ImageOffset:   0x{0:x}", ImageOffset);
+            logger.LogInfo(str + "File Path:     {0}", Source.Path);
             if (Source.ParentDevice == null)
+            {
                 return;
+            }
+
             Source.ParentDevice.LogInfo(logger, checked(indentLevel + 2));
         }
 
-         public uint Size => Source.Size + 24U;
+        public uint Size => Source.Size + 24U;
 
-         public BlockIoType BlockType => BlockIoType.RamDisk;
+        public BlockIoType BlockType => BlockIoType.RamDisk;
 
-        
+
         public void ReplaceParentDeviceIdentifier(IDeviceIdentifier identifier)
         {
             Source.ReplaceParentDeviceIdentifier(identifier);

@@ -10,15 +10,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class BcdElementDeviceGptInput
     {
-        public string DiskId { get; set; }
+        public string DiskId
+        {
+            get; set;
+        }
 
-        public GptPartitionInput Partition { get; set; }
+        public GptPartitionInput Partition
+        {
+            get; set;
+        }
 
         public static BcdElementDevice CreateGptBootDevice(BcdElementDeviceGptInput inputValue)
         {
-            var baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
-            var empty1 = Guid.Empty;
-            var empty2 = Guid.Empty;
+            BcdElementDevice baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
             Guid diskId;
             Guid partitionId;
             try
@@ -31,7 +35,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 throw new ImageStorageException("Unable to parse the GPTDevice value.", ex);
             }
 
-            var simpleGpt = PartitionIdentifierEx.CreateSimpleGpt(diskId, partitionId);
+            PartitionIdentifierEx simpleGpt = PartitionIdentifierEx.CreateSimpleGpt(diskId, partitionId);
             baseBootDevice.ReplaceBootDeviceIdentifier(simpleGpt);
             return baseBootDevice;
         }

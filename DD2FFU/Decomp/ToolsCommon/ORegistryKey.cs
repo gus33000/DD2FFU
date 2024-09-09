@@ -23,23 +23,29 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         };
 
         private readonly ConcurrentDictionary<ORRegistryKey, bool> m_children =
-            new ConcurrentDictionary<ORRegistryKey, bool>();
+            new();
 
-        private IntPtr m_handle = IntPtr.Zero;
+        private nint m_handle = nint.Zero;
         private readonly bool m_isRoot;
 
-        private ORRegistryKey(string name, IntPtr handle, bool isRoot, ORRegistryKey parent)
+        private ORRegistryKey(string name, nint handle, bool isRoot, ORRegistryKey parent)
         {
             FullName = name;
             m_handle = handle;
             m_isRoot = isRoot;
             Parent = parent;
             if (Parent == null)
+            {
                 return;
+            }
+
             Parent.m_children[this] = true;
         }
 
-        public ORRegistryKey Parent { get; }
+        public ORRegistryKey Parent
+        {
+            get;
+        }
 
         public string[] SubKeys => OfflineRegUtils.GetSubKeys(m_handle);
 
@@ -68,14 +74,19 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
+            {
                 return;
-            foreach (var key in m_children.Keys)
+            }
+
+            foreach (ORRegistryKey key in m_children.Keys)
+            {
                 key.Close();
+            }
+
             m_children.Clear();
             if (Parent != null)
             {
-                bool flag;
-                Parent.m_children.TryRemove(this, out flag);
+                _ = Parent.m_children.TryRemove(this, out _);
             }
 
             Close();
@@ -88,8 +99,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static ORRegistryKey OpenHive(string hivefile, string prefix)
         {
-            if (prefix == null)
-                prefix = "\\";
+            prefix ??= "\\";
             return new ORRegistryKey(prefix, OfflineRegUtils.OpenHive(hivefile), true, null);
         }
 
@@ -109,10 +119,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             ORRegistryKey orRegistryKey1;
             if (-1 < subkeyname.IndexOf("\\", StringComparison.OrdinalIgnoreCase))
             {
-                var strArray = subkeyname.Split(BSLASH_DELIMITER);
-                var orRegistryKey2 = this;
-                var orRegistryKey3 = (ORRegistryKey) null;
-                foreach (var subkeyname1 in strArray)
+                string[] strArray = subkeyname.Split(BSLASH_DELIMITER);
+                ORRegistryKey orRegistryKey2 = this;
+                ORRegistryKey orRegistryKey3 = null;
+                foreach (string subkeyname1 in strArray)
                 {
                     orRegistryKey3 = orRegistryKey2.OpenSubKey(subkeyname1);
                     orRegistryKey2 = orRegistryKey3;
@@ -122,7 +132,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             }
             else
             {
-                var handle = OfflineRegUtils.OpenKey(m_handle, subkeyname);
+                nint handle = OfflineRegUtils.OpenKey(m_handle, subkeyname);
                 orRegistryKey1 = new ORRegistryKey(CombineSubKeys(FullName, subkeyname), handle, false, this);
             }
 
@@ -139,36 +149,31 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             return OfflineRegUtils.GetValue(m_handle, valueName);
         }
 
-        
+
         public uint GetDwordValue(string valueName)
         {
-            var byteValue = GetByteValue(valueName);
-            if (byteValue.Length != 0)
-                return BitConverter.ToUInt32(byteValue, 0);
-            return 0;
+            byte[] byteValue = GetByteValue(valueName);
+            return byteValue.Length != 0 ? BitConverter.ToUInt32(byteValue, 0) : 0;
         }
 
-        
+
         public ulong GetQwordValue(string valueName)
         {
-            var byteValue = GetByteValue(valueName);
-            if (byteValue.Length != 0)
-                return BitConverter.ToUInt64(byteValue, 0);
-            return 0;
+            byte[] byteValue = GetByteValue(valueName);
+            return byteValue.Length != 0 ? BitConverter.ToUInt64(byteValue, 0) : 0;
         }
 
         public string GetStringValue(string valueName)
         {
-            var byteValue = GetByteValue(valueName);
-            var empty = string.Empty;
+            byte[] byteValue = GetByteValue(valueName);
             string str;
             if (byteValue.Length > 1)
             {
-                var numArray1 = byteValue;
-                if (numArray1[numArray1.Length - 1] == 0)
+                byte[] numArray1 = byteValue;
+                if (numArray1[^1] == 0)
                 {
-                    var numArray2 = byteValue;
-                    if (numArray2[numArray2.Length - 2] == 0)
+                    byte[] numArray2 = byteValue;
+                    if (numArray2[^2] == 0)
                     {
                         str = Encoding.Unicode.GetString(byteValue, 0, byteValue.Length - 2);
                         goto label_5;
@@ -177,7 +182,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             }
 
             str = Encoding.Unicode.GetString(byteValue);
-            label_5:
+        label_5:
             return str;
         }
 
@@ -189,8 +194,8 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public object GetValue(string valueName)
         {
-            var valueKind = GetValueKind(valueName);
-            var obj = (object) null;
+            RegistryValueType valueKind = GetValueKind(valueName);
+            object obj = null;
             switch (valueKind)
             {
                 case RegistryValueType.None:
@@ -237,9 +242,15 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public void SaveHive(string path)
         {
             if (!m_isRoot)
+            {
                 throw new IUException("Invalid operation - This registry key does not represent hive root");
+            }
+
             if (string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
+
             OfflineRegUtils.SaveHive(m_handle, path, 6, 3);
         }
 
@@ -248,10 +259,10 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             ORRegistryKey orRegistryKey1;
             if (-1 != subkeyName.IndexOf("\\", StringComparison.OrdinalIgnoreCase))
             {
-                var strArray = subkeyName.Split(BSLASH_DELIMITER, StringSplitOptions.RemoveEmptyEntries);
-                var orRegistryKey2 = this;
-                var orRegistryKey3 = (ORRegistryKey) null;
-                foreach (var subkeyName1 in strArray)
+                string[] strArray = subkeyName.Split(BSLASH_DELIMITER, StringSplitOptions.RemoveEmptyEntries);
+                ORRegistryKey orRegistryKey2 = this;
+                ORRegistryKey orRegistryKey3 = null;
+                foreach (string subkeyName1 in strArray)
                 {
                     orRegistryKey3 = orRegistryKey2.CreateSubKey(subkeyName1);
                     orRegistryKey2 = orRegistryKey3;
@@ -261,7 +272,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             }
             else
             {
-                var key = OfflineRegUtils.CreateKey(m_handle, subkeyName);
+                nint key = OfflineRegUtils.CreateKey(m_handle, subkeyName);
                 orRegistryKey1 = new ORRegistryKey(CombineSubKeys(FullName, subkeyName), key, false, this);
             }
 
@@ -275,31 +286,37 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public void SetValue(string valueName, string value)
         {
-            var bytes = Encoding.Unicode.GetBytes(value);
+            byte[] bytes = Encoding.Unicode.GetBytes(value);
             OfflineRegUtils.SetValue(m_handle, valueName, RegistryValueType.String, bytes);
         }
 
         public void SetValue(string valueName, string[] values)
         {
             if (values == null)
+            {
                 throw new ArgumentNullException(nameof(values));
-            var stringBuilder = new StringBuilder(1024);
-            foreach (var str in values)
-                stringBuilder.AppendFormat("{0}{1}", str, "\0");
-            stringBuilder.Append("\0");
-            var bytes = Encoding.Unicode.GetBytes(stringBuilder.ToString());
+            }
+
+            StringBuilder stringBuilder = new(1024);
+            foreach (string str in values)
+            {
+                _ = stringBuilder.AppendFormat("{0}{1}", str, "\0");
+            }
+
+            _ = stringBuilder.Append("\0");
+            byte[] bytes = Encoding.Unicode.GetBytes(stringBuilder.ToString());
             OfflineRegUtils.SetValue(m_handle, valueName, RegistryValueType.MultiString, bytes);
         }
 
         public void SetValue(string valueName, int value)
         {
-            var bytes = BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             OfflineRegUtils.SetValue(m_handle, valueName, RegistryValueType.DWord, bytes);
         }
 
         public void SetValue(string valueName, long value)
         {
-            var bytes = BitConverter.GetBytes(value);
+            byte[] bytes = BitConverter.GetBytes(value);
             OfflineRegUtils.SetValue(m_handle, valueName, RegistryValueType.QWord, bytes);
         }
 
@@ -316,29 +333,38 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         private string CombineSubKeys(string path1, string path2)
         {
             if (path1 == null)
+            {
                 throw new ArgumentNullException(nameof(path1),
-                    "The first registry key path to combine cannot be null.");
-            if (path2 == null)
-                throw new ArgumentNullException(nameof(path2),
-                    "The second registry key path to combine cannot be null.");
-            if (-1 < path2.IndexOf("\\", StringComparison.OrdinalIgnoreCase) || path1.Length == 0)
-                return path2;
-            if (path2.Length == 0)
-                return path1;
-            if (path1.Length == path1.LastIndexOfAny(BSLASH_DELIMITER) + 1)
-                return path1 + path2;
-            return path1 + BSLASH_DELIMITER[0] + path2;
+                                "The first registry key path to combine cannot be null.");
+            }
+
+            return path2 == null
+                ? throw new ArgumentNullException(nameof(path2),
+                                "The second registry key path to combine cannot be null.")
+                : -1 < path2.IndexOf("\\", StringComparison.OrdinalIgnoreCase) || path1.Length == 0
+                ? path2
+                : path2.Length == 0
+                ? path1
+                : path1.Length == path1.LastIndexOfAny(BSLASH_DELIMITER) + 1 ? path1 + path2 : path1 + BSLASH_DELIMITER[0] + path2;
         }
 
         private void Close()
         {
-            if (!(m_handle != IntPtr.Zero))
+            if (!(m_handle != nint.Zero))
+            {
                 return;
+            }
+
             if (m_isRoot)
+            {
                 OfflineRegUtils.CloseHive(m_handle);
+            }
             else
+            {
                 OfflineRegUtils.CloseKey(m_handle);
-            m_handle = IntPtr.Zero;
+            }
+
+            m_handle = nint.Zero;
         }
     }
 }

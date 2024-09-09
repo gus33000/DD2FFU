@@ -13,16 +13,21 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         [XmlArrayItem(ElementName = "StringValue", IsNullable = false, Type = typeof(string))]
         [XmlArray]
-        public string[] StringValues { get; set; }
+        public string[] StringValues
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(StreamWriter writer, string elementName)
         {
             writer.Write("\"Element\"=hex:");
-            for (var index = 0; index < StringValues.Length; ++index)
+            for (int index = 0; index < StringValues.Length; ++index)
             {
                 BcdElementValueTypeInput.WriteIntegerValue(writer, elementName, StringValues[index]);
                 if (index < StringValues.Length - 1)
+                {
                     writer.Write(",");
+                }
             }
 
             writer.WriteLine();
@@ -31,13 +36,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void SaveAsRegData(BcdRegData bcdRegData, string path)
         {
-            var memoryStream = new MemoryStream();
-            var writer = new StreamWriter(memoryStream);
-            for (var index = 0; index < StringValues.Length; ++index)
+            MemoryStream memoryStream = new();
+            StreamWriter writer = new(memoryStream);
+            for (int index = 0; index < StringValues.Length; ++index)
+            {
                 BcdElementValueTypeInput.WriteIntegerValue(writer, "", StringValues[index]);
+            }
+
             writer.Flush();
             memoryStream.Position = 0L;
-            var end = new StreamReader(memoryStream).ReadToEnd();
+            string end = new StreamReader(memoryStream).ReadToEnd();
             bcdRegData.AddRegValue(path, "Element", end, "REG_BINARY");
         }
     }

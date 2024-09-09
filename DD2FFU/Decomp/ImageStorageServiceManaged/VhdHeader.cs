@@ -33,7 +33,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             Cookie = BitConverter.ToUInt64(Encoding.ASCII.GetBytes("cxsparse"), 0);
             DataOffset = ulong.MaxValue;
-            TableOffset = (ulong) (Marshal.SizeOf(typeof(VhdFooter)) + Marshal.SizeOf(typeof(VhdHeader)));
+            TableOffset = (ulong)(Marshal.SizeOf(typeof(VhdFooter)) + Marshal.SizeOf(typeof(VhdHeader)));
             HeaderVersion = 65536U;
             BlockSize = VhdCommon.DynamicVHDBlockSize;
             ParentUniqueId = Guid.Empty;
@@ -47,9 +47,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private static uint CalculateNumberOfBlocks(ulong vhdFileSize)
         {
-            if (vhdFileSize % VhdCommon.DynamicVHDBlockSize != 0UL)
-                return (uint) (vhdFileSize / VhdCommon.DynamicVHDBlockSize + 1UL);
-            return (uint) (vhdFileSize / VhdCommon.DynamicVHDBlockSize);
+            return vhdFileSize % VhdCommon.DynamicVHDBlockSize != 0UL
+                ? (uint)((vhdFileSize / VhdCommon.DynamicVHDBlockSize) + 1UL)
+                : (uint)(vhdFileSize / VhdCommon.DynamicVHDBlockSize);
         }
 
         private void ChangeByteOrder()
@@ -78,7 +78,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static VhdHeader Read(FileStream reader)
         {
-            var vhdHeader = reader.ReadStruct<VhdHeader>();
+            VhdHeader vhdHeader = reader.ReadStruct<VhdHeader>();
             vhdHeader.ChangeByteOrder();
             return vhdHeader;
         }

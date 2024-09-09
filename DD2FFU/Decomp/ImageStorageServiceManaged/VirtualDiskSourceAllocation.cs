@@ -22,9 +22,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _virtualDisk = new DynamicHardDisk(virtualDiskPath, false);
             _sectorsPerVirtualBlock = _virtualDisk.BlockSize / _virtualDisk.SectorSize;
             if (_virtualDisk.BlockSize % alignmentSize != 0U)
+            {
                 throw new ImageStorageException(string.Format(
-                    "{0}: The virtual disk allocation size (0x{1:x}) is not a multiple of the given alignment size (0x{2:x}).",
-                    MethodBase.GetCurrentMethod().Name, _virtualDisk.BlockSize, alignmentSize));
+                                "{0}: The virtual disk allocation size (0x{1:x}) is not a multiple of the given alignment size (0x{2:x}).",
+                                MethodBase.GetCurrentMethod().Name, _virtualDisk.BlockSize, alignmentSize));
+            }
         }
 
         public void Dispose()
@@ -36,7 +38,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public bool BlockIsAllocated(ulong diskByteOffset)
         {
             return _virtualDisk.AllocationTable[
-                       (uint) (diskByteOffset / _virtualDisk.SectorSize / _sectorsPerVirtualBlock)] != uint.MaxValue;
+                       (uint)(diskByteOffset / _virtualDisk.SectorSize / _sectorsPerVirtualBlock)] != uint.MaxValue;
         }
 
         public uint GetAllocationSize()
@@ -52,7 +54,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected virtual void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
+            }
+
             if (isDisposing)
             {
                 _virtualDiskPath = null;

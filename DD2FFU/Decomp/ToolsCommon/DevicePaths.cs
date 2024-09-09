@@ -15,7 +15,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         private static readonly string _updateFilesPath = "SharedData\\DuShared";
         private static readonly string _BiosBCDHivePath = "boot";
         private static readonly string _UefiBCDHivePath = "efi\\Microsoft\\boot";
-        private static string _dsmPath = ImageUpdatePath;
+        private static readonly string _dsmPath = ImageUpdatePath;
         private static readonly string _UpdateOSPath = "PROGRAMS\\UpdateOS\\";
         private static readonly string _FMFilesDirectory = "FeatureManifest";
         private static readonly string _OEMInputPath = "OEMInput";
@@ -79,9 +79,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string GetBCDHivePath(bool isUefiBoot)
         {
-            if (!isUefiBoot)
-                return _BiosBCDHivePath;
-            return _UefiBCDHivePath;
+            return !isUefiBoot ? _BiosBCDHivePath : _UefiBCDHivePath;
         }
 
         public static string GetRegistryHiveFilePath(SystemRegistryHiveFiles hiveType)
@@ -91,7 +89,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string GetRegistryHiveFilePath(SystemRegistryHiveFiles hiveType, bool isUefiBoot)
         {
-            var str = "";
+            string str = "";
             switch (hiveType)
             {
                 case SystemRegistryHiveFiles.SYSTEM:

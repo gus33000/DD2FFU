@@ -16,37 +16,39 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public BlockAllocationTable(uint batSize)
         {
             _blockAllocationTable =
-                new uint[(int) (
-                    VhdCommon.Round(batSize * (uint) Marshal.SizeOf(typeof(uint)), VhdCommon.VHDSectorSize) /
-                    (uint) Marshal.SizeOf(typeof(uint)))];
-            for (var index = 0; (long) index < (long) batSize; ++index)
+                new uint[(int)(
+                    VhdCommon.Round(batSize * (uint)Marshal.SizeOf(typeof(uint)), VhdCommon.VHDSectorSize) /
+                    (uint)Marshal.SizeOf(typeof(uint)))];
+            for (int index = 0; index < batSize; ++index)
+            {
                 _blockAllocationTable[index] = uint.MaxValue;
+            }
         }
 
         public uint this[uint index]
         {
-            get => _blockAllocationTable[(int) index];
-            set => _blockAllocationTable[(int) index] = value;
+            get => _blockAllocationTable[(int)index];
+            set => _blockAllocationTable[(int)index] = value;
         }
 
-        public ulong SizeInBytes => (ulong) _blockAllocationTable.Length * (ulong) Marshal.SizeOf(typeof(uint));
+        public ulong SizeInBytes => (ulong)_blockAllocationTable.Length * (ulong)Marshal.SizeOf(typeof(uint));
 
-        public uint EntryCount => (uint) _blockAllocationTable.Length;
+        public uint EntryCount => (uint)_blockAllocationTable.Length;
 
         public void Write(FileStream writer)
         {
-            foreach (var data in _blockAllocationTable)
+            foreach (uint data in _blockAllocationTable)
             {
-                var structure = VhdCommon.Swap32(data);
+                uint structure = VhdCommon.Swap32(data);
                 writer.WriteStruct(ref structure);
             }
         }
 
         public void Read(FileStream reader)
         {
-            for (var index = 0; index < _blockAllocationTable.Length; ++index)
+            for (int index = 0; index < _blockAllocationTable.Length; ++index)
             {
-                var data = reader.ReadStruct<uint>();
+                uint data = reader.ReadStruct<uint>();
                 _blockAllocationTable[index] = VhdCommon.Swap32(data);
             }
         }

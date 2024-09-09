@@ -4,10 +4,10 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
@@ -47,15 +47,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override bool CanSeek => false;
 
-        public override long Length => (long) _sectorCount * _sectorSize;
+        public override long Length => (long)_sectorCount * _sectorSize;
 
         public override long Position
         {
             get => _position;
             set
             {
-                if ((ulong) value > _sizeInBytes)
+                if ((ulong)value > _sizeInBytes)
+                {
                     throw new ImageStorageException("The specified osition is beyond the end of the disk.");
+                }
+
                 _position = value;
             }
         }
@@ -68,13 +71,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected override void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
+            }
+
             if (isDisposing)
             {
                 if (_diskHandle != null)
                 {
                     if (_ownsDiskHandle)
+                    {
                         _diskHandle.Dispose();
+                    }
+
                     _diskHandle = null;
                 }
 
@@ -94,10 +103,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _diskHandle = diskHandle;
             _canRead = canRead;
             _canWrite = canWrite;
-            long newFileLocation = 0;
-            Win32Exports.SetFilePointerEx(diskHandle, 0L, out newFileLocation, Win32Exports.MoveMethod.FILE_BEGIN);
-            _sectorCount = NativeImaging.GetSectorCount(IntPtr.Zero, _diskHandle);
-            _sectorSize = NativeImaging.GetSectorSize(IntPtr.Zero, _diskHandle);
+
+            Win32Exports.SetFilePointerEx(diskHandle, 0L, out _, Win32Exports.MoveMethod.FILE_BEGIN);
+            _sectorCount = NativeImaging.GetSectorCount(nint.Zero, _diskHandle);
+            _sectorSize = NativeImaging.GetSectorSize(nint.Zero, _diskHandle);
             _sizeInBytes = _sectorCount * _sectorSize;
             _buffer = new VirtualMemoryPtr(65536U);
         }
@@ -109,19 +118,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private void FillBuffer(uint sectorIndex)
         {
-            var num = (ulong) (sectorIndex * _sectorSize);
+            ulong num = sectorIndex * _sectorSize;
             uint bytesToRead = 65536;
-            uint bytesRead = 0;
             if (_sizeInBytes - num < 65536UL)
             {
-                Marshal.Copy(new byte[65536], 0, (IntPtr) _buffer, 65536);
-                bytesToRead = (uint) (_sizeInBytes - num);
+                Marshal.Copy(new byte[65536], 0, (nint)_buffer, 65536);
+                bytesToRead = (uint)(_sizeInBytes - num);
             }
 
-            long newFileLocation;
-            Win32Exports.SetFilePointerEx(_diskHandle, (long) num, out newFileLocation,
+            Win32Exports.SetFilePointerEx(_diskHandle, (long)num, out _,
                 Win32Exports.MoveMethod.FILE_BEGIN);
-            Win32Exports.ReadFile(_diskHandle, (IntPtr) _buffer, bytesToRead, out bytesRead);
+
+            Win32Exports.ReadFile(_diskHandle, (nint)_buffer, bytesToRead, out _);
             _bufferOffsetOnDisk = num;
         }
 
@@ -132,35 +140,43 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private uint BytesInBuffer(ulong diskOffset)
         {
-            if (!OffsetIsInBuffer(diskOffset))
-                throw new ImageStorageException("Attempt to copy from outside the buffer range.");
-            return (uint) (65536UL - (diskOffset - _bufferOffsetOnDisk));
+            return !OffsetIsInBuffer(diskOffset)
+                ? throw new ImageStorageException("Attempt to copy from outside the buffer range.")
+                : (uint)(65536UL - (diskOffset - _bufferOffsetOnDisk));
         }
 
         private void CopyFromBuffer(byte[] destination, int destinationOffset, int count, ulong diskOffset,
             out uint bytesCopied)
         {
             if (!OffsetIsInBuffer(diskOffset))
+            {
                 throw new ImageStorageException("Attempt to copy from outside the buffer range.");
-            var num = Math.Min(BytesInBuffer(diskOffset), (uint) count);
-            Marshal.Copy(((IntPtr) _buffer).Increment((int) (uint) (diskOffset - _bufferOffsetOnDisk)), destination,
-                destinationOffset, (int) num);
+            }
+
+            uint num = Math.Min(BytesInBuffer(diskOffset), (uint)count);
+            Marshal.Copy(((nint)_buffer).Increment((int)(uint)(diskOffset - _bufferOffsetOnDisk)), destination,
+                destinationOffset, (int)num);
             bytesCopied = num;
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var num = 0;
-            if (_sizeInBytes - (uint) count < (uint) offset)
+            int num = 0;
+            if (_sizeInBytes - (uint)count < (uint)offset)
+            {
                 throw new ImageStorageException("Attempt to read beyond end of the disk.");
+            }
+
             while (count > 0)
             {
-                if (!OffsetIsInBuffer((ulong) _position))
-                    FillBuffer((uint) ((ulong) _position / _sectorSize));
-                uint bytesCopied = 0;
-                CopyFromBuffer(buffer, offset + num, count, (ulong) _position, out bytesCopied);
-                num += (int) bytesCopied;
-                count -= (int) bytesCopied;
+                if (!OffsetIsInBuffer((ulong)_position))
+                {
+                    FillBuffer((uint)((ulong)_position / _sectorSize));
+                }
+
+                CopyFromBuffer(buffer, offset + num, count, (ulong)_position, out uint bytesCopied);
+                num += (int)bytesCopied;
+                count -= (int)bytesCopied;
                 _position += bytesCopied;
             }
 

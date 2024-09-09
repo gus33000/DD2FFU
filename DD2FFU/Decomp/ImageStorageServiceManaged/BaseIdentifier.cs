@@ -8,6 +8,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public abstract class BaseIdentifier
     {
-        public BcdElementBootDevice Parent { get; set; }
+        public BcdElementBootDevice Parent
+        {
+            get; set;
+        }
     }
 }

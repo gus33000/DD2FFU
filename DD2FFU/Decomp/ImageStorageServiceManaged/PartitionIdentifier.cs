@@ -14,20 +14,32 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class PartitionIdentifier : BaseIdentifier, IDeviceIdentifier
     {
-         public uint ElToritoValue { get; set; }
+        public uint ElToritoValue
+        {
+            get; set;
+        }
 
-        public Guid GptValue { get; set; }
+        public Guid GptValue
+        {
+            get; set;
+        }
 
-         public uint MbrPartitionNumber { get; set; }
+        public uint MbrPartitionNumber
+        {
+            get; set;
+        }
 
-         public IBlockIoIdentifier ParentIdentifier { get; set; }
+        public IBlockIoIdentifier ParentIdentifier
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
-            var b = reader.ReadBytes(16);
+            byte[] b = reader.ReadBytes(16);
             GptValue = new Guid(b);
-            ElToritoValue = (uint) ((b[3] << 24) | (b[2] << 16) | (b[1] << 8)) | b[0];
-            MbrPartitionNumber = (uint) ((b[3] << 24) | (b[2] << 16) | (b[1] << 8)) | b[0];
+            ElToritoValue = (uint)((b[3] << 24) | (b[2] << 16) | (b[1] << 8)) | b[0];
+            MbrPartitionNumber = (uint)((b[3] << 24) | (b[2] << 16) | (b[1] << 8)) | b[0];
             ParentIdentifier = BlockIoIdentifierFactory.CreateFromStream(reader);
             ParentIdentifier.ReadFromStream(reader);
         }
@@ -38,29 +50,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 MethodBase.GetCurrentMethod().Name));
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Identifier: Partition");
             if (ParentIdentifier != null)
             {
                 if (ParentIdentifier.BlockType == BlockIoType.HardDisk)
+                {
                     switch ((ParentIdentifier as HardDiskIdentifier).PartitionStyle)
                     {
                         case PartitionFormat.Gpt:
-                            logger.LogInfo(str + "GPT Partition Identifier: {{{0}}}", (object) GptValue);
+                            logger.LogInfo(str + "GPT Partition Identifier: {{{0}}}", GptValue);
                             break;
                         case PartitionFormat.Mbr:
-                            logger.LogInfo(str + "MBR Partition Number: {0}", (object) MbrPartitionNumber);
+                            logger.LogInfo(str + "MBR Partition Number: {0}", MbrPartitionNumber);
                             break;
                         case PartitionFormat.Raw:
                             throw new ImageStorageException("Cannot use a partition identifier on a RAW disk.");
                     }
+                }
                 else if (ParentIdentifier.BlockType == BlockIoType.CdRom)
-                    logger.LogInfo(str + "El Torito Value: {0}", (object) ElToritoValue);
+                {
+                    logger.LogInfo(str + "El Torito Value: {0}", ElToritoValue);
+                }
                 else
+                {
                     logger.LogInfo(str + "Value: Unsure of the partition style.");
+                }
             }
             else
             {
@@ -68,6 +86,6 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-         public uint Size => 0;
+        public uint Size => 0;
     }
 }

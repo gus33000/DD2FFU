@@ -21,19 +21,25 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             _logger = logger;
             if (logger == null)
+            {
                 _logger = new IULogger();
+            }
+
             _parameters = parameters;
         }
 
         public FullFlashUpdateImage CreateFFU()
         {
-            var image = new FullFlashUpdateImage();
+            FullFlashUpdateImage image = new();
             if (_parameters == null)
+            {
                 throw new ImageCommonException(
-                    "ImageCommon!ImageGenerator::CreateFFU: ImageGenerator has not been initialized.");
+                                "ImageCommon!ImageGenerator::CreateFFU: ImageGenerator has not been initialized.");
+            }
+
             try
             {
-                _parameters.VerifyInputParameters();
+                _ = _parameters.VerifyInputParameters();
                 image.Initialize();
                 image.Description = _parameters.Description;
                 image.DevicePlatformIDs = _parameters.DevicePlatformIDs.ToList();
@@ -49,35 +55,46 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
             if (_parameters.Rules != null)
             {
-                var stringBuilder1 = new StringBuilder();
-                foreach (var integerRule in _parameters.Rules.IntegerRules)
+                StringBuilder stringBuilder1 = new();
+                foreach (InputIntegerRule integerRule in _parameters.Rules.IntegerRules)
                 {
-                    var nullable1 = integerRule.Min;
+                    ulong? nullable1 = integerRule.Min;
                     if (!nullable1.HasValue)
                     {
                         nullable1 = integerRule.Max;
                         if (!nullable1.HasValue)
+                        {
                             goto label_10;
+                        }
                     }
 
                     if (integerRule.Values != null && integerRule.Values.Length != 0)
+                    {
                         throw new ImageCommonException(
-                            "ImageCommon!ImageGenerator::CreateFFU: Cannot specify both min/max value and list at the same time");
-                    label_10:
+                                                "ImageCommon!ImageGenerator::CreateFFU: Cannot specify both min/max value and list at the same time");
+                    }
+
+                label_10:
                     if (!integerRule.Property.All(char.IsLetterOrDigit))
+                    {
                         throw new ImageCommonException(
-                            "ImageCommon!ImageGenerator::CreateFFU: Only alphanumerics are allowed for the rule property");
+                                                "ImageCommon!ImageGenerator::CreateFFU: Only alphanumerics are allowed for the rule property");
+                    }
+
                     nullable1 = integerRule.Min;
                     if (!nullable1.HasValue)
                     {
                         nullable1 = integerRule.Max;
                         if (!nullable1.HasValue)
                         {
-                            stringBuilder1.AppendFormat("{0}={1}[{2}", integerRule.Property, integerRule.ModeCharacter,
+                            _ = stringBuilder1.AppendFormat("{0}={1}[{2}", integerRule.Property, integerRule.ModeCharacter,
                                 integerRule.Values[0]);
-                            foreach (var num in integerRule.Values.Skip(1))
-                                stringBuilder1.AppendFormat(",{0}", num);
-                            stringBuilder1.Append("];");
+                            foreach (ulong num in integerRule.Values.Skip(1))
+                            {
+                                _ = stringBuilder1.AppendFormat(",{0}", num);
+                            }
+
+                            _ = stringBuilder1.Append("];");
                             continue;
                         }
                     }
@@ -94,21 +111,23 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                             if ((nullable1.GetValueOrDefault() > nullable2.GetValueOrDefault()
                                     ? nullable1.HasValue & nullable2.HasValue ? 1 : 0
                                     : 0) != 0)
+                            {
                                 throw new ImageCommonException(
-                                    "ImageCommon!ImageGenerator::CreateFFU: Invalid min/max integer rule");
+                                                                "ImageCommon!ImageGenerator::CreateFFU: Invalid min/max integer rule");
+                            }
                         }
                     }
 
-                    var stringBuilder2 = stringBuilder1;
-                    var format = "{0}={1}<{2},{3}>;";
-                    var objArray = new object[4]
+                    StringBuilder stringBuilder2 = stringBuilder1;
+                    string format = "{0}={1}<{2},{3}>;";
+                    object[] objArray = new object[4]
                     {
                         integerRule.Property,
                         integerRule.ModeCharacter,
                         null,
                         null
                     };
-                    var index1 = 2;
+                    int index1 = 2;
                     nullable2 = integerRule.Min;
                     string empty1;
                     if (nullable2.HasValue)
@@ -122,7 +141,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     }
 
                     objArray[index1] = empty1;
-                    var index2 = 3;
+                    int index2 = 3;
                     nullable2 = integerRule.Max;
                     string empty2;
                     if (nullable2.HasValue)
@@ -136,21 +155,27 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     }
 
                     objArray[index2] = empty2;
-                    stringBuilder2.AppendFormat(format, objArray);
+                    _ = stringBuilder2.AppendFormat(format, objArray);
                 }
 
-                var unicodeEncoding = new UnicodeEncoding();
-                foreach (var stringRule in _parameters.Rules.StringRules)
+                UnicodeEncoding unicodeEncoding = new();
+                foreach (InputStringRule stringRule in _parameters.Rules.StringRules)
                 {
                     if (!stringRule.Property.All(char.IsLetterOrDigit))
+                    {
                         throw new ImageCommonException(
-                            "ImageCommon!ImageGenerator::CreateFFU: Only alphanumerics are allowed for the rule property");
-                    stringBuilder1.AppendFormat("{0}={1}", stringRule.Property, stringRule.ModeCharacter);
-                    stringBuilder1.Append("{");
-                    stringBuilder1.Append(Convert.ToBase64String(unicodeEncoding.GetBytes(stringRule.Values[0])));
-                    foreach (var s in stringRule.Values.Skip(1))
-                        stringBuilder1.AppendFormat(",{0}", Convert.ToBase64String(unicodeEncoding.GetBytes(s)));
-                    stringBuilder1.Append("};");
+                                                "ImageCommon!ImageGenerator::CreateFFU: Only alphanumerics are allowed for the rule property");
+                    }
+
+                    _ = stringBuilder1.AppendFormat("{0}={1}", stringRule.Property, stringRule.ModeCharacter);
+                    _ = stringBuilder1.Append("{");
+                    _ = stringBuilder1.Append(Convert.ToBase64String(unicodeEncoding.GetBytes(stringRule.Values[0])));
+                    foreach (string s in stringRule.Values.Skip(1))
+                    {
+                        _ = stringBuilder1.AppendFormat(",{0}", Convert.ToBase64String(unicodeEncoding.GetBytes(s)));
+                    }
+
+                    _ = stringBuilder1.Append("};");
                 }
 
                 image.RulesVersion = "1.0";
@@ -159,17 +184,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
             try
             {
-                foreach (var store1 in _parameters.Stores)
+                foreach (InputStore store1 in _parameters.Stores)
                 {
-                    var store2 = new FullFlashUpdateImage.FullFlashUpdateStore();
-                    var minSectorCount = _parameters.MinSectorCount;
+                    FullFlashUpdateImage.FullFlashUpdateStore store2 = new();
+                    uint minSectorCount = _parameters.MinSectorCount;
                     if (!store1.IsMainOSStore())
-                        minSectorCount = store1.SizeInSectors;
-                    store2.Initialize(image, store1.Id, store1.IsMainOSStore(), store1.DevicePath,
-                        store1.OnlyAllocateDefinedGptEntries, minSectorCount, _parameters.SectorSize);
-                    foreach (var partition1 in store1.Partitions)
                     {
-                        var partition2 = new FullFlashUpdateImage.FullFlashUpdatePartition();
+                        minSectorCount = store1.SizeInSectors;
+                    }
+
+                    store2.Initialize(image, store1.Id, store1.IsMainOSStore(), store1.DevicePath,
+                                            store1.OnlyAllocateDefinedGptEntries, minSectorCount, _parameters.SectorSize);
+                    foreach (InputPartition partition1 in store1.Partitions)
+                    {
+                        FullFlashUpdateImage.FullFlashUpdatePartition partition2 = new();
                         partition2.Initialize(0U, partition1.TotalSectors, partition1.Type, partition1.Id,
                             partition1.Name, store2, partition1.UseAllSpace);
                         partition2.FileSystem = partition1.FileSystem;
@@ -184,7 +212,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                         partition2.OffsetInSectors = partition1.OffsetInSectors;
                         store2.AddPartition(partition2);
                         if (!store1.IsMainOSStore() && partition1.ByteAlignment == 0U)
+                        {
                             partition2.ByteAlignment = image.ChunkSize * 1024U;
+                        }
                     }
 
                     image.AddStore(store2);

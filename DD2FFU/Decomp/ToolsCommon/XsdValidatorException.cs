@@ -33,9 +33,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public override string ToString()
         {
-            var message = Message;
+            string message = Message;
             if (InnerException != null)
+            {
                 message += InnerException.ToString();
+            }
+
             return message;
         }
     }

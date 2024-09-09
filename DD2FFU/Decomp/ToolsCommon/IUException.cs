@@ -50,10 +50,15 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         {
             get
             {
-                var stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
                 for (Exception exception = this; exception != null; exception = exception.InnerException)
+                {
                     if (!string.IsNullOrEmpty(exception.Message))
-                        stringBuilder.AppendLine(exception.Message);
+                    {
+                        _ = stringBuilder.AppendLine(exception.Message);
+                    }
+                }
+
                 return stringBuilder.ToString();
             }
         }

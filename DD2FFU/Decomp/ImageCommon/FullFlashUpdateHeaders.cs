@@ -11,10 +11,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     public static class FullFlashUpdateHeaders
     {
         public static uint SecurityHeaderSize =>
-            (uint) (FullFlashUpdateImage.SecureHeaderSize + GetSecuritySignature().Length);
+            (uint)(FullFlashUpdateImage.SecureHeaderSize + GetSecuritySignature().Length);
 
         public static uint ImageHeaderSize =>
-            (uint) (FullFlashUpdateImage.ImageHeaderSize + GetImageSignature().Length);
+            (uint)(FullFlashUpdateImage.ImageHeaderSize + GetImageSignature().Length);
 
         public static byte[] GetSecuritySignature()
         {

@@ -22,9 +22,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private byte[] _memoryData;
 
-        public DataSource Source { get; set; }
+        public DataSource Source
+        {
+            get; set;
+        }
 
-        public ulong StorageOffset { get; set; }
+        public ulong StorageOffset
+        {
+            get; set;
+        }
 
         public void SetMemoryData(byte[] buffer, int bufferOffset, int blockSize)
         {
@@ -35,7 +41,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void SetMemoryData(FileStream stream, int blockSize)
         {
             _memoryData = new byte[blockSize];
-            stream.Read(_memoryData, 0, blockSize);
+            _ = stream.Read(_memoryData, 0, blockSize);
         }
 
         public void CreateMemoryData(int blockSize)
@@ -50,16 +56,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public byte[] GetNewMemoryData(uint blockSize)
         {
-            _memoryData = new byte[(int) blockSize];
+            _memoryData = new byte[(int)blockSize];
             return _memoryData;
         }
 
         public void LogInfo(IULogger logger, ushort indentLevel = 0)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo(str + "Source           : {0}", (object) Source);
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo(str + "Source           : {0}", Source);
             if (Source == DataSource.Disk)
-                logger.LogInfo(str + "  : {0}", (object) StorageOffset);
+            {
+                logger.LogInfo(str + "  : {0}", StorageOffset);
+            }
+
             logger.LogInfo("");
         }
     }

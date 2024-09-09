@@ -14,8 +14,8 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 {
     internal static class SddlNormalizer
     {
-        private static readonly HashSet<string> s_knownSids = new HashSet<string>
-        {
+        private static readonly HashSet<string> s_knownSids =
+        [
             "AN",
             "AO",
             "AU",
@@ -58,20 +58,22 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             "SY",
             "WD",
             "WR"
-        };
+        ];
 
-        private static readonly ConcurrentDictionary<string, string> s_map = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, string> s_map = new();
 
         private static string ToFullSddl(string sid)
         {
             if (string.IsNullOrEmpty(sid) || sid.StartsWith("S-", StringComparison.Ordinal) ||
                 s_knownSids.Contains(sid))
+            {
                 return sid;
-            var str = (string) null;
-            if (!s_map.TryGetValue(sid, out str))
+            }
+
+            if (!s_map.TryGetValue(sid, out string str))
             {
                 str = new SecurityIdentifier(sid).ToString();
-                s_map.TryAdd(sid, str);
+                _ = s_map.TryAdd(sid, str);
             }
 
             return str;
@@ -79,24 +81,24 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         private static string FormatFullAccountSid(string matchGroupIndex, Match match)
         {
-            var str = match.Value;
-            var sid = match.Groups[matchGroupIndex].Value;
-            var ch = str[str.Length - 1];
+            string str = match.Value;
+            string sid = match.Groups[matchGroupIndex].Value;
+            char ch = str[^1];
             return str.Remove(str.Length - (sid.Length + 1)) + ToFullSddl(sid) + ch;
         }
 
         public static string FixAceSddl(string sddl)
         {
-            if (string.IsNullOrEmpty(sddl))
-                return sddl;
-            return Regex.Replace(sddl, "((;[^;]*){4};)(?<sid>[^;\\)]+)([;\\)])", x => FormatFullAccountSid("sid", x));
+            return string.IsNullOrEmpty(sddl)
+                ? sddl
+                : Regex.Replace(sddl, "((;[^;]*){4};)(?<sid>[^;\\)]+)([;\\)])", x => FormatFullAccountSid("sid", x));
         }
 
         public static string FixOwnerSddl(string sddl)
         {
-            if (string.IsNullOrEmpty(sddl))
-                return sddl;
-            return Regex.Replace(sddl, "O:(?<oid>.*?)G:(?<gid>.*)",
+            return string.IsNullOrEmpty(sddl)
+                ? sddl
+                : Regex.Replace(sddl, "O:(?<oid>.*?)G:(?<gid>.*)",
                 x => string.Format("O:{0}G:{1}", ToFullSddl(x.Groups["oid"].Value), ToFullSddl(x.Groups["gid"].Value)));
         }
     }

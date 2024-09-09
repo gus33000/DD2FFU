@@ -30,54 +30,66 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void ReadBlock(uint blockIndex, byte[] buffer, int bufferIndex)
         {
-            var diskOffset = blockIndex * (long) _blockSize;
+            long diskOffset = blockIndex * (long)_blockSize;
             if (diskOffset > Length)
+            {
                 throw new ImageStorageException("Attempting to read beyond the end of the disk.");
-            var offsetForDiskOffset = GetDataBlockOffsetForDiskOffset(diskOffset);
+            }
+
+            long offsetForDiskOffset = GetDataBlockOffsetForDiskOffset(diskOffset);
             if (offsetForDiskOffset == -1L)
             {
-                Array.Clear(buffer, bufferIndex, (int) _blockSize);
+                Array.Clear(buffer, bufferIndex, (int)_blockSize);
             }
             else
             {
                 _stream.Position = _firstDataByte + offsetForDiskOffset;
-                _stream.Read(buffer, bufferIndex, (int) _blockSize);
+                _ = _stream.Read(buffer, bufferIndex, (int)_blockSize);
             }
         }
 
-        public long Length { get; }
+        public long Length
+        {
+            get;
+        }
 
         private long GetLocationDiskOffset(DiskLocation location)
         {
-            if (location.AccessMethod == DiskLocation.DiskAccessMethod.DiskBegin)
-                return location.BlockIndex * (long) _blockSize;
-            return Length - (location.BlockIndex + 1U) * _blockSize;
+            return location.AccessMethod == DiskLocation.DiskAccessMethod.DiskBegin
+                ? location.BlockIndex * (long)_blockSize
+                : Length - ((location.BlockIndex + 1U) * _blockSize);
         }
 
         private long GetDataBlockOffsetForDiskOffset(long diskOffset)
         {
             long num1 = -1;
-            var num2 = _payload.StoreHeader.StoreDataEntryCount - 1U;
-            var phase = _recovery ? StorePayload.BlockPhase.Phase3 : StorePayload.BlockPhase.Invalid;
+            uint num2 = _payload.StoreHeader.StoreDataEntryCount - 1U;
+            StorePayload.BlockPhase phase = _recovery ? StorePayload.BlockPhase.Phase3 : StorePayload.BlockPhase.Invalid;
             do
             {
                 --phase;
-                var phaseEntries = _payload.GetPhaseEntries(phase);
-                for (var index1 = 0; index1 < phaseEntries.Count; ++index1)
+                System.Collections.Generic.List<DataBlockEntry> phaseEntries = _payload.GetPhaseEntries(phase);
+                for (int index1 = 0; index1 < phaseEntries.Count; ++index1)
                 {
-                    var dataBlockEntryList = phaseEntries;
-                    var dataBlockEntry = dataBlockEntryList[dataBlockEntryList.Count - (index1 + 1)];
-                    for (var index2 = 0; index2 < dataBlockEntry.BlockLocationsOnDisk.Count; ++index2)
+                    System.Collections.Generic.List<DataBlockEntry> dataBlockEntryList = phaseEntries;
+                    DataBlockEntry dataBlockEntry = dataBlockEntryList[^(index1 + 1)];
+                    for (int index2 = 0; index2 < dataBlockEntry.BlockLocationsOnDisk.Count; ++index2)
+                    {
                         if (diskOffset == GetLocationDiskOffset(dataBlockEntry.BlockLocationsOnDisk[index2]))
                         {
-                            num1 = _blockSize * (long) num2;
+                            num1 = _blockSize * (long)num2;
                             break;
                         }
+                    }
 
                     if (num1 <= 0L)
+                    {
                         --num2;
+                    }
                     else
+                    {
                         break;
+                    }
                 }
             } while (num1 < 0L && phase != StorePayload.BlockPhase.Phase1);
 

@@ -1,4 +1,9 @@
-﻿using System;
+﻿using DD2FFU.Streams;
+using DiscUtils;
+using DiscUtils.Containers;
+using DiscUtils.Raw;
+using DiscUtils.Streams;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -6,13 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Text;
-using DD2FFU.Streams;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
 using Decomp.Microsoft.WindowsPhone.Imaging;
-using DiscUtils;
-using DiscUtils.Containers;
-using DiscUtils.Raw;
-using DiscUtils.Streams;
 
 namespace DD2FFU
 {
@@ -29,51 +29,69 @@ namespace DD2FFU
         /// </returns>
         public static string MountVHD(string vhdfile)
         {
-            var handle = IntPtr.Zero;
+            nint handle = IntPtr.Zero;
 
             // open disk handle
-            var openParameters = new NativeMethods.OPEN_VIRTUAL_DISK_PARAMETERS();
-            openParameters.Version = NativeMethods.OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1;
+            NativeMethods.OPEN_VIRTUAL_DISK_PARAMETERS openParameters = new()
+            {
+                Version = NativeMethods.OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1
+            };
             openParameters.Version1.RWDepth = NativeMethods.OPEN_VIRTUAL_DISK_RW_DEPTH_DEFAULT;
 
-            var openStorageType = new NativeMethods.VIRTUAL_STORAGE_TYPE();
-            openStorageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-            openStorageType.VendorId = NativeMethods.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
+            NativeMethods.VIRTUAL_STORAGE_TYPE openStorageType = new()
+            {
+                DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD,
+                VendorId = NativeMethods.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
+            };
 
-            var openResult = NativeMethods.OpenVirtualDisk(ref openStorageType, vhdfile,
+            int openResult = NativeMethods.OpenVirtualDisk(ref openStorageType, vhdfile,
                 NativeMethods.VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL,
                 NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref openParameters, ref handle);
             if (openResult != NativeMethods.ERROR_SUCCESS)
+            {
                 throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Native error {0}.",
                     openResult));
+            }
 
             // attach disk - permanently
-            var attachParameters = new NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS();
-            attachParameters.Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1;
-            var attachResult = NativeMethods.AttachVirtualDisk(handle, IntPtr.Zero,
+            NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS attachParameters = new()
+            {
+                Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1
+            };
+            int attachResult = NativeMethods.AttachVirtualDisk(handle, IntPtr.Zero,
                 NativeMethods.ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME, 0,
                 ref attachParameters, IntPtr.Zero);
             if (attachResult != NativeMethods.ERROR_SUCCESS)
+            {
                 throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Native error {0}.",
                     attachResult));
+            }
 
             // close handle to disk
-            NativeMethods.CloseHandle(handle);
+            _ = NativeMethods.CloseHandle(handle);
 
             return GetDriveId(vhdfile);
         }
 
         private static string GetDriveId(string vhdpath)
         {
-            var scope = new ManagementScope(@"\\localhost\ROOT\Microsoft\Windows\Storage");
-            var query = new ObjectQuery("SELECT * FROM MSFT_PhysicalDisk");
-            var searcher = new ManagementObjectSearcher(scope, query);
-            var allPDisks = searcher.Get();
+            ManagementScope scope = new(@"\\localhost\ROOT\Microsoft\Windows\Storage");
+            ObjectQuery query = new("SELECT * FROM MSFT_PhysicalDisk");
+            ManagementObjectSearcher searcher = new(scope, query);
+            ManagementObjectCollection allPDisks = searcher.Get();
             foreach (ManagementObject onePDisk in allPDisks)
+            {
                 // Show physical disk information
+                Console.WriteLine("====");
+                Console.WriteLine(onePDisk["PhysicalLocation"].ToString());
+                Console.WriteLine(vhdpath.ToString());
+                Console.WriteLine("====");
 
-                if (onePDisk["PhysicalLocation"].ToString().ToLower() == vhdpath.ToLower())
-                    return @"\\.\PHYSICALDRIVE" + onePDisk["DeviceId"];
+                if (onePDisk["PhysicalLocation"].ToString().Equals(vhdpath, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return $@"\\.\PHYSICALDRIVE{onePDisk["DeviceId"]}";
+                }
+            }
 
             throw new Exception();
         }
@@ -89,7 +107,7 @@ namespace DD2FFU
         public static void CommitFFU(string physicalDiskPath, string imagepath, string antitheftversion,
             string osversion)
         {
-            var iulogger = new IULogger();
+            IULogger iulogger = new();
 
             /*iulogger.InformationLogger = NullLog;
             iulogger.ErrorLogger = NullLog;
@@ -97,19 +115,18 @@ namespace DD2FFU
 
             iulogger.DebugLogger = iulogger.InformationLogger;
 
-            var imageStorageManager = new ImageStorageManager(iulogger);
-            var imageStorage = imageStorageManager.AttachToMountedVirtualHardDisk(physicalDiskPath, false, true);
+            ImageStorageManager imageStorageManager = new(iulogger);
+            ImageStorage imageStorage = imageStorageManager.AttachToMountedVirtualHardDisk(physicalDiskPath, false, true);
 
-            var fullFlashUpdateImage = imageStorageManager.CreateFullFlashObjectFromAttachedImage(imageStorage);
+            FullFlashUpdateImage fullFlashUpdateImage = imageStorageManager.CreateFullFlashObjectFromAttachedImage(imageStorage);
             imageStorageManager.VirtualHardDiskSectorSize = fullFlashUpdateImage.Stores[0].SectorSize;
-            
+
             fullFlashUpdateImage.OSVersion = osversion;
             fullFlashUpdateImage.AntiTheftVersion = antitheftversion;
 
-            var payloadWrapper = GetPayloadWrapper(fullFlashUpdateImage, imagepath);
+            IPayloadWrapper payloadWrapper = GetPayloadWrapper(fullFlashUpdateImage, imagepath);
 
             imageStorageManager.DismountFullFlashImage(true, payloadWrapper, false, 1u);
-            fullFlashUpdateImage = null;
         }
 
         /// <summary>
@@ -124,52 +141,48 @@ namespace DD2FFU
             Stream strm;
 
             if (ddfile.ToLower().Contains(@"\\.\physicaldrive"))
-                strm = new ReadFromDevice.DeviceStream(ddfile);//DeviceFileStream.DeviceFileStream(ddfile);
-            else
-                strm = new FileStream(ddfile, FileMode.Open);
-
-            Stream fstream;
-            if (!Recovery)
-                fstream = new EPartitionStream(strm, partitions);
-            else
-                fstream = strm;
-
-            using (var inDisk = new Disk(fstream, Ownership.Dispose))
             {
-                var diskParams = inDisk.Parameters;
-
-                using (var outDisk = VirtualDisk.CreateDisk("VHD", "dynamic", vhdfile, diskParams, "", ""))
-                {
-                    var contentStream = inDisk.Content;
-
-                    var pump = new StreamPump
-                    {
-                        InputStream = contentStream,
-                        OutputStream = outDisk.Content,
-                        SparseCopy = true,
-                        SparseChunkSize = SectorSize,
-                        BufferSize = SectorSize * 1024
-                    };
-                    
-                    var totalBytes = contentStream.Length;
-
-                    var now = DateTime.Now;
-                    pump.ProgressEvent += (o, e) => { ShowProgress(totalBytes, now, o, e); };
-
-                    Logging.Log("Converting RAW to VHD");
-                    pump.Run();
-                    Console.WriteLine();
-                }
+                strm = new ReadFromDevice.DeviceStream(ddfile);//DeviceFileStream.DeviceFileStream(ddfile);
             }
+            else
+            {
+                strm = new FileStream(ddfile, FileMode.Open);
+            }
+
+            Stream fstream = !Recovery ? new EPartitionStream(strm, partitions) : strm;
+
+            using Disk inDisk = new(fstream, Ownership.Dispose);
+            VirtualDiskParameters diskParams = inDisk.Parameters;
+
+            using VirtualDisk outDisk = VirtualDisk.CreateDisk("VHD", "dynamic", vhdfile, diskParams, "", "");
+            SparseStream contentStream = inDisk.Content;
+
+            StreamPump pump = new()
+            {
+                InputStream = contentStream,
+                OutputStream = outDisk.Content,
+                SparseCopy = true,
+                SparseChunkSize = SectorSize,
+                BufferSize = SectorSize * 1024
+            };
+
+            long totalBytes = contentStream.Length;
+
+            DateTime now = DateTime.Now;
+            pump.ProgressEvent += (o, e) => { ShowProgress(totalBytes, now, o, e); };
+
+            Logging.Log("Converting RAW to VHD");
+            pump.Run();
+            Console.WriteLine();
         }
 
         public static void MountDiskId(string diskid, string partid, string driveletter)
         {
-            var commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nassign letter=" +
-                           driveletter.Substring(0, 1);
+            string commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nassign letter=" +
+                           driveletter[..1];
             File.WriteAllText("diskpartcommands.txt", commands);
 
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "diskpart.exe";
             process.StartInfo.Arguments = "/s diskpartcommands.txt";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -178,7 +191,7 @@ namespace DD2FFU
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.Start();
+            _ = process.Start();
 
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -190,11 +203,11 @@ namespace DD2FFU
 
         public static void UnMountDiskId(string diskid, string partid, string driveletter)
         {
-            var commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nremove letter=" +
-                           driveletter.Substring(0, 1);
+            string commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nremove letter=" +
+                           driveletter[..1];
             File.WriteAllText("diskpartcommands.txt", commands);
 
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "diskpart.exe";
             process.StartInfo.Arguments = "/s diskpartcommands.txt";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -203,7 +216,7 @@ namespace DD2FFU
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.Start();
+            _ = process.Start();
 
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -219,22 +232,22 @@ namespace DD2FFU
 
         protected static IPayloadWrapper GetPayloadWrapper(FullFlashUpdateImage image, string imagePath)
         {
-            var outputWrapper = new OutputWrapper(imagePath);
+            OutputWrapper outputWrapper = new(imagePath);
             IPayloadWrapper innerWrapper = outputWrapper;
-            var innerWrapper2 = new SecurityWrapper(image, innerWrapper);
+            SecurityWrapper innerWrapper2 = new(image, innerWrapper);
             return new ManifestWrapper(image, innerWrapper2);
         }
 
         protected static void ShowProgress(long totalBytes, DateTime startTime, object sourceObject,
             PumpProgressEventArgs e)
         {
-            var now = DateTime.Now;
-            var timeSoFar = now - startTime;
+            DateTime now = DateTime.Now;
+            TimeSpan timeSoFar = now - startTime;
 
-            var remaining =
+            TimeSpan remaining =
                 TimeSpan.FromMilliseconds(timeSoFar.TotalMilliseconds / e.BytesRead * (totalBytes - e.BytesRead));
 
-            var speed = Math.Round(e.SourcePosition / 1024L / 1024L / timeSoFar.TotalSeconds);
+            double speed = Math.Round(e.SourcePosition / 1024L / 1024L / timeSoFar.TotalSeconds);
 
             Logging.Log(
                 string.Format("{0} {1}MB/s {2:hh\\:mm\\:ss\\.f}", GetDismLikeProgBar((int)(e.BytesRead * 100 / totalBytes)), speed.ToString(),
@@ -245,22 +258,27 @@ namespace DD2FFU
 
         private static string GetDismLikeProgBar(int perc)
         {
-            var eqsLength = (int) ((double) perc / 100 * 55);
-            var bases = new string('=', eqsLength) + new string(' ', 55 - eqsLength);
+            int eqsLength = (int)((double)perc / 100 * 55);
+            string bases = new string('=', eqsLength) + new string(' ', 55 - eqsLength);
             bases = bases.Insert(28, perc + "%");
             if (perc == 100)
-                bases = bases.Substring(1);
+            {
+                bases = bases[1..];
+            }
             else if (perc < 10)
+            {
                 bases = bases.Insert(28, " ");
+            }
+
             return "[" + bases + "]";
         }
 
         public static void SetDiskType(string diskid, string partid, string type)
         {
-            var commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nset id=" + type;
+            string commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nset id=" + type;
             File.WriteAllText("diskpartcommands.txt", commands);
 
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "diskpart.exe";
             process.StartInfo.Arguments = "/s diskpartcommands.txt";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -269,7 +287,7 @@ namespace DD2FFU
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.Start();
+            _ = process.Start();
 
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -281,17 +299,17 @@ namespace DD2FFU
 
         public static void ShrinkPartition(string diskid, string partid, string desired)
         {
-            var commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nshrink desired=" + desired;
+            string commands = "SELECT DISK " + diskid.Last() + "\nSELECT PART " + partid + "\nshrink desired=" + desired;
             File.WriteAllText("diskpartcommands.txt", commands);
 
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "diskpart.exe";
             process.StartInfo.Arguments = "/s diskpartcommands.txt";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
             process.StartInfo.UseShellExecute = false;
 
-            process.Start();
+            _ = process.Start();
             process.WaitForExit();
 
             File.Delete("diskpartcommands.txt");
@@ -299,7 +317,7 @@ namespace DD2FFU
 
         public static List<GPTPartition> GetPartsFromGPT(string PhysicalDiskId)
         {
-            var GPTSignature = "EFI PART";
+            string GPTSignature = "EFI PART";
             byte[] partitionArray = null;
             DeviceFileStream.DeviceFileStream ds;
             try
@@ -313,18 +331,21 @@ namespace DD2FFU
                 throw new Exception("Failed to open disk " + PhysicalDiskId.Last());
             }
 
-            var sector = new byte[Constants.SectorSize]; // 512d, regular sector size
-            var read = ds.Read(sector, 0, sector.Length);
+            byte[] sector = new byte[Constants.SectorSize]; // 512d, regular sector size
+            int read = ds.Read(sector, 0, sector.Length);
             if (read == sector.Length && Encoding.ASCII.GetString(sector, 0, 8) != GPTSignature)
+            {
                 read = ds.Read(sector, 0, sector.Length);
+            }
+
             if (read == sector.Length && Encoding.ASCII.GetString(sector, 0, 8) == GPTSignature)
             {
-                var partitionSlotCount = BitConverter.ToUInt32(sector, 0x50); // partition count from header
-                var partitionSlotSize = BitConverter.ToUInt32(sector, 0x54); // partition size from header
-                var bytesToRead = (int) Math.Round(partitionSlotCount * partitionSlotSize / (double) sector.Length,
+                uint partitionSlotCount = BitConverter.ToUInt32(sector, 0x50); // partition count from header
+                uint partitionSlotSize = BitConverter.ToUInt32(sector, 0x54); // partition size from header
+                int bytesToRead = (int)Math.Round(partitionSlotCount * partitionSlotSize / (double)sector.Length,
                                       MidpointRounding.AwayFromZero) * sector.Length;
                 partitionArray = new byte[bytesToRead];
-                ds.Read(partitionArray, 0, partitionArray.Length);
+                _ = ds.Read(partitionArray, 0, partitionArray.Length);
             }
 
             ds.Dispose();
@@ -335,25 +356,32 @@ namespace DD2FFU
                 throw new Exception("Failed to read partition array");
             }
 
-            var partitionarray = new List<GPTPartition>();
+            List<GPTPartition> partitionarray = [];
 
-            using (var br = new BinaryReader(new MemoryStream(partitionArray)))
+            using (BinaryReader br = new(new MemoryStream(partitionArray)))
             {
                 Logging.Log("Partitions on disk " + PhysicalDiskId.Last() + ":");
-                var name = new byte[72]; // fixed name size
-                var iterator = 0;
+                byte[] name = new byte[72]; // fixed name size
+                int iterator = 0;
                 while (true)
                 {
-                    var type = new Guid(br.ReadBytes(16));
+                    Guid type = new(br.ReadBytes(16));
                     if (type == Guid.Empty)
+                    {
                         break;
-                    br.BaseStream.Seek(0x28, SeekOrigin.Current); // 40d, offset to name in partition entry after type
+                    }
+
+                    _ = br.BaseStream.Seek(0x28, SeekOrigin.Current); // 40d, offset to name in partition entry after type
                     name = br.ReadBytes(name.Length);
                     iterator++;
                     Logging.Log($"({type}) [{iterator}] {Encoding.Unicode.GetString(name).TrimEnd('\0')}");
 
                     partitionarray.Add(new GPTPartition
-                        {Type = type.ToString(), id = iterator, Name = Encoding.Unicode.GetString(name).TrimEnd('\0')});
+                    {
+                        Type = type.ToString(),
+                        id = iterator,
+                        Name = Encoding.Unicode.GetString(name).TrimEnd('\0')
+                    });
                 }
             }
 
@@ -362,11 +390,20 @@ namespace DD2FFU
 
         internal class GPTPartition
         {
-            public string Type { get; set; }
+            public string Type
+            {
+                get; set;
+            }
 
-            public int id { get; set; }
+            public int id
+            {
+                get; set;
+            }
 
-            public string Name { get; set; }
+            public string Name
+            {
+                get; set;
+            }
         }
     }
 }

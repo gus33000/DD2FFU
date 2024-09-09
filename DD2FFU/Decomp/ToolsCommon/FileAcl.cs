@@ -25,14 +25,20 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public FileAcl(string file, string rootPath)
         {
             if (!LongPathFile.Exists(file))
+            {
                 throw new FileNotFoundException("Specified file cannot be found", file);
+            }
+
             Initialize(new FileInfo(file), rootPath);
         }
 
         public FileAcl(FileInfo fi, string rootPath)
         {
             if (fi == null)
+            {
                 throw new ArgumentNullException(nameof(fi));
+            }
+
             Initialize(fi, rootPath);
         }
 
@@ -44,10 +50,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 if (Nos != null)
                 {
                     MacLabel = SecurityUtils.GetFileSystemMandatoryLevel(FullPath);
-                    if (string.IsNullOrEmpty(MacLabel))
-                        MacLabel = null;
-                    else
-                        MacLabel = SddlNormalizer.FixAceSddl(MacLabel);
+                    MacLabel = string.IsNullOrEmpty(MacLabel) ? null : SddlNormalizer.FixAceSddl(MacLabel);
                 }
 
                 return MacLabel;
@@ -60,12 +63,14 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             get
             {
                 if (m_objectSecurity == null)
+                {
                     if (Nos != null)
                     {
-                        var fileSecurity = new FileSecurity();
+                        FileSecurity fileSecurity = new();
                         fileSecurity.SetSecurityDescriptorBinaryForm(Nos.GetSecurityDescriptorBinaryForm());
                         m_objectSecurity = fileSecurity;
                     }
+                }
 
                 return m_objectSecurity;
             }
@@ -75,24 +80,31 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         protected override string ComputeExplicitDACL()
         {
-            var accessControl = m_fi.GetAccessControl(AccessControlSections.All);
-            var accessRules = accessControl.GetAccessRules(true, false, typeof(NTAccount));
-            var count = accessRules.Count;
+            FileSecurity accessControl = m_fi.GetAccessControl(AccessControlSections.All);
+            AuthorizationRuleCollection accessRules = accessControl.GetAccessRules(true, false, typeof(NTAccount));
+            int count = accessRules.Count;
             foreach (FileSystemAccessRule rule in accessRules)
+            {
                 if (rule.IsInherited)
                 {
-                    accessControl.RemoveAccessRule(rule);
+                    _ = accessControl.RemoveAccessRule(rule);
                     --count;
                 }
+            }
 
             if (DACLProtected && accessControl.AreAccessRulesCanonical)
+            {
                 accessControl.SetAccessRuleProtection(true, PreserveInheritance);
-            var str = (string) null;
+            }
+
+            string str = null;
             if (DACLProtected || count > 0)
             {
                 str = accessControl.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
                 if (!string.IsNullOrEmpty(str))
+                {
                     str = regexStripDacl.Replace(str, string.Empty);
+                }
             }
 
             return SddlNormalizer.FixAceSddl(str);
@@ -100,9 +112,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         private void Initialize(FileInfo fi, string rootPath)
         {
-            if (fi == null)
-                throw new ArgumentNullException(nameof(fi));
-            m_fi = fi;
+            m_fi = fi ?? throw new ArgumentNullException(nameof(fi));
             Initialize(fi.GetAccessControl(AccessControlSections.All),
                 System.IO.Path.Combine("\\", fi.FullName.Remove(0, rootPath.Length))
                     .ToUpper(CultureInfo.InvariantCulture), fi.FullName, null, null);

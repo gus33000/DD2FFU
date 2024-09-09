@@ -22,7 +22,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private BcdInput _bcdInput;
         private readonly IULogger _logger;
 
-        
+
         public BcdConverter(IULogger logger)
         {
             _logger = logger;
@@ -31,20 +31,24 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void ProcessInputXml(string bcdLayoutFile, string bcdLayoutSchema)
         {
             if (!File.Exists(bcdLayoutSchema))
-                throw new ImageStorageException(string.Format("{0}: BCD layout schema file is not found: {1}.",
-                    MethodBase.GetCurrentMethod().Name, bcdLayoutSchema));
-            using (var fileStream = new FileStream(bcdLayoutSchema, FileMode.Open, FileAccess.Read))
             {
-                ProcessInputXml(bcdLayoutFile, fileStream);
+                throw new ImageStorageException(string.Format("{0}: BCD layout schema file is not found: {1}.",
+                                MethodBase.GetCurrentMethod().Name, bcdLayoutSchema));
             }
+
+            using FileStream fileStream = new(bcdLayoutSchema, FileMode.Open, FileAccess.Read);
+            ProcessInputXml(bcdLayoutFile, fileStream);
         }
 
         public void ProcessInputXml(string bcdLayoutFile, Stream bcdLayoutSchema)
         {
             if (!File.Exists(bcdLayoutFile))
+            {
                 throw new ImageStorageException(string.Format("{0}: BCD layout file is not found: {1}.",
-                    MethodBase.GetCurrentMethod().Name, bcdLayoutFile));
-            var bcdXsdValidator = new BCDXsdValidator();
+                                MethodBase.GetCurrentMethod().Name, bcdLayoutFile));
+            }
+
+            BCDXsdValidator bcdXsdValidator = new();
             try
             {
                 bcdXsdValidator.ValidateXsd(bcdLayoutSchema, bcdLayoutFile, _logger);
@@ -56,13 +60,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                         MethodBase.GetCurrentMethod().Name, bcdLayoutFile), ex);
             }
 
-            var fileStream = (FileStream) null;
-            var xmlReader = (XmlReader) null;
-            var xmlSerializer = (XmlSerializer) null;
+            FileStream fileStream = null;
             try
             {
                 fileStream = new FileStream(bcdLayoutFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                _bcdInput = (BcdInput) new XmlSerializer(typeof(BcdInput)).Deserialize(XmlReader.Create(fileStream));
+                _bcdInput = (BcdInput)new XmlSerializer(typeof(BcdInput)).Deserialize(XmlReader.Create(fileStream));
             }
             catch (SecurityException ex)
             {
@@ -85,14 +87,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             finally
             {
                 fileStream?.Close();
-                xmlSerializer = null;
-                xmlReader = null;
             }
         }
 
         public void SaveToRegFile(Stream stream)
         {
-            var writer = new StreamWriter(stream, Encoding.Unicode);
+            StreamWriter writer = new(stream, Encoding.Unicode);
             try
             {
                 if (_bcdInput.IncludeRegistryHeader)
@@ -127,10 +127,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void SaveToRegData(BcdRegData bcdRegData)
         {
             if (_bcdInput.SaveKeyToRegistry)
+            {
                 bcdRegData.AddRegKey(HiveBase);
+            }
+
             if (_bcdInput.IncludeDescriptions)
             {
-                var regKey = string.Format("{0}\\Description", HiveBase);
+                string regKey = string.Format("{0}\\Description", HiveBase);
                 bcdRegData.AddRegKey(regKey);
                 bcdRegData.AddRegValue(regKey, "KeyName", "BCD00000000", "REG_SZ");
                 bcdRegData.AddRegValue(regKey, "System", string.Format("{0:x8}", 1), "REG_DWORD");
@@ -142,17 +145,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static void ConvertBCD(string inputFile, string outputFile)
         {
-            var bcdConverter = new BcdConverter(new IULogger());
-            using (var manifestResourceStream =
+            BcdConverter bcdConverter = new(new IULogger());
+            using (Stream manifestResourceStream =
                 Assembly.GetExecutingAssembly().GetManifestResourceStream("BcdLayout.xsd"))
             {
                 bcdConverter.ProcessInputXml(inputFile, manifestResourceStream);
             }
 
-            using (var fileStream = new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite))
-            {
-                bcdConverter.SaveToRegFile(fileStream);
-            }
+            using FileStream fileStream = new(outputFile, FileMode.Create, FileAccess.ReadWrite);
+            bcdConverter.SaveToRegFile(fileStream);
         }
     }
 }

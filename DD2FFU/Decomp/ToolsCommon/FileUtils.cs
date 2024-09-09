@@ -20,9 +20,15 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static string RerootPath(string path, string oldRoot, string newRoot)
         {
             if (oldRoot.Last() != '\\')
+            {
                 oldRoot += "\\";
+            }
+
             if (newRoot.Last() != '\\')
+            {
                 newRoot += "\\";
+            }
+
             return path.Replace(oldRoot, newRoot);
         }
 
@@ -39,18 +45,30 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static void DeleteTree(string dirPath)
         {
             if (string.IsNullOrEmpty(dirPath))
+            {
                 throw new ArgumentException("Empty directory path");
+            }
+
             if (LongPathFile.Exists(dirPath))
+            {
                 throw new IOException(string.Format("Cannot delete directory {0}, it's a file", dirPath));
+            }
+
             if (!LongPathDirectory.Exists(dirPath))
+            {
                 return;
+            }
+
             LongPathDirectory.Delete(dirPath, true);
         }
 
         public static void DeleteFile(string filePath)
         {
             if (!LongPathFile.Exists(filePath))
+            {
                 return;
+            }
+
             LongPathFile.SetAttributes(filePath, FileAttributes.Normal);
             LongPathFile.Delete(filePath);
         }
@@ -58,10 +76,16 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static void CleanDirectory(string dirPath)
         {
             if (string.IsNullOrEmpty(dirPath))
+            {
                 throw new ArgumentException("Empty directory path");
+            }
+
             if (LongPathFile.Exists(dirPath))
+            {
                 throw new IOException(string.Format("Cannot create directory {0}, a file with same name exists",
-                    dirPath));
+                                dirPath));
+            }
+
             NativeMethods.IU_CleanDirectory(dirPath, false);
         }
 
@@ -80,16 +104,22 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static bool IsTargetUpToDate(string inputFile, string targetFile)
         {
             if (!LongPathFile.Exists(targetFile))
+            {
                 return false;
-            var lastWriteTimeUtc = new FileInfo(targetFile).LastWriteTimeUtc;
+            }
+
+            DateTime lastWriteTimeUtc = new FileInfo(targetFile).LastWriteTimeUtc;
             return !(new FileInfo(inputFile).LastWriteTimeUtc > lastWriteTimeUtc);
         }
 
         public static string GetFileVersion(string filepath)
         {
-            var str = string.Empty;
+            string str = string.Empty;
             if (LongPathFile.Exists(filepath))
+            {
                 str = FileVersionInfo.GetVersionInfo(filepath).FileVersion;
+            }
+
             return str;
         }
 
@@ -104,19 +134,22 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string GetShortPathName(string dirPath)
         {
-            var lpszShortPath = new StringBuilder(260);
-            if (GetShortPathName(dirPath, lpszShortPath, 260U) == 0U)
-                return dirPath;
-            return lpszShortPath.ToString();
+            StringBuilder lpszShortPath = new(260);
+            return GetShortPathName(dirPath, lpszShortPath, 260U) == 0U ? dirPath : lpszShortPath.ToString();
         }
 
         public static void CopyDirectory(string source, string destination)
         {
             LongPathDirectory.CreateDirectory(destination);
-            foreach (var file in LongPathDirectory.GetFiles(source))
+            foreach (string file in LongPathDirectory.GetFiles(source))
+            {
                 LongPathFile.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
-            foreach (var directory in LongPathDirectory.GetDirectories(source))
+            }
+
+            foreach (string directory in LongPathDirectory.GetDirectories(source))
+            {
                 CopyDirectory(directory, Path.Combine(destination, Path.GetFileName(directory)));
+            }
         }
     }
 }

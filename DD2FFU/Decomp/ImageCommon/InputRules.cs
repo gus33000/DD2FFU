@@ -10,10 +10,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class InputRules
     {
-        [XmlArrayItem(ElementName = "IntegerRule", IsNullable = false, Type = typeof(InputIntegerRule))] [XmlArray]
+        [XmlArrayItem(ElementName = "IntegerRule", IsNullable = false, Type = typeof(InputIntegerRule))]
+        [XmlArray]
         public InputIntegerRule[] IntegerRules;
 
-        [XmlArrayItem(ElementName = "StringRule", IsNullable = false, Type = typeof(InputStringRule))] [XmlArray]
+        [XmlArrayItem(ElementName = "StringRule", IsNullable = false, Type = typeof(InputStringRule))]
+        [XmlArray]
         public InputStringRule[] StringRules;
     }
 }

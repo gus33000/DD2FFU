@@ -18,25 +18,26 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private bool _fileIsValid = true;
         private IULogger _logger;
 
-        
+
         public void ValidateXsd(Stream bcdSchemaStream, string xmlFile, IULogger logger)
         {
             if (!File.Exists(xmlFile))
+            {
                 throw new BCDXsdValidatorException(
-                    "ImageServices!BCDXsdValidator::ValidateXsd: XML file was not found: " + xmlFile);
+                                "ImageServices!BCDXsdValidator::ValidateXsd: XML file was not found: " + xmlFile);
+            }
+
             _logger = logger;
             _fileIsValid = true;
-            var settings = new XmlReaderSettings();
+            XmlReaderSettings settings = new();
             settings.ValidationEventHandler += ValidationHandler;
             settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
             settings.ValidationType = ValidationType.Schema;
             try
             {
-                using (var reader = XmlReader.Create(bcdSchemaStream))
-                {
-                    var schema = XmlSchema.Read(reader, ValidationHandler);
-                    settings.Schemas.Add(schema);
-                }
+                using XmlReader reader = XmlReader.Create(bcdSchemaStream);
+                XmlSchema schema = XmlSchema.Read(reader, ValidationHandler);
+                _ = settings.Schemas.Add(schema);
             }
             catch (XmlSchemaException ex)
             {
@@ -44,8 +45,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     "ImageServices!BCDXsdValidator::ValidateXsd: Unable to use the schema provided", ex);
             }
 
-            var xmlTextReader = (XmlTextReader) null;
-            var xmlReader = (XmlReader) null;
+            XmlTextReader xmlTextReader = null;
+            XmlReader xmlReader = null;
             try
             {
                 try
@@ -79,16 +80,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
 
             if (!_fileIsValid)
+            {
                 throw new BCDXsdValidatorException(string.Format(CultureInfo.InvariantCulture,
-                    "ImageServices!BCDXsdValidator::ValidateXsd: Validation of {0} failed", new object[1]
-                    {
+                                "ImageServices!BCDXsdValidator::ValidateXsd: Validation of {0} failed", new object[1]
+                                {
                         xmlFile
-                    }));
+                                }));
+            }
         }
 
         private void ValidationHandler(object sender, ValidationEventArgs args)
         {
-            var format = string.Format(CultureInfo.InvariantCulture,
+            string format = string.Format(CultureInfo.InvariantCulture,
                 "\nImageServices!BCDXsdValidator::ValidateXsd: XML Validation {0}: {1}", new object[2]
                 {
                     args.Severity,
@@ -96,14 +99,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 });
             if (args.Severity == XmlSeverityType.Error)
             {
-                if (_logger != null)
-                    _logger.LogError(format);
+                _logger?.LogError(format);
                 _fileIsValid = false;
             }
             else
             {
                 if (_logger == null)
+                {
                     return;
+                }
+
                 _logger.LogWarning(format);
             }
         }

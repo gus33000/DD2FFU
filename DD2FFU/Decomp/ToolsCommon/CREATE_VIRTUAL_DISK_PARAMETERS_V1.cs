@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 {
-    
+
     public struct CREATE_VIRTUAL_DISK_PARAMETERS_V1
     {
         public Guid UniqueId;

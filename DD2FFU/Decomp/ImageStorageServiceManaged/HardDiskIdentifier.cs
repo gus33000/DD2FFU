@@ -15,71 +15,81 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         private byte[] _rawIdentifier;
 
-         public PartitionFormat PartitionStyle { get; set; }
+        public PartitionFormat PartitionStyle
+        {
+            get; set;
+        }
 
-        
+
         public uint MbrSignature
         {
-            get => (uint) ((_rawIdentifier[3] << 24) | (_rawIdentifier[2] << 16) | (_rawIdentifier[1] << 8)) |
+            get => (uint)((_rawIdentifier[3] << 24) | (_rawIdentifier[2] << 16) | (_rawIdentifier[1] << 8)) |
                    _rawIdentifier[0];
             set
             {
-                _rawIdentifier[3] = (byte) ((value & 4278190080U) >> 24);
-                _rawIdentifier[2] = (byte) ((value & 16711680U) >> 16);
-                _rawIdentifier[1] = (byte) ((value & 65280U) >> 8);
-                _rawIdentifier[0] = (byte) (value & byte.MaxValue);
-                for (var index = 4; index < 16; ++index)
+                _rawIdentifier[3] = (byte)((value & 4278190080U) >> 24);
+                _rawIdentifier[2] = (byte)((value & 16711680U) >> 16);
+                _rawIdentifier[1] = (byte)((value & 65280U) >> 8);
+                _rawIdentifier[0] = (byte)(value & byte.MaxValue);
+                for (int index = 4; index < 16; ++index)
+                {
                     _rawIdentifier[index] = 0;
+                }
             }
         }
 
         public Guid GptSignature
         {
-            get => new Guid(_rawIdentifier);
+            get => new(_rawIdentifier);
             set => _rawIdentifier = value.ToByteArray();
         }
 
-        
+
         public uint RawDiskNumber
         {
-            get => (uint) ((_rawIdentifier[3] << 24) | (_rawIdentifier[2] << 16) | (_rawIdentifier[1] << 8)) |
+            get => (uint)((_rawIdentifier[3] << 24) | (_rawIdentifier[2] << 16) | (_rawIdentifier[1] << 8)) |
                    _rawIdentifier[0];
             set
             {
-                _rawIdentifier[3] = (byte) ((value & 4278190080U) >> 24);
-                _rawIdentifier[2] = (byte) ((value & 16711680U) >> 16);
-                _rawIdentifier[1] = (byte) ((value & 65280U) >> 8);
-                _rawIdentifier[0] = (byte) (value & byte.MaxValue);
-                for (var index = 4; index < 16; ++index)
+                _rawIdentifier[3] = (byte)((value & 4278190080U) >> 24);
+                _rawIdentifier[2] = (byte)((value & 16711680U) >> 16);
+                _rawIdentifier[1] = (byte)((value & 65280U) >> 8);
+                _rawIdentifier[0] = (byte)(value & byte.MaxValue);
+                for (int index = 4; index < 16; ++index)
+                {
                     _rawIdentifier[index] = 0;
+                }
             }
         }
 
-        internal bool AsVirtualDisk { get; set; }
+        internal bool AsVirtualDisk
+        {
+            get; set;
+        }
 
         public void ReadFromStream(BinaryReader reader)
         {
-            PartitionStyle = (PartitionFormat) reader.ReadUInt32();
+            PartitionStyle = (PartitionFormat)reader.ReadUInt32();
             _rawIdentifier = reader.ReadBytes(16);
         }
 
         public void WriteToStream(BinaryWriter writer)
         {
-            writer.Write((uint) BlockType);
-            writer.Write((uint) PartitionStyle);
+            writer.Write((uint)BlockType);
+            writer.Write((uint)PartitionStyle);
             writer.Write(_rawIdentifier);
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             logger.LogInfo(str + "Identifier: Hard Disk");
             logger.LogInfo(str + string.Format("Partition Style:   {0}", PartitionStyle));
             switch (PartitionStyle)
             {
                 case PartitionFormat.Gpt:
-                    logger.LogInfo(str + "GPT Guid:          {{{0}}}", (object) GptSignature);
+                    logger.LogInfo(str + "GPT Guid:          {{{0}}}", GptSignature);
                     break;
                 case PartitionFormat.Mbr:
                     logger.LogInfo(str + string.Format("MBR Signature:     0x{0:x}", MbrSignature));
@@ -90,11 +100,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-         public uint Size => 24;
+        public uint Size => 24;
 
-         public BlockIoType BlockType => BlockIoType.HardDisk;
+        public BlockIoType BlockType => BlockIoType.HardDisk;
 
-        
+
         public static HardDiskIdentifier CreateSimpleMbr(uint diskSignature)
         {
             return new HardDiskIdentifier
@@ -105,7 +115,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             };
         }
 
-        
+
         public static HardDiskIdentifier CreateSimpleGpt(Guid diskId)
         {
             return new HardDiskIdentifier

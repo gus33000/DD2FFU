@@ -36,29 +36,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             AccessMethod = accessMethod;
         }
 
-        public DiskAccessMethod AccessMethod { set; get; }
+        public DiskAccessMethod AccessMethod
+        {
+            set; get;
+        }
 
-        public uint BlockIndex { set; get; }
+        public uint BlockIndex
+        {
+            set; get;
+        }
 
         public static int SizeInBytes => 8;
 
         public void Write(BinaryWriter writer)
         {
-            writer.Write((uint) AccessMethod);
+            writer.Write((uint)AccessMethod);
             writer.Write(BlockIndex);
         }
 
         public void Read(BinaryReader reader)
         {
-            AccessMethod = (DiskAccessMethod) reader.ReadUInt32();
+            AccessMethod = (DiskAccessMethod)reader.ReadUInt32();
             BlockIndex = reader.ReadUInt32();
         }
 
         public void LogInfo(IULogger logger, ushort indentLevel = 0)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo(str + "Access Method: {0}", (object) AccessMethod);
-            logger.LogInfo(str + "Block Index  : {0}", (object) BlockIndex);
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo(str + "Access Method: {0}", AccessMethod);
+            logger.LogInfo(str + "Block Index  : {0}", BlockIndex);
             logger.LogInfo("");
         }
     }

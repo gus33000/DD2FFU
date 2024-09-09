@@ -12,11 +12,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         private byte[] _compareData;
 
-        public uint SectorIndex { get; set; }
+        public uint SectorIndex
+        {
+            get; set;
+        }
 
-        public int SectorOffset { get; set; }
+        public int SectorOffset
+        {
+            get; set;
+        }
 
-        public int ByteCount { get; set; }
+        public int ByteCount
+        {
+            get; set;
+        }
 
         public void SetCompareData(byte[] data)
         {

@@ -32,15 +32,21 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public SecurityHeader GetSecureHeader => _securityHeader;
 
-        public static int SecureHeaderSize => Marshal.SizeOf((object) new SecurityHeader());
+        public static int SecureHeaderSize => Marshal.SizeOf((object)new SecurityHeader());
 
-        public byte[] CatalogData { get; set; }
+        public byte[] CatalogData
+        {
+            get; set;
+        }
 
-        public byte[] HashTableData { get; set; }
+        public byte[] HashTableData
+        {
+            get; set;
+        }
 
         public ImageHeader GetImageHeader => _imageHeader;
 
-        public static int ImageHeaderSize => Marshal.SizeOf((object) new ImageHeader());
+        public static int ImageHeaderSize => Marshal.SizeOf((object)new ImageHeader());
 
         public uint ChunkSize
         {
@@ -64,18 +70,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public int StoreCount => Stores.Count;
 
-        public List<FullFlashUpdateStore> Stores { get; } = new List<FullFlashUpdateStore>();
+        public List<FullFlashUpdateStore> Stores { get; } = [];
 
         public uint ImageStyle
         {
             get
             {
-                var flag = true;
+                bool flag = true;
                 if (Stores[0].Partitions != null && Stores[0].Partitions.Count() > 0)
+                {
                     flag = IsGPTPartitionType(Stores[0].Partitions[0].PartitionType);
-                if (!flag)
-                    return PartitionTypeMbr;
-                return PartitionTypeGpt;
+                }
+
+                return !flag ? PartitionTypeMbr : PartitionTypeGpt;
             }
         }
 
@@ -83,10 +90,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             get
             {
-                foreach (var store in Stores)
-                foreach (var partition in store.Partitions)
-                    if (string.CompareOrdinal(partition.Name, name) == 0)
-                        return partition;
+                foreach (FullFlashUpdateStore store in Stores)
+                {
+                    foreach (FullFlashUpdatePartition partition in store.Partitions)
+                    {
+                        if (string.CompareOrdinal(partition.Name, name) == 0)
+                        {
+                            return partition;
+                        }
+                    }
+                }
+
                 return null;
             }
         }
@@ -97,13 +111,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 uint num = 0;
                 if (GetManifest != null)
+                {
                     num = num + FullFlashUpdateHeaders.SecurityHeaderSize + _securityHeader.CatalogSize +
-                          _securityHeader.HashTableSize;
+                                          _securityHeader.HashTableSize;
+                }
+
                 return num;
             }
         }
 
-        public FullFlashUpdateManifest GetManifest { get; private set; }
+        public FullFlashUpdateManifest GetManifest
+        {
+            get; private set;
+        }
 
         public uint DefaultPartitionAlignmentInBytes
         {
@@ -111,7 +131,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (!InputHelpers.IsPowerOfTwo(value))
+                {
                     return;
+                }
+
                 _defaultPartititionByteAlignment = value;
             }
         }
@@ -129,13 +152,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 else
                 {
                     if (_securityHeader.ChunkSize == 0U)
+                    {
                         throw new ImageCommonException(
-                            "ImageCommon!FullFlashUpdateImage::SecurityPadding: Neither the of the headers have been initialized with a chunk size.");
+                                                "ImageCommon!FullFlashUpdateImage::SecurityPadding: Neither the of the headers have been initialized with a chunk size.");
+                    }
+
                     blockSize = num * _securityHeader.ChunkSize;
                 }
 
                 return CalculateAlignment(
-                    (uint) ((int) FullFlashUpdateHeaders.SecurityHeaderSize +
+                    (uint)((int)FullFlashUpdateHeaders.SecurityHeaderSize +
                             (CatalogData != null ? CatalogData.Length : 0) +
                             (HashTableData != null ? HashTableData.Length : 0)), blockSize);
             }
@@ -143,19 +169,22 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public string Description
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(Description)] != null)
-                    return GetManifest["FullFlash"][nameof(Description)];
-                return "";
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(Description)] != null
+                    ? GetManifest["FullFlash"][nameof(Description)]
+                    : "";
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(Description)] = value;
             }
         }
@@ -164,15 +193,21 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             get
             {
-                var stringList = new List<string>();
+                List<string> stringList = [];
                 if (GetManifest == null || GetManifest["FullFlash"] == null)
-                    return stringList;
-                var num = 0;
-                while (GetManifest["FullFlash"][string.Format("DevicePlatformId{0}", num)] != null)
-                    ++num;
-                for (var index1 = 0; index1 < num; ++index1)
                 {
-                    var index2 = string.Format("DevicePlatformId{0}", index1);
+                    return stringList;
+                }
+
+                int num = 0;
+                while (GetManifest["FullFlash"][string.Format("DevicePlatformId{0}", num)] != null)
+                {
+                    ++num;
+                }
+
+                for (int index1 = 0; index1 < num; ++index1)
+                {
+                    string index2 = string.Format("DevicePlatformId{0}", index1);
                     stringList.Add(GetManifest["FullFlash"][index2]);
                 }
 
@@ -181,143 +216,171 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
-                for (var index = 0; index < value.Count; ++index)
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
+                for (int index = 0; index < value.Count; ++index)
+                {
                     GetManifest["FullFlash"][string.Format("DevicePlatformId{0}", index)] = value[index];
+                }
             }
         }
 
         public string Version
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(Version)] != null)
-                    return GetManifest["FullFlash"][nameof(Version)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(Version)] != null
+                    ? GetManifest["FullFlash"][nameof(Version)]
+                    : string.Empty;
             private set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(Version)] = value;
             }
         }
 
         public string OSVersion
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(OSVersion)] != null)
-                    return GetManifest["FullFlash"][nameof(OSVersion)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(OSVersion)] != null
+                    ? GetManifest["FullFlash"][nameof(OSVersion)]
+                    : string.Empty;
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(OSVersion)] = value;
             }
         }
 
         public string CanFlashToRemovableMedia
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(CanFlashToRemovableMedia)] != null)
-                    return GetManifest["FullFlash"][nameof(CanFlashToRemovableMedia)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(CanFlashToRemovableMedia)] != null
+                    ? GetManifest["FullFlash"][nameof(CanFlashToRemovableMedia)]
+                    : string.Empty;
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(CanFlashToRemovableMedia)] = value;
             }
         }
 
         public string AntiTheftVersion
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(AntiTheftVersion)] != null)
-                    return GetManifest["FullFlash"][nameof(AntiTheftVersion)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(AntiTheftVersion)] != null
+                    ? GetManifest["FullFlash"][nameof(AntiTheftVersion)]
+                    : string.Empty;
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(AntiTheftVersion)] = value;
             }
         }
 
         public string RulesVersion
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(RulesVersion)] != null)
-                    return GetManifest["FullFlash"][nameof(RulesVersion)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(RulesVersion)] != null
+                    ? GetManifest["FullFlash"][nameof(RulesVersion)]
+                    : string.Empty;
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(RulesVersion)] = value;
             }
         }
 
         public string RulesData
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(RulesData)] != null)
-                    return GetManifest["FullFlash"][nameof(RulesData)];
-                return string.Empty;
-            }
+            get => GetManifest != null && GetManifest["FullFlash"] != null &&
+                    GetManifest["FullFlash"][nameof(RulesData)] != null
+                    ? GetManifest["FullFlash"][nameof(RulesData)]
+                    : string.Empty;
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(RulesData)] = value;
             }
         }
 
         public bool UEFI
         {
-            get
-            {
-                if (GetManifest != null && GetManifest["FullFlash"] != null &&
-                    GetManifest["FullFlash"][nameof(UEFI)] != null)
-                    return GetManifest["FullFlash"][nameof(UEFI)].Equals("True", StringComparison.OrdinalIgnoreCase);
-                return true;
-            }
+            get => GetManifest == null || GetManifest["FullFlash"] == null ||
+                    GetManifest["FullFlash"][nameof(UEFI)] == null
+|| GetManifest["FullFlash"][nameof(UEFI)].Equals("True", StringComparison.OrdinalIgnoreCase);
             set
             {
                 if (GetManifest == null)
+                {
                     return;
+                }
+
                 if (GetManifest["FullFlash"] == null)
-                    GetManifest.AddCategory("FullFlash", "FullFlash");
+                {
+                    _ = GetManifest.AddCategory("FullFlash", "FullFlash");
+                }
+
                 GetManifest["FullFlash"][nameof(UEFI)] = value.ToString();
             }
         }
@@ -325,60 +388,68 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void Initialize(string imagePath)
         {
             if (!File.Exists(imagePath))
-                throw new ImageCommonException("ImageCommon!FullFlashUpdateImage::Initialize: The FFU file '" +
-                                               imagePath + "' does not exist.");
-            _imagePath = Path.GetFullPath(imagePath);
-            using (var imageStream = GetImageStream())
             {
-                using (var binaryReader = new BinaryReader(imageStream))
-                {
-                    var num1 = binaryReader.ReadUInt32();
-                    var signature1 = binaryReader.ReadBytes(12);
-                    if ((int) num1 != (int) FullFlashUpdateHeaders.SecurityHeaderSize ||
-                        !SecurityHeader.ValidateSignature(signature1))
-                        throw new ImageCommonException(
-                            "ImageCommon!FullFlashUpdateImage::Initialize: Unable to load image because the security header is invalid.");
-                    _securityHeader.ByteCount = num1;
-                    _securityHeader.ChunkSize = binaryReader.ReadUInt32();
-                    _securityHeader.HashAlgorithmID = binaryReader.ReadUInt32();
-                    _securityHeader.CatalogSize = binaryReader.ReadUInt32();
-                    _securityHeader.HashTableSize = binaryReader.ReadUInt32();
-                    CatalogData = binaryReader.ReadBytes((int) _securityHeader.CatalogSize);
-                    HashTableData = binaryReader.ReadBytes((int) _securityHeader.HashTableSize);
-                    binaryReader.ReadBytes((int) SecurityPadding);
-                    var num2 = binaryReader.ReadUInt32();
-                    var signature2 = binaryReader.ReadBytes(12);
-                    if ((int) num2 != (int) FullFlashUpdateHeaders.ImageHeaderSize ||
-                        !ImageHeader.ValidateSignature(signature2))
-                        throw new ImageCommonException(
-                            "ImageCommon!FullFlashUpdateImage::Initialize: Unable to load image because the image header is invalid.");
-                    _imageHeader.ByteCount = num2;
-                    _imageHeader.ManifestLength = binaryReader.ReadUInt32();
-                    _imageHeader.ChunkSize = binaryReader.ReadUInt32();
-                    var manifestStream =
-                        new StreamReader(new MemoryStream(binaryReader.ReadBytes((int) _imageHeader.ManifestLength)),
-                            Encoding.ASCII);
-                    try
-                    {
-                        GetManifest = new FullFlashUpdateManifest(this, manifestStream);
-                    }
-                    finally
-                    {
-                        manifestStream.Close();
-                    }
-
-                    ValidateManifest();
-                    if (_imageHeader.ChunkSize > 0U)
-                        binaryReader.ReadBytes((int) CalculateAlignment((uint) imageStream.Position,
-                            _imageHeader.ChunkSize * 1024U));
-                    _payloadOffset = imageStream.Position;
-                }
+                throw new ImageCommonException("ImageCommon!FullFlashUpdateImage::Initialize: The FFU file '" +
+                                                           imagePath + "' does not exist.");
             }
+
+            _imagePath = Path.GetFullPath(imagePath);
+            using FileStream imageStream = GetImageStream();
+            using BinaryReader binaryReader = new(imageStream);
+            uint num1 = binaryReader.ReadUInt32();
+            byte[] signature1 = binaryReader.ReadBytes(12);
+            if ((int)num1 != (int)FullFlashUpdateHeaders.SecurityHeaderSize ||
+                !SecurityHeader.ValidateSignature(signature1))
+            {
+                throw new ImageCommonException(
+                                        "ImageCommon!FullFlashUpdateImage::Initialize: Unable to load image because the security header is invalid.");
+            }
+
+            _securityHeader.ByteCount = num1;
+            _securityHeader.ChunkSize = binaryReader.ReadUInt32();
+            _securityHeader.HashAlgorithmID = binaryReader.ReadUInt32();
+            _securityHeader.CatalogSize = binaryReader.ReadUInt32();
+            _securityHeader.HashTableSize = binaryReader.ReadUInt32();
+            CatalogData = binaryReader.ReadBytes((int)_securityHeader.CatalogSize);
+            HashTableData = binaryReader.ReadBytes((int)_securityHeader.HashTableSize);
+            _ = binaryReader.ReadBytes((int)SecurityPadding);
+            uint num2 = binaryReader.ReadUInt32();
+            byte[] signature2 = binaryReader.ReadBytes(12);
+            if ((int)num2 != (int)FullFlashUpdateHeaders.ImageHeaderSize ||
+                !ImageHeader.ValidateSignature(signature2))
+            {
+                throw new ImageCommonException(
+                                        "ImageCommon!FullFlashUpdateImage::Initialize: Unable to load image because the image header is invalid.");
+            }
+
+            _imageHeader.ByteCount = num2;
+            _imageHeader.ManifestLength = binaryReader.ReadUInt32();
+            _imageHeader.ChunkSize = binaryReader.ReadUInt32();
+            StreamReader manifestStream =
+                new(new MemoryStream(binaryReader.ReadBytes((int)_imageHeader.ManifestLength)),
+                    Encoding.ASCII);
+            try
+            {
+                GetManifest = new FullFlashUpdateManifest(this, manifestStream);
+            }
+            finally
+            {
+                manifestStream.Close();
+            }
+
+            ValidateManifest();
+            if (_imageHeader.ChunkSize > 0U)
+            {
+                _ = binaryReader.ReadBytes((int)CalculateAlignment((uint)imageStream.Position,
+                                        _imageHeader.ChunkSize * 1024U));
+            }
+
+            _payloadOffset = imageStream.Position;
         }
 
         public FileStream GetImageStream()
         {
-            var fileStream = File.OpenRead(_imagePath);
+            FileStream fileStream = File.OpenRead(_imagePath);
             fileStream.Position = _payloadOffset;
             return fileStream;
         }
@@ -386,29 +457,47 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void AddStore(FullFlashUpdateStore store)
         {
             if (store == null)
+            {
                 throw new ArgumentNullException(nameof(store));
+            }
+
             Stores.Add(store);
         }
 
         private void AddStore(ManifestCategory category)
         {
-            var sectorSize = uint.Parse(category["SectorSize"], CultureInfo.InvariantCulture);
+            uint sectorSize = uint.Parse(category["SectorSize"], CultureInfo.InvariantCulture);
             uint minSectorCount = 0;
             if (category["MinSectorCount"] != null)
+            {
                 minSectorCount = uint.Parse(category["MinSectorCount"], CultureInfo.InvariantCulture);
-            var storeId = (string) null;
+            }
+
+            string storeId = null;
             if (category["StoreId"] != null)
+            {
                 storeId = category["StoreId"];
-            var isMainOSStore = true;
+            }
+
+            bool isMainOSStore = true;
             if (category["IsMainOSStore"] != null)
+            {
                 isMainOSStore = bool.Parse(category["IsMainOSStore"]);
-            var devicePath = (string) null;
+            }
+
+            string devicePath = null;
             if (category["DevicePath"] != null)
+            {
                 devicePath = category["DevicePath"];
-            var onlyAllocateDefinedGptEntries = false;
+            }
+
+            bool onlyAllocateDefinedGptEntries = false;
             if (category["OnlyAllocateDefinedGptEntries"] != null)
+            {
                 onlyAllocateDefinedGptEntries = bool.Parse(category["OnlyAllocateDefinedGptEntries"]);
-            var flashUpdateStore = new FullFlashUpdateStore();
+            }
+
+            FullFlashUpdateStore flashUpdateStore = new();
             flashUpdateStore.Initialize(this, storeId, isMainOSStore, devicePath, onlyAllocateDefinedGptEntries,
                 minSectorCount, sectorSize);
             Stores.Add(flashUpdateStore);
@@ -416,35 +505,40 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public static bool IsGPTPartitionType(string partitionType)
         {
-            Guid result;
-            return Guid.TryParse(partitionType, out result);
+            return Guid.TryParse(partitionType, out _);
         }
 
         public void DisplayImageInformation(IULogger logger)
         {
-            foreach (var devicePlatformId in DevicePlatformIDs)
-                logger.LogInfo("\tDevice Platform ID: {0}", (object) devicePlatformId);
-            logger.LogInfo("\tChunk Size: 0x{0:X}", (object) ChunkSize);
+            foreach (string devicePlatformId in DevicePlatformIDs)
+            {
+                logger.LogInfo("\tDevice Platform ID: {0}", devicePlatformId);
+            }
+
+            logger.LogInfo("\tChunk Size: 0x{0:X}", ChunkSize);
             logger.LogInfo(" ");
-            foreach (var store in Stores)
+            foreach (FullFlashUpdateStore store in Stores)
             {
                 logger.LogInfo("Store");
-                logger.LogInfo("\tSector Size: 0x{0:X}", (object) store.SectorSize);
-                logger.LogInfo("\tID: {0}", (object) store.Id);
-                logger.LogInfo("\tDevice Path: {0}", (object) store.DevicePath);
-                logger.LogInfo("\tContains MainOS: {0}", (object) store.IsMainOSStore);
+                logger.LogInfo("\tSector Size: 0x{0:X}", store.SectorSize);
+                logger.LogInfo("\tID: {0}", store.Id);
+                logger.LogInfo("\tDevice Path: {0}", store.DevicePath);
+                logger.LogInfo("\tContains MainOS: {0}", store.IsMainOSStore);
                 if (store.IsMainOSStore)
-                    logger.LogInfo("\tMinimum Sector Count: 0x{0:X}", (object) store.SectorCount);
+                {
+                    logger.LogInfo("\tMinimum Sector Count: 0x{0:X}", store.SectorCount);
+                }
+
                 logger.LogInfo(" ");
-                logger.LogInfo("There are {0} partitions in the store.", (object) store.Partitions.Count);
+                logger.LogInfo("There are {0} partitions in the store.", store.Partitions.Count);
                 logger.LogInfo(" ");
-                foreach (var partition in store.Partitions)
+                foreach (FullFlashUpdatePartition partition in store.Partitions)
                 {
                     logger.LogInfo("\tPartition");
-                    logger.LogInfo("\t\tName: {0}", (object) partition.Name);
-                    logger.LogInfo("\t\tPartition Type: {0}", (object) partition.PartitionType);
-                    logger.LogInfo("\t\tTotal Sectors: 0x{0:X}", (object) partition.TotalSectors);
-                    logger.LogInfo("\t\tSectors In Use: 0x{0:X}", (object) partition.SectorsInUse);
+                    logger.LogInfo("\t\tName: {0}", partition.Name);
+                    logger.LogInfo("\t\tPartition Type: {0}", partition.PartitionType);
+                    logger.LogInfo("\t\tTotal Sectors: 0x{0:X}", partition.TotalSectors);
+                    logger.LogInfo("\t\tSectors In Use: 0x{0:X}", partition.SectorsInUse);
                     logger.LogInfo(" ");
                 }
             }
@@ -453,16 +547,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private uint CalculateAlignment(uint currentPosition, uint blockSize)
         {
             uint num1 = 0;
-            var num2 = currentPosition % blockSize;
+            uint num2 = currentPosition % blockSize;
             if (num2 > 0U)
+            {
                 num1 = blockSize - num2;
+            }
+
             return num1;
         }
 
         public byte[] GetSecurityHeader(byte[] catalogData, byte[] hashData)
         {
-            var memoryStream1 = new MemoryStream();
-            var binaryWriter = new BinaryWriter(memoryStream1);
+            MemoryStream memoryStream1 = new();
+            BinaryWriter binaryWriter = new(memoryStream1);
             binaryWriter.Write(FullFlashUpdateHeaders.SecurityHeaderSize);
             binaryWriter.Write(FullFlashUpdateHeaders.GetSecuritySignature());
             binaryWriter.Write(ChunkSize);
@@ -474,8 +571,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             binaryWriter.Flush();
             if (memoryStream1.Length % ChunkSizeInBytes != 0L)
             {
-                var num = ChunkSizeInBytes - memoryStream1.Length % ChunkSizeInBytes;
-                var memoryStream2 = memoryStream1;
+                long num = ChunkSizeInBytes - (memoryStream1.Length % ChunkSizeInBytes);
+                MemoryStream memoryStream2 = memoryStream1;
                 memoryStream2.SetLength(memoryStream2.Length + num);
             }
 
@@ -484,8 +581,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public byte[] GetManifestRegion()
         {
-            var memoryStream1 = new MemoryStream();
-            var binaryWriter = new BinaryWriter(memoryStream1);
+            MemoryStream memoryStream1 = new();
+            BinaryWriter binaryWriter = new(memoryStream1);
             binaryWriter.Write(FullFlashUpdateHeaders.ImageHeaderSize);
             binaryWriter.Write(FullFlashUpdateHeaders.GetImageSignature());
             binaryWriter.Write(GetManifest.Length);
@@ -494,8 +591,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             GetManifest.WriteToStream(memoryStream1);
             if (memoryStream1.Length % ChunkSizeInBytes != 0L)
             {
-                var num = ChunkSizeInBytes - memoryStream1.Length % ChunkSizeInBytes;
-                var memoryStream2 = memoryStream1;
+                long num = ChunkSizeInBytes - (memoryStream1.Length % ChunkSizeInBytes);
+                MemoryStream memoryStream2 = memoryStream1;
                 memoryStream2.SetLength(memoryStream2.Length + num);
             }
 
@@ -510,15 +607,23 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private void ValidateManifest()
         {
             if (GetManifest["FullFlash"] == null)
+            {
                 throw new ImageCommonException(
-                    "ImageCommon!FullFlashUpdateImage::ValidateManifest: Missing 'FullFlash' or 'Image' category in the manifest");
-            var str = GetManifest["FullFlash"]["Version"];
+                                "ImageCommon!FullFlashUpdateImage::ValidateManifest: Missing 'FullFlash' or 'Image' category in the manifest");
+            }
+
+            string str = GetManifest["FullFlash"]["Version"];
             if (str == null)
+            {
                 throw new ImageCommonException(
-                    "ImageCommon!FullFlashUpdateImage::ValidateManifest: Missing 'Version' name/value pair in the 'FullFlash' category.");
+                                "ImageCommon!FullFlashUpdateImage::ValidateManifest: Missing 'Version' name/value pair in the 'FullFlash' category.");
+            }
+
             if (!str.Equals("2.0", StringComparison.OrdinalIgnoreCase))
+            {
                 throw new ImageCommonException("ImageCommon!FullFlashUpdateImage::ValidateManifest: 'Version' value (" +
-                                               str + ") does not match current version of 2.0.");
+                                                           str + ") does not match current version of 2.0.");
+            }
         }
 
         public void Initialize()
@@ -531,40 +636,74 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             public static bool ValidateSignature(byte[] signature)
             {
-                var securitySignature = FullFlashUpdateHeaders.GetSecuritySignature();
-                for (var index = 0; index < securitySignature.Length; ++index)
+                byte[] securitySignature = FullFlashUpdateHeaders.GetSecuritySignature();
+                for (int index = 0; index < securitySignature.Length; ++index)
+                {
                     if (signature[index] != securitySignature[index])
+                    {
                         return false;
+                    }
+                }
+
                 return true;
             }
 
-            public uint ByteCount { get; set; }
+            public uint ByteCount
+            {
+                get; set;
+            }
 
-            public uint ChunkSize { get; set; }
+            public uint ChunkSize
+            {
+                get; set;
+            }
 
-            public uint HashAlgorithmID { get; set; }
+            public uint HashAlgorithmID
+            {
+                get; set;
+            }
 
-            public uint CatalogSize { get; set; }
+            public uint CatalogSize
+            {
+                get; set;
+            }
 
-            public uint HashTableSize { get; set; }
+            public uint HashTableSize
+            {
+                get; set;
+            }
         }
 
         public struct ImageHeader
         {
             public static bool ValidateSignature(byte[] signature)
             {
-                var imageSignature = FullFlashUpdateHeaders.GetImageSignature();
-                for (var index = 0; index < imageSignature.Length; ++index)
+                byte[] imageSignature = FullFlashUpdateHeaders.GetImageSignature();
+                for (int index = 0; index < imageSignature.Length; ++index)
+                {
                     if (signature[index] != imageSignature[index])
+                    {
                         return false;
+                    }
+                }
+
                 return true;
             }
 
-            public uint ByteCount { get; set; }
+            public uint ByteCount
+            {
+                get; set;
+            }
 
-            public uint ManifestLength { get; set; }
+            public uint ManifestLength
+            {
+                get; set;
+            }
 
-            public uint ChunkSize { get; set; }
+            public uint ChunkSize
+            {
+                get; set;
+            }
         }
 
         public class FullFlashUpdatePartition
@@ -573,27 +712,57 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             private uint _clusterSize;
             private FullFlashUpdateStore _store;
 
-            public string Name { get; set; }
+            public string Name
+            {
+                get; set;
+            }
 
-            public uint TotalSectors { get; set; }
+            public uint TotalSectors
+            {
+                get; set;
+            }
 
-            public string PartitionType { get; set; }
+            public string PartitionType
+            {
+                get; set;
+            }
 
-            public string PartitionId { get; set; }
+            public string PartitionId
+            {
+                get; set;
+            }
 
-            public bool Bootable { get; set; }
+            public bool Bootable
+            {
+                get; set;
+            }
 
-            public bool ReadOnly { get; set; }
+            public bool ReadOnly
+            {
+                get; set;
+            }
 
-            public bool Hidden { get; set; }
+            public bool Hidden
+            {
+                get; set;
+            }
 
-            public bool AttachDriveLetter { get; set; }
+            public bool AttachDriveLetter
+            {
+                get; set;
+            }
 
-            public string PrimaryPartition { get; set; }
+            public string PrimaryPartition
+            {
+                get; set;
+            }
 
             public bool Contiguous => true;
 
-            public string FileSystem { get; set; }
+            public string FileSystem
+            {
+                get; set;
+            }
 
             public uint ByteAlignment
             {
@@ -601,7 +770,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set
                 {
                     if (!InputHelpers.IsPowerOfTwo(value))
+                    {
                         return;
+                    }
+
                     _byteAlignment = value;
                 }
             }
@@ -612,30 +784,40 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set
                 {
                     if (!InputHelpers.IsPowerOfTwo(value))
+                    {
                         return;
+                    }
+
                     _clusterSize = value;
                 }
             }
 
-            public uint LastUsedSector
+            public uint LastUsedSector => SectorsInUse > 0U ? SectorsInUse - 1U : 0;
+
+            public uint SectorsInUse
             {
-                get
-                {
-                    if (SectorsInUse > 0U)
-                        return SectorsInUse - 1U;
-                    return 0;
-                }
+                get; set;
             }
 
-            public uint SectorsInUse { get; set; }
+            public bool UseAllSpace
+            {
+                get; set;
+            }
 
-            public bool UseAllSpace { get; set; }
+            public bool RequiredToFlash
+            {
+                get; set;
+            }
 
-            public bool RequiredToFlash { get; set; }
+            public uint SectorAlignment
+            {
+                get; set;
+            }
 
-            public uint SectorAlignment { get; set; }
-
-            public ulong OffsetInSectors { get; set; }
+            public ulong OffsetInSectors
+            {
+                get; set;
+            }
 
             public void Initialize(uint usedSectors, uint totalSectors, string partitionType, string partitionId,
                 string name, FullFlashUpdateStore store, bool useAllSpace)
@@ -648,12 +830,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 _store = store;
                 UseAllSpace = useAllSpace;
                 if (UseAllSpace && !name.Equals("Data", StringComparison.InvariantCultureIgnoreCase))
+                {
                     throw new ImageCommonException(string.Format(
-                        "ImageCommon!FullFlashUpdatePartition::Initialize: Partition {0} cannot specify UseAllSpace.",
-                        Name));
+                                        "ImageCommon!FullFlashUpdatePartition::Initialize: Partition {0} cannot specify UseAllSpace.",
+                                        Name));
+                }
+
                 if (TotalSectors == uint.MaxValue)
+                {
                     throw new ImageCommonException("ImageCommon!FullFlashUpdatePartition::Initialize: Partition " +
-                                                   name + " is too large (" + TotalSectors + " sectors)");
+                                                                   name + " is too large (" + TotalSectors + " sectors)");
+                }
+
                 ReadOnly = false;
                 Bootable = false;
                 Hidden = false;
@@ -672,18 +860,36 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 category["Name"] = Name;
                 category["Type"] = PartitionType;
                 if (!string.IsNullOrEmpty(PartitionId))
+                {
                     category["Id"] = PartitionId;
+                }
+
                 category["Primary"] = PrimaryPartition;
                 if (!string.IsNullOrEmpty(FileSystem))
+                {
                     category["FileSystem"] = FileSystem;
+                }
+
                 if (ReadOnly)
+                {
                     category["ReadOnly"] = ReadOnly.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (Hidden)
+                {
                     category["Hidden"] = Hidden.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (AttachDriveLetter)
+                {
                     category["AttachDriveLetter"] = AttachDriveLetter.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (Bootable)
+                {
                     category["Bootable"] = Bootable.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (UseAllSpace)
                 {
                     category["UseAllSpace"] = "true";
@@ -695,13 +901,25 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 }
 
                 if (_byteAlignment != 0U)
+                {
                     category["ByteAlignment"] = _byteAlignment.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (_clusterSize != 0U)
+                {
                     category["ClusterSize"] = _clusterSize.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (SectorAlignment != 0U)
+                {
                     category["SectorAlignment"] = SectorAlignment.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (!RequiredToFlash)
+                {
                     return;
+                }
+
                 category["RequiredToFlash"] = RequiredToFlash.ToString(CultureInfo.InvariantCulture);
             }
 
@@ -717,17 +935,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             private uint _sectorsUsed;
             private string _tempBackingStorePath = string.Empty;
 
-            public FullFlashUpdateImage Image { get; private set; }
+            public FullFlashUpdateImage Image
+            {
+                get; private set;
+            }
 
-            public string Id { get; private set; }
+            public string Id
+            {
+                get; private set;
+            }
 
-            public bool IsMainOSStore { get; private set; }
+            public bool IsMainOSStore
+            {
+                get; private set;
+            }
 
-            public string DevicePath { get; private set; }
+            public string DevicePath
+            {
+                get; private set;
+            }
 
-            public bool OnlyAllocateDefinedGptEntries { get; private set; }
+            public bool OnlyAllocateDefinedGptEntries
+            {
+                get; private set;
+            }
 
-            public uint SectorCount { get; set; }
+            public uint SectorCount
+            {
+                get; set;
+            }
 
             public uint MinSectorCount
             {
@@ -735,20 +971,31 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 set => SectorCount = value;
             }
 
-            public uint SectorSize { get; set; }
+            public uint SectorSize
+            {
+                get; set;
+            }
 
             public int PartitionCount => Partitions.Count;
 
-            public List<FullFlashUpdatePartition> Partitions { get; private set; } =
-                new List<FullFlashUpdatePartition>();
+            public List<FullFlashUpdatePartition> Partitions
+            {
+                get; private set;
+            } =
+                [];
 
             public FullFlashUpdatePartition this[string name]
             {
                 get
                 {
-                    foreach (var partition in Partitions)
+                    foreach (FullFlashUpdatePartition partition in Partitions)
+                    {
                         if (string.CompareOrdinal(partition.Name, name) == 0)
+                        {
                             return partition;
+                        }
+                    }
+
                     return null;
                 }
             }
@@ -769,10 +1016,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             protected virtual void Dispose(bool isDisposing)
             {
                 if (_alreadyDisposed)
+                {
                     return;
+                }
+
                 if (isDisposing)
+                {
                     Partitions = null;
+                }
+
                 if (File.Exists(BackingFile))
+                {
                     try
                     {
                         File.Delete(BackingFile);
@@ -782,8 +1036,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                         Console.WriteLine("Warning: ImageCommon!Dispose: Failed to delete temporary backing store '" +
                                           BackingFile + "' with exception: " + ex.Message);
                     }
+                }
 
                 if (Directory.Exists(_tempBackingStorePath))
+                {
                     try
                     {
                         Directory.Delete(_tempBackingStorePath, true);
@@ -794,6 +1050,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                             "Warning: ImageCommon!Dispose: Failed to delete temporary backing store directory '" +
                             _tempBackingStorePath + "' with exception: " + ex.Message);
                     }
+                }
 
                 _alreadyDisposed = true;
             }
@@ -802,7 +1059,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 bool onlyAllocateDefinedGptEntries, uint minSectorCount, uint sectorSize)
             {
                 _tempBackingStorePath = BuildPaths.GetImagingTempPath(Directory.GetCurrentDirectory());
-                Directory.CreateDirectory(_tempBackingStorePath);
+                _ = Directory.CreateDirectory(_tempBackingStorePath);
                 BackingFile = FileUtils.GetTempFile(_tempBackingStorePath) + "FFUBackingStore";
                 Image = image;
                 Id = storeId;
@@ -817,36 +1074,58 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             public void AddPartition(FullFlashUpdatePartition partition)
             {
                 if (this[partition.Name] != null)
+                {
                     throw new ImageCommonException(
-                        "ImageCommon!FullFlashUpdateStore::AddPartition: Two partitions in a store have the same name (" +
-                        partition.Name + ").");
+                                        "ImageCommon!FullFlashUpdateStore::AddPartition: Two partitions in a store have the same name (" +
+                                        partition.Name + ").");
+                }
+
                 if (IsMainOSStore)
                 {
                     if (SectorCount != 0U && partition.TotalSectors > SectorCount)
+                    {
                         throw new ImageCommonException(
-                            "ImageCommon!FullFlashUpdateStore::AddPartition: The partition " + partition.Name +
-                            " is too large for the store.");
+                                                "ImageCommon!FullFlashUpdateStore::AddPartition: The partition " + partition.Name +
+                                                " is too large for the store.");
+                    }
+
                     if (partition.UseAllSpace)
-                        foreach (var partition1 in Partitions)
+                    {
+                        foreach (FullFlashUpdatePartition partition1 in Partitions)
+                        {
                             if (partition1.UseAllSpace)
+                            {
                                 throw new ImageCommonException(
-                                    "ImageCommon!FullFlashUpdateStore::AddPartition: Two partitions in the same store have the UseAllSpace flag set.");
-                    else if (partition.SectorsInUse > partition.TotalSectors)
-                        throw new ImageCommonException(
-                            "ImageCommon!FullFlashUpdateStore::AddPartition: The partition data is invalid.  There are more used sectors (" +
-                            partition.SectorsInUse + ") than total sectors (" + partition.TotalSectors +
-                            ") for partition:" + partition.Name);
+                                                                "ImageCommon!FullFlashUpdateStore::AddPartition: Two partitions in the same store have the UseAllSpace flag set.");
+                            }
+                            else if (partition.SectorsInUse > partition.TotalSectors)
+                            {
+                                throw new ImageCommonException(
+                                                                "ImageCommon!FullFlashUpdateStore::AddPartition: The partition data is invalid.  There are more used sectors (" +
+                                                                partition.SectorsInUse + ") than total sectors (" + partition.TotalSectors +
+                                                                ") for partition:" + partition.Name);
+                            }
+                        }
+                    }
+
                     if (SectorCount != 0U)
                     {
                         if (partition.UseAllSpace)
+                        {
                             ++_sectorsUsed;
+                        }
                         else
+                        {
                             _sectorsUsed += partition.TotalSectors;
+                        }
+
                         if (_sectorsUsed > SectorCount)
+                        {
                             throw new ImageCommonException(
-                                "ImageCommon!FullFlashUpdateStore::AddPartition: Partition (" + partition.Name +
-                                ") on the Store does not fit. SectorsUsed = " + _sectorsUsed + " > MinSectorCount = " +
-                                SectorCount);
+                                                        "ImageCommon!FullFlashUpdateStore::AddPartition: Partition (" + partition.Name +
+                                                        ") on the Store does not fit. SectorsUsed = " + _sectorsUsed + " > MinSectorCount = " +
+                                                        SectorCount);
+                        }
                     }
                 }
 
@@ -857,60 +1136,101 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 uint usedSectors = 0;
                 uint totalSectors = 0;
-                var partitionType = category["Type"];
-                var name = category["Name"];
-                var partitionId = category["Id"];
-                var useAllSpace = false;
+                string partitionType = category["Type"];
+                string name = category["Name"];
+                string partitionId = category["Id"];
+                bool useAllSpace = false;
                 if (IsMainOSStore)
                 {
                     if (category["UsedSectors"] != null)
+                    {
                         usedSectors = uint.Parse(category["UsedSectors"], CultureInfo.InvariantCulture);
+                    }
+
                     if (category["TotalSectors"] != null)
+                    {
                         totalSectors = uint.Parse(category["TotalSectors"], CultureInfo.InvariantCulture);
+                    }
+
                     if (category["UseAllSpace"] != null)
+                    {
                         useAllSpace = bool.Parse(category["UseAllSpace"]);
+                    }
+
                     if (!useAllSpace && totalSectors == 0U)
+                    {
                         throw new ImageCommonException(string.Format(
-                            "ImageCommon!FullFlashUpdateImage::AddPartition: The partition category for partition {0} must contain either a 'TotalSectors' or 'UseAllSpace' key/value pair.",
-                            name));
+                                                "ImageCommon!FullFlashUpdateImage::AddPartition: The partition category for partition {0} must contain either a 'TotalSectors' or 'UseAllSpace' key/value pair.",
+                                                name));
+                    }
+
                     if (useAllSpace && totalSectors > 0U)
+                    {
                         throw new ImageCommonException(string.Format(
-                            "ImageCommon!FullFlashUpdateImage::AddPartition: The partition category for partition {0} cannot contain both a 'TotalSectors' and a 'UseAllSpace' key/value pair.",
-                            name));
+                                                "ImageCommon!FullFlashUpdateImage::AddPartition: The partition category for partition {0} cannot contain both a 'TotalSectors' and a 'UseAllSpace' key/value pair.",
+                                                name));
+                    }
                 }
 
-                var partition = new FullFlashUpdatePartition();
+                FullFlashUpdatePartition partition = new();
                 partition.Initialize(usedSectors, totalSectors, partitionType, partitionId, name, this, useAllSpace);
                 if (category["Hidden"] != null)
+                {
                     partition.Hidden = bool.Parse(category["Hidden"]);
+                }
+
                 if (category["AttachDriveLetter"] != null)
+                {
                     partition.AttachDriveLetter = bool.Parse(category["AttachDriveLetter"]);
+                }
+
                 if (category["ReadOnly"] != null)
+                {
                     partition.ReadOnly = bool.Parse(category["ReadOnly"]);
+                }
+
                 if (category["Bootable"] != null)
+                {
                     partition.Bootable = bool.Parse(category["Bootable"]);
+                }
+
                 if (category["FileSystem"] != null)
+                {
                     partition.FileSystem = category["FileSystem"];
+                }
+
                 partition.PrimaryPartition = category["Primary"];
                 if (category["ByteAlignment"] != null)
+                {
                     partition.ByteAlignment = uint.Parse(category["ByteAlignment"], CultureInfo.InvariantCulture);
+                }
+
                 if (category["ClusterSize"] != null)
+                {
                     partition.ClusterSize = uint.Parse(category["ClusterSize"], CultureInfo.InvariantCulture);
+                }
+
                 if (category["SectorAlignment"] != null)
+                {
                     partition.SectorAlignment = uint.Parse(category["SectorAlignment"], CultureInfo.InvariantCulture);
+                }
+
                 if (category["RequiredToFlash"] != null)
+                {
                     partition.RequiredToFlash = bool.Parse(category["RequiredToFlash"]);
+                }
+
                 AddPartition(partition);
             }
 
             public void TransferLocation(Stream sourceStream, Stream destinationStream)
             {
-                var buffer = new byte[1048576];
-                var val1 = sourceStream.Length - sourceStream.Position;
+                byte[] buffer = new byte[1048576];
+                long val1 = sourceStream.Length - sourceStream.Position;
                 while (val1 > 0L)
                 {
-                    var count = (int) Math.Min(val1, buffer.Length);
-                    sourceStream.Read(buffer, 0, count);
+                    int count = (int)Math.Min(val1, buffer.Length);
+                    _ = sourceStream.Read(buffer, 0, count);
                     destinationStream.Write(buffer, 0, count);
                     val1 -= count;
                 }
@@ -920,20 +1240,29 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 category["SectorSize"] = SectorSize.ToString(CultureInfo.InvariantCulture);
                 if (SectorCount != 0U)
+                {
                     category["MinSectorCount"] = SectorCount.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (!string.IsNullOrEmpty(Id))
+                {
                     category["StoreId"] = Id;
+                }
+
                 category["IsMainOSStore"] = IsMainOSStore.ToString(CultureInfo.InvariantCulture);
                 if (!string.IsNullOrEmpty(DevicePath))
+                {
                     category["DevicePath"] = DevicePath;
+                }
+
                 category["OnlyAllocateDefinedGptEntries"] =
-                    OnlyAllocateDefinedGptEntries.ToString(CultureInfo.InvariantCulture);
+                                    OnlyAllocateDefinedGptEntries.ToString(CultureInfo.InvariantCulture);
             }
         }
 
         public class ManifestCategory
         {
-            private readonly Hashtable _keyValues = new Hashtable();
+            private readonly Hashtable _keyValues = [];
             private int _maxKeySize;
 
             public ManifestCategory(string name)
@@ -949,7 +1278,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
             public string this[string name]
             {
-                get => (string) _keyValues[name];
+                get => (string)_keyValues[name];
                 set
                 {
                     if (_keyValues.ContainsKey(name))
@@ -959,7 +1288,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     else
                     {
                         if (name.Length > _maxKeySize)
+                        {
                             _maxKeySize = name.Length;
+                        }
+
                         _keyValues.Add(name, value);
                     }
                 }
@@ -972,23 +1304,29 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             public void RemoveNameValue(string name)
             {
                 if (!_keyValues.ContainsKey(name))
+                {
                     return;
+                }
+
                 _keyValues.Remove(name);
             }
 
             public void WriteToStream(Stream targetStream)
             {
-                var asciiEncoding = new ASCIIEncoding();
-                var bytes1 = asciiEncoding.GetBytes("[" + Category + "]\r\n");
+                ASCIIEncoding asciiEncoding = new();
+                byte[] bytes1 = asciiEncoding.GetBytes("[" + Category + "]\r\n");
                 targetStream.Write(bytes1, 0, bytes1.Count());
                 foreach (DictionaryEntry keyValue in _keyValues)
                 {
-                    var key = keyValue.Key as string;
-                    var bytes2 = asciiEncoding.GetBytes(key);
+                    string key = keyValue.Key as string;
+                    byte[] bytes2 = asciiEncoding.GetBytes(key);
                     targetStream.Write(bytes2, 0, bytes2.Count());
-                    for (var index = 0; index < _maxKeySize + 1 - key.Length; ++index)
+                    for (int index = 0; index < _maxKeySize + 1 - key.Length; ++index)
+                    {
                         targetStream.Write(asciiEncoding.GetBytes(" "), 0, 1);
-                    var bytes3 = asciiEncoding.GetBytes("= " + _keyValues[key] + "\r\n");
+                    }
+
+                    byte[] bytes3 = asciiEncoding.GetBytes("= " + _keyValues[key] + "\r\n");
                     targetStream.Write(bytes3, 0, bytes3.Count());
                 }
 
@@ -1000,10 +1338,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 targetStream.WriteLine("[{0}]", Category);
                 foreach (DictionaryEntry keyValue in _keyValues)
                 {
-                    var key = keyValue.Key as string;
+                    string key = keyValue.Key as string;
                     targetStream.Write("{0}", key);
-                    for (var index = 0; index < _maxKeySize + 1 - key.Length; ++index)
+                    for (int index = 0; index < _maxKeySize + 1 - key.Length; ++index)
+                    {
                         targetStream.Write(" ");
+                    }
+
                     targetStream.WriteLine("= {0}", _keyValues[key]);
                 }
 
@@ -1018,7 +1359,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public class FullFlashUpdateManifest
         {
-            private readonly ArrayList _categories = new ArrayList(20);
+            private readonly ArrayList _categories = new(20);
             private readonly FullFlashUpdateImage _image;
 
             public FullFlashUpdateManifest(FullFlashUpdateImage image)
@@ -1028,21 +1369,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
             public FullFlashUpdateManifest(FullFlashUpdateImage image, StreamReader manifestStream)
             {
-                var regex1 = new Regex("^\\s*\\[(?<category>[^\\]]+)\\]\\s*$");
-                var regex2 = new Regex("^\\s*(?<key>[^=\\s]+)\\s*=\\s*(?<value>.*)(\\s*$)");
-                var match1 = (Match) null;
+                Regex regex1 = new("^\\s*\\[(?<category>[^\\]]+)\\]\\s*$");
+                Regex regex2 = new("^\\s*(?<key>[^=\\s]+)\\s*=\\s*(?<value>.*)(\\s*$)");
+                Match match1 = null;
                 _image = image;
-                var category = (ManifestCategory) null;
-                ManifestCategory manifestCategory1;
+                ManifestCategory category = null;
                 while (!manifestStream.EndOfStream)
                 {
-                    var input = manifestStream.ReadLine();
+                    string input = manifestStream.ReadLine();
                     if (regex1.IsMatch(input))
                     {
                         match1 = null;
-                        var strA = regex1.Match(input).Groups["category"].Value;
+                        string strA = regex1.Match(input).Groups["category"].Value;
                         ProcessCategory(category);
-                        manifestCategory1 = null;
                         if (string.Compare(strA, "Store", StringComparison.Ordinal) == 0)
                         {
                             category = new ManifestCategory("Store", "Store");
@@ -1053,28 +1392,29 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                         }
                         else
                         {
-                            var str = strA;
+                            string str = strA;
                             category = AddCategory(str, str);
                         }
                     }
                     else if (category != null && regex2.IsMatch(input))
                     {
                         match1 = null;
-                        var match2 = regex2.Match(input);
+                        Match match2 = regex2.Match(input);
                         category[match2.Groups["key"].Value] = match2.Groups["value"].Value;
                         if (match2.Groups["key"].ToString() == "Description")
+                        {
                             match1 = match2;
+                        }
                     }
                     else if (match1 != null)
                     {
-                        var manifestCategory2 = category;
-                        var index = match1.Groups["key"].Value;
+                        ManifestCategory manifestCategory2 = category;
+                        string index = match1.Groups["key"].Value;
                         manifestCategory2[index] = manifestCategory2[index] + Environment.NewLine + input;
                     }
                 }
 
                 ProcessCategory(category);
-                manifestCategory1 = null;
             }
 
             public ManifestCategory this[string categoryName]
@@ -1082,8 +1422,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 get
                 {
                     foreach (ManifestCategory category in _categories)
+                    {
                         if (string.Compare(category.Name, categoryName, StringComparison.Ordinal) == 0)
+                        {
                             return category;
+                        }
+                    }
+
                     return null;
                 }
             }
@@ -1092,60 +1437,73 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 get
                 {
-                    var memoryStream = new MemoryStream();
+                    MemoryStream memoryStream = new();
                     WriteToStream(memoryStream);
-                    return (uint) memoryStream.Position;
+                    return (uint)memoryStream.Position;
                 }
             }
 
             private void ProcessCategory(ManifestCategory category)
             {
                 if (category == null)
+                {
                     return;
+                }
+
                 if (string.CompareOrdinal(category.Name, "Store") == 0)
                 {
                     _image.AddStore(category);
-                    category = null;
                 }
                 else
                 {
                     if (string.CompareOrdinal(category.Name, "Partition") != 0)
+                    {
                         return;
+                    }
+
                     _image.Stores.Last().AddPartition(category);
-                    category = null;
                 }
             }
 
             public ManifestCategory AddCategory(string name, string categoryValue)
             {
                 if (this[name] != null)
+                {
                     throw new ImageCommonException(
-                        "ImageCommon!FullFlashUpdateManifest::AddCategory: Cannot add duplicate categories to a manifest.");
-                var manifestCategory = new ManifestCategory(name, categoryValue);
-                _categories.Add(manifestCategory);
+                                        "ImageCommon!FullFlashUpdateManifest::AddCategory: Cannot add duplicate categories to a manifest.");
+                }
+
+                ManifestCategory manifestCategory = new(name, categoryValue);
+                _ = _categories.Add(manifestCategory);
                 return manifestCategory;
             }
 
             public void RemoveCategory(string name)
             {
                 if (this[name] == null)
+                {
                     return;
+                }
+
                 _categories.Remove(this[name]);
             }
 
             public void WriteToStream(Stream targetStream)
             {
                 foreach (ManifestCategory category in _categories)
-                    category.WriteToStream(targetStream);
-                foreach (var store in _image.Stores)
                 {
-                    var category1 = new ManifestCategory("Store", "Store");
+                    category.WriteToStream(targetStream);
+                }
+
+                foreach (FullFlashUpdateStore store in _image.Stores)
+                {
+                    ManifestCategory category1 = new("Store", "Store");
                     store.ToCategory(category1);
                     category1.WriteToStream(targetStream);
-                    foreach (var partition in store.Partitions)
+                    foreach (FullFlashUpdatePartition partition in store.Partitions)
                     {
-                        var manifestCategory = new ManifestCategory("Partition", "Partition");
-                        var category2 = manifestCategory;
+                        ManifestCategory manifestCategory = new("Partition", "Partition");
+                        ManifestCategory category2 = manifestCategory;
                         partition.ToCategory(category2);
                         manifestCategory.WriteToStream(targetStream);
                     }
@@ -1157,7 +1515,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 try
                 {
                     if (File.Exists(fileName))
+                    {
                         File.Delete(fileName);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1166,7 +1526,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                         ex);
                 }
 
-                var text = File.CreateText(fileName);
+                StreamWriter text = File.CreateText(fileName);
                 WriteToStream(text.BaseStream);
                 text.Close();
             }

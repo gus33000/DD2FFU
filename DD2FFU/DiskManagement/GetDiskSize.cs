@@ -2,18 +2,16 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using DWORD = System.UInt32;
+using HANDLE = nint;
+using LARGE_INTEGER = System.Int64;
+using LPCTSTR = System.String;
+using LPOVERLAPPED = nint;
+using LPSECURITY_ATTRIBUTES = nint;
+using LPVOID = nint;
 
 namespace DD2FFU.DiskManagement
 {
-    using LPSECURITY_ATTRIBUTES = IntPtr;
-    using LPOVERLAPPED = IntPtr;
-    using LPVOID = IntPtr;
-    using HANDLE = IntPtr;
-
-    using DWORD = UInt32;
-    using LPCTSTR = String;
-    using LARGE_INTEGER = Int64;
-
     internal class GetDiskSize
     {
         private const DWORD
@@ -29,7 +27,7 @@ namespace DD2FFU.DiskManagement
 
         private static readonly DWORD DISK_GET_DRIVE_GEOMETRY_EX =
             CTL_CODE(DISK_BASE, 0x0028, METHOD_BUFFERED, FILE_ANY_ACCESS);
-        
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern SafeFileHandle CreateFile(
             LPCTSTR lpFileName,
@@ -105,19 +103,19 @@ namespace DD2FFU.DiskManagement
 
         private static DWORD CTL_CODE(DWORD DeviceType, DWORD Function, DWORD Method, DWORD Access)
         {
-            return (((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method));
+            return ((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method);
         }
 
         public static long GetDiskLength(string deviceName)
         {
-            var x = new DISK_GEOMETRY_EX();
+            DISK_GEOMETRY_EX x = new();
             Execute(ref x, DISK_GET_DRIVE_GEOMETRY_EX, deviceName);
             return x.DiskSize;
         }
 
         public static long GetDiskSectorSize(string deviceName)
         {
-            var x = new DISK_GEOMETRY_EX();
+            DISK_GEOMETRY_EX x = new();
             Execute(ref x, DISK_GET_DRIVE_GEOMETRY_EX, deviceName);
             return x.Geometry.BytesPerSector;
         }
@@ -128,13 +126,13 @@ namespace DD2FFU.DiskManagement
             LPCTSTR lpFileName,
             DWORD dwDesiredAccess = GENERIC_READ,
             DWORD dwShareMode = FILE_SHARE_WRITE | FILE_SHARE_READ,
-            LPSECURITY_ATTRIBUTES lpSecurityAttributes = default(LPSECURITY_ATTRIBUTES),
+            LPSECURITY_ATTRIBUTES lpSecurityAttributes = default,
             DWORD dwCreationDisposition = OPEN_EXISTING,
             DWORD dwFlagsAndAttributes = 0,
-            HANDLE hTemplateFile = default(IntPtr)
+            HANDLE hTemplateFile = default
             )
         {
-            var hDevice =
+            SafeFileHandle hDevice =
                     CreateFile(
                         lpFileName,
                         dwDesiredAccess, dwShareMode,
@@ -143,15 +141,17 @@ namespace DD2FFU.DiskManagement
                         hTemplateFile
                         );
 
-                if (null == hDevice || hDevice.IsInvalid)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (null == hDevice || hDevice.IsInvalid)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
-                var nOutBufferSize = Marshal.SizeOf(typeof(T));
-                var lpOutBuffer = Marshal.AllocHGlobal(nOutBufferSize);
-                var lpBytesReturned = default(DWORD);
-                var NULL = IntPtr.Zero;
+            int nOutBufferSize = Marshal.SizeOf(typeof(T));
+            nint lpOutBuffer = Marshal.AllocHGlobal(nOutBufferSize);
+            uint lpBytesReturned = default;
+            nint NULL = IntPtr.Zero;
 
-                var result =
+            uint result =
                     DeviceIoControl(
                         hDevice, dwIoControlCode,
                         NULL, 0,
@@ -159,15 +159,16 @@ namespace DD2FFU.DiskManagement
                         ref lpBytesReturned, NULL
                         );
 
-                if (0 == result)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (0 == result)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
-                x = (T)Marshal.PtrToStructure(lpOutBuffer, typeof(T));
-                Marshal.FreeHGlobal(lpOutBuffer);
+            x = (T)Marshal.PtrToStructure(lpOutBuffer, typeof(T));
+            Marshal.FreeHGlobal(lpOutBuffer);
 
             hDevice.Close();
             hDevice.Dispose();
-            hDevice = null;
         }
     }
 }

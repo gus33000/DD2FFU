@@ -17,30 +17,45 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             SaveKeyToRegistry = true;
         }
 
-        [XmlElement("Object")] public BcdObjectInput[] Objects { get; set; }
+        [XmlElement("Object")]
+        public BcdObjectInput[] Objects
+        {
+            get; set;
+        }
 
-        [XmlAttribute] public bool SaveKeyToRegistry { get; set; }
+        [XmlAttribute]
+        public bool SaveKeyToRegistry
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(StreamWriter writer, string path)
         {
-            var path1 = path + "\\Objects";
+            string path1 = path + "\\Objects";
             if (SaveKeyToRegistry)
             {
                 writer.WriteLine("[{0}]", path1);
                 writer.WriteLine();
             }
 
-            foreach (var bcdObjectInput in Objects)
+            foreach (BcdObjectInput bcdObjectInput in Objects)
+            {
                 bcdObjectInput.SaveAsRegFile(writer, path1);
+            }
         }
 
         public void SaveAsRegData(BcdRegData bcdRegData, string path)
         {
-            var str = path + "\\Objects";
+            string str = path + "\\Objects";
             if (SaveKeyToRegistry)
+            {
                 bcdRegData.AddRegKey(str);
-            foreach (var bcdObjectInput in Objects)
+            }
+
+            foreach (BcdObjectInput bcdObjectInput in Objects)
+            {
                 bcdObjectInput.SaveAsRegData(bcdRegData, str);
+            }
         }
     }
 }

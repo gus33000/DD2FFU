@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace DD2FFU
+﻿namespace DD2FFU
 {
     internal class Constants
     {
         internal const ulong SectorSize = 0x200;
 
-        internal readonly static string[] partitions = new string[]
+        internal static readonly string[] partitions = new string[]
         {
             "DPP",
             "MODEM_FSG",

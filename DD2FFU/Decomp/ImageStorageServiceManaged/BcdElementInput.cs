@@ -11,31 +11,49 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class BcdElementInput
     {
-        public BcdElementDataTypeInput DataType { get; set; }
+        public BcdElementDataTypeInput DataType
+        {
+            get; set;
+        }
 
-        public BcdElementValueTypeInput ValueType { get; set; }
+        public BcdElementValueTypeInput ValueType
+        {
+            get; set;
+        }
 
         protected void RegFilePreProcessing()
         {
             if (DataType.TypeIdentifier != DataTypeChoice.WellKnownType ||
                 BcdElementDataTypes.GetWellKnownDataType(DataType.DataType as string) !=
                 BcdElementDataTypes.CustomActionsList)
+            {
                 return;
+            }
+
             if (ValueType.ValueIdentifier != ValueTypeChoice.IntegerListValue)
+            {
                 throw new ImageStorageException(string.Format(
-                    "{0}: A custom action list should have an integer list associated with it.",
-                    MethodBase.GetCurrentMethod().Name));
-            var valueType = ValueType.ValueType as BcdElementIntegerListInput;
+                                "{0}: A custom action list should have an integer list associated with it.",
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
+            BcdElementIntegerListInput valueType = ValueType.ValueType as BcdElementIntegerListInput;
             if (valueType.StringValues.Length % 2 != 0)
+            {
                 throw new ImageStorageException(string.Format(
-                    "{0}: A custom action list should have one element associated with each scan key code.",
-                    MethodBase.GetCurrentMethod().Name));
-            var num = 0;
+                                "{0}: A custom action list should have one element associated with each scan key code.",
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
+            int num = 0;
             while (num < valueType.StringValues.Length)
             {
-                var wellKnownDataType = BcdElementDataTypes.GetWellKnownDataType(valueType.StringValues[num + 1]);
+                BcdElementDataType wellKnownDataType = BcdElementDataTypes.GetWellKnownDataType(valueType.StringValues[num + 1]);
                 if (wellKnownDataType != null)
+                {
                     valueType.StringValues[num + 1] = string.Format("{0:x8}", wellKnownDataType.RawValue);
+                }
+
                 num += 2;
             }
         }

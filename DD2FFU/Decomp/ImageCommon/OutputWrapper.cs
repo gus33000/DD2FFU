@@ -30,22 +30,31 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void ResetPosition()
         {
-            fileStream.Seek(0L, SeekOrigin.Begin);
+            _ = fileStream.Seek(0L, SeekOrigin.Begin);
         }
 
         public void Write(byte[] data)
         {
             while (writes.Count > 0 && writes.Peek().IsCompleted)
+            {
                 fileStream.EndWrite(writes.Dequeue());
+            }
+
             writes.Enqueue(fileStream.BeginWrite(data, 0, data.Length, null, null));
         }
 
         public void FinalizeWrapper()
         {
             while (writes.Count > 0)
+            {
                 fileStream.EndWrite(writes.Dequeue());
+            }
+
             if (fileStream == null)
+            {
                 return;
+            }
+
             fileStream.Close();
             fileStream = null;
         }

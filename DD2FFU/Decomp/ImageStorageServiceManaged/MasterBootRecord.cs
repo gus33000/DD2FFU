@@ -496,44 +496,62 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _metadataPartition = new MasterBootRecordMetadataPartition(logger);
         }
 
-        public uint DiskSignature { get; set; }
+        public uint DiskSignature
+        {
+            get; set;
+        }
 
-        public uint DiskSectorCount { get; set; }
+        public uint DiskSectorCount
+        {
+            get; set;
+        }
 
-        public List<MbrPartitionEntry> PartitionEntries { get; } = new List<MbrPartitionEntry>();
+        public List<MbrPartitionEntry> PartitionEntries { get; } = [];
 
-        public MasterBootRecord ExtendedRecord { get; private set; }
+        public MasterBootRecord ExtendedRecord
+        {
+            get; private set;
+        }
 
         public bool ReadFromStream(Stream stream, MbrParseType parseType)
         {
-            var reader = new BinaryReader(stream);
-            var flag = true;
-            _sectorIndex = (uint) ((ulong) stream.Position / (ulong) _bytesPerSector);
-            stream.Read(_codeData, 0, _codeData.Length);
+            BinaryReader reader = new(stream);
+            bool flag = true;
+            _sectorIndex = (uint)((ulong)stream.Position / (ulong)_bytesPerSector);
+            _ = stream.Read(_codeData, 0, _codeData.Length);
             DiskSignature = reader.ReadUInt32();
             stream.Position += 2L;
-            for (var index = 0; index < 4; ++index)
+            for (int index = 0; index < 4; ++index)
             {
-                var mbrPartitionEntry = new MbrPartitionEntry();
+                MbrPartitionEntry mbrPartitionEntry = new();
                 mbrPartitionEntry.ReadFromStream(reader);
                 if (IsExtendedBootRecord())
+                {
                     mbrPartitionEntry.StartingSectorOffset = _sectorIndex;
+                }
+
                 if (mbrPartitionEntry.TypeIsContainer && parseType == MbrParseType.TruncateAllExtendedRecords)
+                {
                     mbrPartitionEntry.ZeroData();
+                }
+
                 if (mbrPartitionEntry.TypeIsContainer)
                 {
                     if (_extendedEntry != null)
                     {
                         _logger.LogWarning(
                             "{0}: The extended boot record at sector 0x{1:x} contains multiple extended boot records.",
-                            (object) MethodBase.GetCurrentMethod().Name, (object) _sectorIndex);
+                            MethodBase.GetCurrentMethod().Name, _sectorIndex);
                         if (!IsExtendedBootRecord() || parseType != MbrParseType.TruncateInvalidExtendedRecords)
+                        {
                             throw new ImageStorageException("There are multiple extended partition entries.");
+                        }
+
                         flag = false;
                         break;
                     }
 
-                    var num = IsExtendedBootRecord()
+                    long num = IsExtendedBootRecord()
                         ? (mbrPartitionEntry.StartingSector + _primaryRecord._extendedEntry.StartingSector) *
                           _bytesPerSector
                         : mbrPartitionEntry.StartingSector * _bytesPerSector;
@@ -541,16 +559,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     {
                         _logger.LogWarning(
                             "{0}: The boot record at sector 0x{1:x} has an entry with a extended partition type, but the start sector or size is 0.",
-                            (object) MethodBase.GetCurrentMethod().Name, (object) _sectorIndex);
+                            MethodBase.GetCurrentMethod().Name, _sectorIndex);
                         mbrPartitionEntry.PartitionType = 0;
                     }
                     else if (num > stream.Length)
                     {
                         if (parseType != MbrParseType.TruncateInvalidExtendedRecords)
+                        {
                             throw new ImageStorageException("There are multiple extended partition entries.");
+                        }
+
                         _logger.LogDebug(
-                            "{0}: The extended boot entry at sector 0x{1:x} points beyond the end of the stream.",
-                            (object) MethodBase.GetCurrentMethod().Name, (object) _sectorIndex);
+                                                    "{0}: The extended boot entry at sector 0x{1:x} points beyond the end of the stream.",
+                                                    MethodBase.GetCurrentMethod().Name, _sectorIndex);
                         if (IsExtendedBootRecord())
                         {
                             flag = false;
@@ -571,14 +592,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             if (reader.ReadUInt16() != 43605)
             {
                 if (!IsExtendedBootRecord() || parseType != MbrParseType.TruncateInvalidExtendedRecords)
+                {
                     throw new ImageStorageException("The MBR disk signature is invalid.");
+                }
+
                 _logger.LogDebug("{0}: The extended boot record at sector 0x{1:x} has an invalid MBR signature.",
-                    (object) MethodBase.GetCurrentMethod().Name, (object) _sectorIndex);
+                                    MethodBase.GetCurrentMethod().Name, _sectorIndex);
                 flag = false;
             }
 
             if (stream.Position % _bytesPerSector != 0L)
-                stream.Position += _bytesPerSector - stream.Position % _bytesPerSector;
+            {
+                stream.Position += _bytesPerSector - (stream.Position % _bytesPerSector);
+            }
+
             if (flag && !ReadExtendedPartitions(stream, parseType))
             {
                 ExtendedRecord = null;
@@ -591,14 +618,14 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private bool ReadExtendedPartitions(Stream stream, MbrParseType parseType)
         {
-            var position = stream.Position;
-            var flag = true;
+            _ = stream.Position;
+            bool flag = true;
             if (_extendedEntry != null)
             {
                 stream.Position = IsExtendedBootRecord()
                     ? (_extendedEntry.StartingSector + _primaryRecord._extendedEntry.StartingSector) * _bytesPerSector
                     : _extendedEntry.StartingSector * _bytesPerSector;
-                ExtendedRecord = new MasterBootRecord(_primaryRecord == null ? this : _primaryRecord);
+                ExtendedRecord = new MasterBootRecord(_primaryRecord ?? this);
                 flag = ExtendedRecord.ReadFromStream(stream, parseType);
             }
 
@@ -607,28 +634,42 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void WriteToStream(Stream stream, bool addCodeData)
         {
-            var writer = new BinaryWriter(stream);
+            BinaryWriter writer = new(stream);
             stream.Position = _sectorIndex * _bytesPerSector;
             if (!addCodeData)
+            {
                 stream.Write(_codeData, 0, 440);
+            }
             else
+            {
                 stream.Write(CodeData, 0, CodeData.Length);
+            }
+
             writer.Write(DiskSignature);
             stream.WriteByte(0);
             stream.WriteByte(0);
-            foreach (var entry in PartitionEntries)
+            foreach (MbrPartitionEntry entry in PartitionEntries)
+            {
                 entry.WriteToStream(writer);
-            writer.Write((ushort) 43605);
+            }
+
+            writer.Write((ushort)43605);
             if (stream.Position % _bytesPerSector != 0L)
-                stream.Position += _bytesPerSector - stream.Position % _bytesPerSector;
+            {
+                stream.Position += _bytesPerSector - (stream.Position % _bytesPerSector);
+            }
+
             if (ExtendedRecord == null)
+            {
                 return;
+            }
+
             ExtendedRecord.WriteToStream(stream, false);
         }
 
         public void LogInfo(IULogger logger, ushort indentLevel = 0)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             if (IsValidProtectiveMbr())
             {
                 logger.LogInfo(str + "Protective Master Boot Record");
@@ -636,7 +677,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             else if (_primaryRecord == null)
             {
                 logger.LogInfo(str + "Master Boot Record");
-                logger.LogInfo(str + "  Disk Signature: 0x{0:x}", (object) DiskSignature);
+                logger.LogInfo(str + "  Disk Signature: 0x{0:x}", DiskSignature);
             }
             else
             {
@@ -644,24 +685,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
 
             logger.LogInfo("");
-            foreach (var entry in PartitionEntries)
-                entry.LogInfo(logger, this, (ushort) (indentLevel + 2U));
+            foreach (MbrPartitionEntry entry in PartitionEntries)
+            {
+                entry.LogInfo(logger, this, (ushort)(indentLevel + 2U));
+            }
+
             if (ExtendedRecord == null)
+            {
                 return;
+            }
+
             if (!IsExtendedBootRecord())
+            {
                 indentLevel += 2;
+            }
+
             ExtendedRecord.LogInfo(logger, indentLevel);
         }
 
         public bool IsValidProtectiveMbr()
         {
-            for (var index = 0; index < PartitionEntries.Count; ++index)
+            for (int index = 0; index < PartitionEntries.Count; ++index)
             {
-                var entry = PartitionEntries[index];
+                MbrPartitionEntry entry = PartitionEntries[index];
                 if (index == 0)
                 {
                     if (entry.StartingSector != 1U || entry.SectorCount == 0U || entry.PartitionType != 238)
+                    {
                         return false;
+                    }
                 }
                 else if (entry.SectorCount != 0U || entry.StartingSector != 0U || entry.PartitionType != 0)
                 {
@@ -669,7 +721,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 }
 
                 if (entry.Bootable)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -682,74 +736,98 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public MbrPartitionEntry FindPartitionByType(byte partitionType)
         {
-            foreach (var entry in PartitionEntries)
+            foreach (MbrPartitionEntry entry in PartitionEntries)
+            {
                 if (entry.PartitionType == partitionType)
+                {
                     return entry;
-            if (ExtendedRecord != null)
-                return ExtendedRecord.FindPartitionByType(partitionType);
-            return null;
+                }
+            }
+
+            return ExtendedRecord?.FindPartitionByType(partitionType);
         }
 
         public ulong FindPartitionOffset(string partitionName)
         {
             ulong num = 0;
             if (_metadataPartition != null)
-                foreach (var entry in _metadataPartition.Entries)
+            {
+                foreach (MetadataPartitionEntry entry in _metadataPartition.Entries)
+                {
                     if (string.Compare(entry.Name, partitionName, true, CultureInfo.InvariantCulture) == 0)
                     {
                         num = entry.DiskOffset;
                         break;
                     }
+                }
+            }
 
             return num;
         }
 
         public MbrPartitionEntry FindPartitionByName(string partitionName)
         {
-            var partitionOffset = FindPartitionOffset(partitionName);
-            if (partitionOffset > 0UL)
-                return FindPartitionByName(partitionName, partitionOffset);
-            return null;
+            ulong partitionOffset = FindPartitionOffset(partitionName);
+            return partitionOffset > 0UL ? FindPartitionByName(partitionName, partitionOffset) : null;
         }
 
         private MbrPartitionEntry FindPartitionByName(string partitionName, ulong diskOffset)
         {
-            foreach (var entry in PartitionEntries)
-                if (entry.AbsoluteStartingSector * _bytesPerSector == (long) diskOffset)
+            foreach (MbrPartitionEntry entry in PartitionEntries)
+            {
+                if (entry.AbsoluteStartingSector * _bytesPerSector == (long)diskOffset)
+                {
                     return entry;
-            if (ExtendedRecord != null)
-                return ExtendedRecord.FindPartitionByName(partitionName, diskOffset);
-            return null;
+                }
+            }
+
+            return ExtendedRecord?.FindPartitionByName(partitionName, diskOffset);
         }
 
         public string GetPartitionName(MbrPartitionEntry entry)
         {
-            var num = entry.AbsoluteStartingSector * (ulong) _bytesPerSector;
-            var metadataPartition = _metadataPartition;
+            ulong num = entry.AbsoluteStartingSector * (ulong)_bytesPerSector;
+            MasterBootRecordMetadataPartition metadataPartition = _metadataPartition;
             if (IsExtendedBootRecord())
+            {
                 metadataPartition = _primaryRecord._metadataPartition;
+            }
+
             if (metadataPartition != null)
-                foreach (var entry1 in metadataPartition.Entries)
-                    if ((long) entry1.DiskOffset == (long) num)
+            {
+                foreach (MetadataPartitionEntry entry1 in metadataPartition.Entries)
+                {
+                    if ((long)entry1.DiskOffset == (long)num)
+                    {
                         return entry1.Name;
+                    }
+                }
+            }
+
             return string.Empty;
         }
 
         public long GetMetadataPartitionOffset()
         {
             long num = 0;
-            var partitionByType = FindPartitionByType(MasterBootRecordMetadataPartition.PartitonType);
+            MbrPartitionEntry partitionByType = FindPartitionByType(MasterBootRecordMetadataPartition.PartitonType);
             if (partitionByType != null)
+            {
                 num = partitionByType.AbsoluteStartingSector * _bytesPerSector;
+            }
+
             return num;
         }
 
         public void ReadMetadataPartition(Stream stream)
         {
             if (_primaryRecord != null || IsValidProtectiveMbr())
+            {
                 return;
-            var metadataPartitionOffset = GetMetadataPartitionOffset();
-            var position = stream.Position;
+            }
+
+            long metadataPartitionOffset = GetMetadataPartitionOffset();
+            long position = stream.Position;
             if (metadataPartitionOffset > 0L)
             {
                 stream.Position = metadataPartitionOffset;
@@ -767,30 +845,41 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void RemovePartition(string partitionName)
         {
-            var partitionOffset = FindPartitionOffset(partitionName);
+            ulong partitionOffset = FindPartitionOffset(partitionName);
             if (partitionOffset == 0UL)
+            {
                 throw new ImageStorageException(
-                    string.Format("Partition {0} was not found in the MBR metadata partition.", partitionName));
+                                string.Format("Partition {0} was not found in the MBR metadata partition.", partitionName));
+            }
+
             RemovePartition(partitionName, partitionOffset);
         }
 
         private void RemovePartition(string partitionName, ulong partitionOffset)
         {
-            var flag = true;
-            foreach (var entry in PartitionEntries)
-                if (entry.AbsoluteStartingSector * _bytesPerSector == (long) partitionOffset)
+            bool flag = true;
+            foreach (MbrPartitionEntry entry in PartitionEntries)
+            {
+                if (entry.AbsoluteStartingSector * _bytesPerSector == (long)partitionOffset)
                 {
                     entry.ZeroData();
                     flag = false;
                     break;
                 }
+            }
 
             if (!flag)
+            {
                 return;
+            }
+
             if (ExtendedRecord == null)
+            {
                 throw new ImageStorageException(string.Format(
-                    "Partition {0} was in the MBR metadata partition, but the boot record is not found.",
-                    partitionName));
+                                "Partition {0} was in the MBR metadata partition, but the boot record is not found.",
+                                partitionName));
+            }
+
             ExtendedRecord.RemovePartition(partitionName, partitionOffset);
         }
     }

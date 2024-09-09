@@ -20,25 +20,31 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             {
                 NativeMethods.IU_EnsureDirectoryExists(path);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public static void Delete(string path)
         {
-            var str = LongPathCommon.NormalizeLongPath(path);
+            string str = LongPathCommon.NormalizeLongPath(path);
             if (Exists(str) && !NativeMethods.RemoveDirectory(str))
+            {
                 throw LongPathCommon.GetExceptionFromLastWin32Error();
+            }
         }
 
         public static void Delete(string path, bool recursive)
         {
             if (recursive)
+            {
                 NativeMethods.IU_CleanDirectory(path, true);
+            }
             else
+            {
                 Delete(path);
+            }
         }
 
         public static bool Exists(string path)
@@ -48,10 +54,8 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static FileAttributes GetAttributes(string path)
         {
-            var attributes = LongPathCommon.GetAttributes(path);
-            if (!attributes.HasFlag(FileAttributes.Directory))
-                throw LongPathCommon.GetExceptionFromWin32Error(267);
-            return attributes;
+            FileAttributes attributes = LongPathCommon.GetAttributes(path);
+            return !attributes.HasFlag(FileAttributes.Directory) ? throw LongPathCommon.GetExceptionFromWin32Error(267) : attributes;
         }
 
         public static IEnumerable<string> EnumerateDirectories(string path, string searchPattern,
@@ -72,25 +76,31 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string[] GetDirectories(string path, string searchPattern, SearchOption searchOptions)
         {
-            if (searchOptions != SearchOption.AllDirectories && searchOptions != SearchOption.TopDirectoryOnly)
+            if (searchOptions is not SearchOption.AllDirectories and not SearchOption.TopDirectoryOnly)
+            {
                 throw new NotImplementedException("Unknown search option: " + searchOptions);
-            var fRecursive = searchOptions == SearchOption.AllDirectories;
-            var rgDirectories = IntPtr.Zero;
-            var cDirectories = 0;
-            var allDirectories = NativeMethods.IU_GetAllDirectories(
+            }
+
+            bool fRecursive = searchOptions == SearchOption.AllDirectories;
+            int allDirectories = NativeMethods.IU_GetAllDirectories(
                 Path.Combine(path, Path.GetDirectoryName(searchPattern)), Path.GetFileName(searchPattern), fRecursive,
-                out rgDirectories, out cDirectories);
+                out nint rgDirectories, out int cDirectories);
             if (allDirectories != 0)
+            {
                 throw LongPathCommon.GetExceptionFromWin32Error(allDirectories);
+            }
+
             try
             {
                 return LongPathCommon.ConvertPtrArrayToStringArray(rgDirectories, cDirectories);
             }
             finally
             {
-                var errorCode = NativeMethods.IU_FreeStringList(rgDirectories, cDirectories);
+                int errorCode = NativeMethods.IU_FreeStringList(rgDirectories, cDirectories);
                 if (errorCode != 0)
+                {
                     throw LongPathCommon.GetExceptionFromWin32Error(errorCode);
+                }
             }
         }
 
@@ -121,24 +131,30 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public static string[] GetFiles(string path, string searchPattern, SearchOption searchOptions)
         {
-            if (searchOptions != SearchOption.AllDirectories && searchOptions != SearchOption.TopDirectoryOnly)
+            if (searchOptions is not SearchOption.AllDirectories and not SearchOption.TopDirectoryOnly)
+            {
                 throw new NotImplementedException("Unknown search option: " + searchOptions);
-            var fRecursive = searchOptions == SearchOption.AllDirectories;
-            var rgFiles = IntPtr.Zero;
-            var cFiles = 0;
-            var allFiles = NativeMethods.IU_GetAllFiles(Path.Combine(path, Path.GetDirectoryName(searchPattern)),
-                Path.GetFileName(searchPattern), fRecursive, out rgFiles, out cFiles);
+            }
+
+            bool fRecursive = searchOptions == SearchOption.AllDirectories;
+            int allFiles = NativeMethods.IU_GetAllFiles(Path.Combine(path, Path.GetDirectoryName(searchPattern)),
+                Path.GetFileName(searchPattern), fRecursive, out nint rgFiles, out int cFiles);
             if (allFiles != 0)
+            {
                 throw LongPathCommon.GetExceptionFromWin32Error(allFiles);
+            }
+
             try
             {
                 return LongPathCommon.ConvertPtrArrayToStringArray(rgFiles, cFiles);
             }
             finally
             {
-                var errorCode = NativeMethods.IU_FreeStringList(rgFiles, cFiles);
+                int errorCode = NativeMethods.IU_FreeStringList(rgFiles, cFiles);
                 if (errorCode != 0)
+                {
                     throw LongPathCommon.GetExceptionFromWin32Error(errorCode);
+                }
             }
         }
 

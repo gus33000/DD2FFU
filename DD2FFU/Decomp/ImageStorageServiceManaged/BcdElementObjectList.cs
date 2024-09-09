@@ -24,13 +24,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             get
             {
-                var guidList = new List<Guid>(MultiStringData.Count);
-                for (var index = 0; index < MultiStringData.Count; ++index)
+                List<Guid> guidList = new(MultiStringData.Count);
+                for (int index = 0; index < MultiStringData.Count; ++index)
                 {
-                    var result = Guid.Empty;
-                    if (!Guid.TryParse(MultiStringData[index], out result))
+                    if (!Guid.TryParse(MultiStringData[index], out Guid result))
+                    {
                         throw new ImageStorageException(string.Format("{0}: The string data isn't a valid Guid.",
-                            MethodBase.GetCurrentMethod().Name));
+                                                MethodBase.GetCurrentMethod().Name));
+                    }
+
                     guidList.Add(result);
                 }
 
@@ -38,13 +40,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-        
+
         public override void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             base.LogInfo(logger, indentLevel);
-            foreach (var guid in ObjectList)
-                logger.LogInfo(str + "Object ID: {{{0}}}", (object) guid);
+            foreach (Guid guid in ObjectList)
+            {
+                logger.LogInfo(str + "Object ID: {{{0}}}", guid);
+            }
         }
     }
 }

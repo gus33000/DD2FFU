@@ -19,17 +19,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [XmlElement("GPTDevice", typeof(BcdElementDeviceGptInput))]
         [XmlElement("MBRDevice", typeof(BcdElementDeviceMbrInput))]
         [XmlElement("RamdiskDevice", typeof(BcdElementDeviceRamdiskInput))]
-        public object DeviceValue { get; set; }
+        public object DeviceValue
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(TextWriter writer, string elementName)
         {
             switch (DeviceType)
             {
                 case DeviceTypeChoice.GPTDevice:
-                    var gptBootDevice =
+                    BcdElementDevice gptBootDevice =
                         BcdElementDeviceGptInput.CreateGptBootDevice(DeviceValue as BcdElementDeviceGptInput);
-                    var buffer1 = new byte[(int) gptBootDevice.BinarySize];
-                    var memoryStream1 = new MemoryStream(buffer1);
+                    byte[] buffer1 = new byte[(int)gptBootDevice.BinarySize];
+                    MemoryStream memoryStream1 = new(buffer1);
                     try
                     {
                         gptBootDevice.WriteToStream(memoryStream1);
@@ -43,9 +46,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     writer.WriteLine();
                     break;
                 case DeviceTypeChoice.MBRDevice:
-                    var baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
-                    var buffer2 = new byte[(int) baseBootDevice.BinarySize];
-                    var memoryStream2 = new MemoryStream(buffer2);
+                    BcdElementDevice baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
+                    byte[] buffer2 = new byte[(int)baseBootDevice.BinarySize];
+                    MemoryStream memoryStream2 = new(buffer2);
                     try
                     {
                         baseBootDevice.WriteToStream(memoryStream2);
@@ -59,27 +62,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     writer.WriteLine();
                     break;
                 case DeviceTypeChoice.RamdiskDevice:
-                    var deviceValue = DeviceValue as BcdElementDeviceRamdiskInput;
-                    BcdElementBootDevice parentDevice;
-                    switch (deviceValue.ParentDevice.DeviceType)
+                    BcdElementDeviceRamdiskInput deviceValue = DeviceValue as BcdElementDeviceRamdiskInput;
+                    BcdElementBootDevice parentDevice = deviceValue.ParentDevice.DeviceType switch
                     {
-                        case DeviceTypeChoice.GPTDevice:
-                            parentDevice = BcdElementDeviceGptInput
-                                .CreateGptBootDevice(deviceValue.ParentDevice.DeviceValue as BcdElementDeviceGptInput)
-                                .BootDevice;
-                            break;
-                        case DeviceTypeChoice.MBRDevice:
-                            parentDevice = BcdElementBootDevice.CreateBaseBootDevice();
-                            break;
-                        default:
-                            throw new ImageStorageException(string.Format(
-                                "{0}: The given Ramdisk parent type is not supported.",
-                                MethodBase.GetCurrentMethod().Name));
-                    }
-
-                    var baseRamdiskDevice =
+                        DeviceTypeChoice.GPTDevice => BcdElementDeviceGptInput
+                                                        .CreateGptBootDevice(deviceValue.ParentDevice.DeviceValue as BcdElementDeviceGptInput)
+                                                        .BootDevice,
+                        DeviceTypeChoice.MBRDevice => BcdElementBootDevice.CreateBaseBootDevice(),
+                        _ => throw new ImageStorageException(string.Format(
+                                                        "{0}: The given Ramdisk parent type is not supported.",
+                                                        MethodBase.GetCurrentMethod().Name)),
+                    };
+                    BcdElementDevice baseRamdiskDevice =
                         BcdElementDevice.CreateBaseRamdiskDevice(deviceValue.FilePath, parentDevice);
-                    var memoryStream3 = new MemoryStream();
+                    MemoryStream memoryStream3 = new();
                     byte[] numArray;
                     try
                     {
@@ -106,10 +102,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             switch (DeviceType)
             {
                 case DeviceTypeChoice.GPTDevice:
-                    var gptBootDevice =
+                    BcdElementDevice gptBootDevice =
                         BcdElementDeviceGptInput.CreateGptBootDevice(DeviceValue as BcdElementDeviceGptInput);
-                    var buffer1 = new byte[(int) gptBootDevice.BinarySize];
-                    var memoryStream1 = new MemoryStream(buffer1);
+                    byte[] buffer1 = new byte[(int)gptBootDevice.BinarySize];
+                    MemoryStream memoryStream1 = new(buffer1);
                     try
                     {
                         gptBootDevice.WriteToStream(memoryStream1);
@@ -122,9 +118,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     BcdElementValueTypeInput.WriteByteArray(bcdRegData, path, buffer1);
                     break;
                 case DeviceTypeChoice.MBRDevice:
-                    var baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
-                    var buffer2 = new byte[(int) baseBootDevice.BinarySize];
-                    var memoryStream2 = new MemoryStream(buffer2);
+                    BcdElementDevice baseBootDevice = BcdElementDevice.CreateBaseBootDevice();
+                    byte[] buffer2 = new byte[(int)baseBootDevice.BinarySize];
+                    MemoryStream memoryStream2 = new(buffer2);
                     try
                     {
                         baseBootDevice.WriteToStream(memoryStream2);
@@ -137,27 +133,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     BcdElementValueTypeInput.WriteByteArray(bcdRegData, path, buffer2);
                     break;
                 case DeviceTypeChoice.RamdiskDevice:
-                    var deviceValue = DeviceValue as BcdElementDeviceRamdiskInput;
-                    BcdElementBootDevice parentDevice;
-                    switch (deviceValue.ParentDevice.DeviceType)
+                    BcdElementDeviceRamdiskInput deviceValue = DeviceValue as BcdElementDeviceRamdiskInput;
+                    BcdElementBootDevice parentDevice = deviceValue.ParentDevice.DeviceType switch
                     {
-                        case DeviceTypeChoice.GPTDevice:
-                            parentDevice = BcdElementDeviceGptInput
-                                .CreateGptBootDevice(deviceValue.ParentDevice.DeviceValue as BcdElementDeviceGptInput)
-                                .BootDevice;
-                            break;
-                        case DeviceTypeChoice.MBRDevice:
-                            parentDevice = BcdElementBootDevice.CreateBaseBootDevice();
-                            break;
-                        default:
-                            throw new ImageStorageException(string.Format(
-                                "{0}: The given Ramdisk parent type is not supported.",
-                                MethodBase.GetCurrentMethod().Name));
-                    }
-
-                    var baseRamdiskDevice =
+                        DeviceTypeChoice.GPTDevice => BcdElementDeviceGptInput
+                                                        .CreateGptBootDevice(deviceValue.ParentDevice.DeviceValue as BcdElementDeviceGptInput)
+                                                        .BootDevice,
+                        DeviceTypeChoice.MBRDevice => BcdElementBootDevice.CreateBaseBootDevice(),
+                        _ => throw new ImageStorageException(string.Format(
+                                                        "{0}: The given Ramdisk parent type is not supported.",
+                                                        MethodBase.GetCurrentMethod().Name)),
+                    };
+                    BcdElementDevice baseRamdiskDevice =
                         BcdElementDevice.CreateBaseRamdiskDevice(deviceValue.FilePath, parentDevice);
-                    var memoryStream3 = new MemoryStream();
+                    MemoryStream memoryStream3 = new();
                     byte[] numArray;
                     try
                     {

@@ -17,12 +17,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
     public class IULogger : IDeploymentLogger
     {
         private readonly Dictionary<LoggingLevel, ConsoleColor> LoggingColors =
-            new Dictionary<LoggingLevel, ConsoleColor>();
+            [];
 
         private readonly Dictionary<LoggingLevel, LogString> LoggingFunctions =
-            new Dictionary<LoggingLevel, LogString>();
+            [];
 
-        private readonly Dictionary<LoggingLevel, string> LoggingMessage = new Dictionary<LoggingLevel, string>();
+        private readonly Dictionary<LoggingLevel, string> LoggingMessage = [];
         private LoggingLevel MinLogLevel;
 
         public IULogger()
@@ -42,9 +42,12 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             LoggingColors.Add(LoggingLevel.Error, ConsoleColor.Red);
         }
 
-        public ConsoleColor OverrideColor { get; set; }
+        public ConsoleColor OverrideColor
+        {
+            get; set;
+        }
 
-        public bool UseOverrideColor => (uint) OverrideColor > 0U;
+        public bool UseOverrideColor => (uint)OverrideColor > 0U;
 
         public LogString ErrorLogger
         {
@@ -73,11 +76,14 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public void Log(LoggingLevel level, string format, params object[] list)
         {
             if (level < MinLogLevel)
+            {
                 return;
-            var foregroundColor = (int) Console.ForegroundColor;
+            }
+
+            int foregroundColor = (int)Console.ForegroundColor;
             Console.ForegroundColor = UseOverrideColor ? OverrideColor : LoggingColors[level];
             LoggingFunctions[level](format, list);
-            Console.ForegroundColor = (ConsoleColor) foregroundColor;
+            Console.ForegroundColor = (ConsoleColor)foregroundColor;
         }
 
         public void LogException(Exception exp)
@@ -87,25 +93,25 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public void LogException(Exception exp, LoggingLevel level)
         {
-            var stringBuilder = new StringBuilder();
-            var stackTrace1 = new StackTrace(exp, true);
+            StringBuilder stringBuilder = new();
+            StackTrace stackTrace1 = new(exp, true);
             if (stackTrace1.FrameCount > 0)
             {
-                var stackTrace2 = stackTrace1;
-                var frame = stackTrace2.GetFrame(stackTrace2.FrameCount - 1);
+                StackTrace stackTrace2 = stackTrace1;
+                StackFrame frame = stackTrace2.GetFrame(stackTrace2.FrameCount - 1);
                 if (frame != null)
                 {
-                    var str = string.Format("{0}({1},{2}):", frame.GetFileName(), frame.GetFileLineNumber(),
+                    string str = string.Format("{0}({1},{2}):", frame.GetFileName(), frame.GetFileLineNumber(),
                         frame.GetFileColumnNumber());
-                    stringBuilder.Append(string.Format("{0}{1}", str, Environment.NewLine));
+                    _ = stringBuilder.Append(string.Format("{0}{1}", str, Environment.NewLine));
                 }
             }
 
-            stringBuilder.Append(string.Format("{0}: {1}{2}", LoggingMessage[level],
+            _ = stringBuilder.Append(string.Format("{0}: {1}{2}", LoggingMessage[level],
                 "0x" + Marshal.GetHRForException(exp).ToString("X"), Environment.NewLine));
-            stringBuilder.Append(string.Format("{0}:{1}",
+            _ = stringBuilder.Append(string.Format("{0}:{1}",
                 Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName), Environment.NewLine));
-            stringBuilder.Append(string.Format("EXCEPTION: {0}{1}", exp, Environment.NewLine));
+            _ = stringBuilder.Append(string.Format("EXCEPTION: {0}{1}", exp, Environment.NewLine));
             Log(level, stringBuilder.ToString());
         }
 
@@ -132,17 +138,25 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public static void LogToConsole(string format, params object[] list)
         {
             if (list.Length != 0)
+            {
                 Console.WriteLine(string.Format(CultureInfo.CurrentCulture, format, list));
+            }
             else
+            {
                 Console.WriteLine(format);
+            }
         }
 
         public static void LogToError(string format, params object[] list)
         {
             if (list.Length != 0)
+            {
                 Console.Error.WriteLine(string.Format(CultureInfo.CurrentCulture, format, list));
+            }
             else
+            {
                 Console.Error.WriteLine(format);
+            }
         }
 
         public static void LogToNull(string format, params object[] list)
@@ -156,10 +170,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         public void SetLogFunction(LoggingLevel level, LogString logFunc)
         {
-            if (logFunc == null)
-                LoggingFunctions[level] = LogToNull;
-            else
-                LoggingFunctions[level] = logFunc;
+            LoggingFunctions[level] = logFunc ?? LogToNull;
         }
 
         public void ResetOverrideColor()

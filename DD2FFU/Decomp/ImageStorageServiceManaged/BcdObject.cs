@@ -29,7 +29,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             }
         }
 
-        
+
         public BcdObject(Guid objectId, uint dataType)
         {
             Id = objectId;
@@ -37,24 +37,33 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             Type = dataType;
         }
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get; set;
+        }
 
-        public Guid Id { get; set; }
+        public Guid Id
+        {
+            get; set;
+        }
 
-         public uint Type { get; private set; }
+        public uint Type
+        {
+            get; private set;
+        }
 
-        public List<BcdElement> Elements { get; } = new List<BcdElement>();
+        public List<BcdElement> Elements { get; } = [];
 
         public void ReadFromRegistry(OfflineRegistryHandle objectKey)
         {
-            var offlineRegistryHandle1 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle2 = (OfflineRegistryHandle) null;
+            OfflineRegistryHandle offlineRegistryHandle1 = null;
+            OfflineRegistryHandle offlineRegistryHandle2 = null;
             try
             {
                 offlineRegistryHandle1 = objectKey.OpenSubKey("Description");
-                Type = (uint) offlineRegistryHandle1.GetValue("Type", 0);
+                Type = (uint)offlineRegistryHandle1.GetValue("Type", 0);
             }
-            catch (ImageStorageException ex)
+            catch (ImageStorageException)
             {
                 throw;
             }
@@ -72,9 +81,9 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             try
             {
                 offlineRegistryHandle2 = objectKey.OpenSubKey("Elements");
-                foreach (var subKeyName in offlineRegistryHandle2.GetSubKeyNames())
+                foreach (string subKeyName in offlineRegistryHandle2.GetSubKeyNames())
                 {
-                    var elementKey = (OfflineRegistryHandle) null;
+                    OfflineRegistryHandle elementKey = null;
                     try
                     {
                         elementKey = offlineRegistryHandle2.OpenSubKey(subKeyName);
@@ -92,7 +101,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     }
                 }
             }
-            catch (ImageStorageException ex)
+            catch (ImageStorageException)
             {
                 throw;
             }
@@ -110,37 +119,48 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void AddElement(BcdElement element)
         {
-            foreach (var element1 in Elements)
+            foreach (BcdElement element1 in Elements)
+            {
                 if (element1.DataType == element.DataType)
+                {
                     throw new ImageStorageException(string.Format(
-                        "{0}: A bcd element with the given datatype already exists.",
-                        MethodBase.GetCurrentMethod().Name));
+                                        "{0}: A bcd element with the given datatype already exists.",
+                                        MethodBase.GetCurrentMethod().Name));
+                }
+            }
+
             Elements.Add(element);
         }
 
         public Guid GetDefaultObjectId()
         {
-            var empty = Guid.Empty;
-            foreach (var element in Elements)
+            Guid empty = Guid.Empty;
+            foreach (BcdElement element in Elements)
+            {
                 if (element.DataType.Equals(BcdElementDataTypes.DefaultObject))
                 {
-                    var bcdElementObject = element as BcdElementObject;
-                    if (bcdElementObject != null)
+                    if (element is BcdElementObject bcdElementObject)
+                    {
                         return bcdElementObject.ElementObject;
+                    }
                 }
+            }
 
             return empty;
         }
 
-        
+
         public void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo(str + "BCD Object: {{{0}}}", (object) Id);
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo(str + "BCD Object: {{{0}}}", Id);
             if (BcdObjects.BootObjectList.ContainsKey(Id))
-                logger.LogInfo(str + "Friendly Name: {0}", (object) BcdObjects.BootObjectList[Id].Name);
+            {
+                logger.LogInfo(str + "Friendly Name: {0}", BcdObjects.BootObjectList[Id].Name);
+            }
+
             logger.LogInfo("");
-            foreach (var element in Elements)
+            foreach (BcdElement element in Elements)
             {
                 element.LogInfo(logger, checked(indentLevel + 2));
                 logger.LogInfo("");
@@ -149,9 +169,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(Name))
-                return Name;
-            return "Unnamed BcdObject";
+            return !string.IsNullOrEmpty(Name) ? Name : "Unnamed BcdObject";
         }
     }
 }

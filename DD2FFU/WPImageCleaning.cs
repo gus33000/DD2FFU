@@ -48,28 +48,28 @@ namespace DD2FFU
 
         private static void CleanFS(string letter)
         {
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "chkdsk.exe";
             process.StartInfo.Arguments = "/f /x " + letter + ":";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
             process.StartInfo.UseShellExecute = false;
 
-            process.Start();
+            _ = process.Start();
 
             process.WaitForExit();
         }
 
         private static void CleanBin(string letter)
         {
-            var process = new Process();
+            Process process = new();
             process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/c rmdir /Q /S " + letter.Substring(0, 1) + @":\$RECYCLE.BIN";
+            process.StartInfo.Arguments = "/c rmdir /Q /S " + letter[..1] + @":\$RECYCLE.BIN";
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
             process.StartInfo.UseShellExecute = false;
 
-            process.Start();
+            _ = process.Start();
 
             process.WaitForExit();
         }
@@ -77,12 +77,14 @@ namespace DD2FFU
         public static void Clean(string physicalharddisk, List<ImageUtils.GPTPartition> partitions, string letter,
             string[] excluded)
         {
-            var mainosid = "";
+            string mainosid = "";
 
-            foreach (var partition in partitions)
+            foreach (ImageUtils.GPTPartition partition in partitions)
             {
                 if (excluded.Any(x => x.ToLower() == partition.Name.ToLower()))
+                {
                     continue;
+                }
 
                 Logging.Log("Processing " + partition.Name + "...");
 
@@ -93,12 +95,13 @@ namespace DD2FFU
                             mainosid = partition.id.ToString();
                             ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                            foreach (var file in filedeletionMainOS)
+                            foreach (string file in filedeletionMainOS)
+                            {
                                 try
                                 {
                                     if (File.Exists(letter + @":" + file))
                                     {
-                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        FileAttributes attributes = File.GetAttributes(letter + @":" + file);
                                         if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
                                         {
                                             File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
@@ -112,10 +115,11 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
-                            var hivetamperLogs = Directory.GetFiles(letter + @":" + @"\Windows\System32\Config", "*.TM*",
+                            string[] hivetamperLogs = Directory.GetFiles(letter + @":" + @"\Windows\System32\Config", "*.TM*",
                                 SearchOption.TopDirectoryOnly);
-                            foreach (var file in hivetamperLogs)
+                            foreach (string file in hivetamperLogs)
                             {
                                 Logging.Log("Removing " + file + "...");
                                 File.Delete(file);
@@ -130,14 +134,15 @@ namespace DD2FFU
                                 "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7");
                             ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                            foreach (var file in Directory.EnumerateFiles(letter + @":\", "*.txt",
+                            foreach (string file in Directory.EnumerateFiles(letter + @":\", "*.txt",
                                 SearchOption.TopDirectoryOnly))
+                            {
                                 try
                                 {
                                     Console.WriteLine(file);
                                     if (File.Exists(file))
                                     {
-                                        var attributes = File.GetAttributes(file);
+                                        FileAttributes attributes = File.GetAttributes(file);
                                         if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
                                         {
                                             File.SetAttributes(file, FileAttributes.Normal);
@@ -151,6 +156,7 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
                             try
                             {
@@ -195,12 +201,13 @@ namespace DD2FFU
                             ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
 
-                            foreach (var file in filedeletionEFIESP)
+                            foreach (string file in filedeletionEFIESP)
+                            {
                                 try
                                 {
                                     if (File.Exists(letter + @":" + file))
                                     {
-                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        FileAttributes attributes = File.GetAttributes(letter + @":" + file);
                                         if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
                                         {
                                             File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
@@ -214,12 +221,18 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
-                            foreach (var file in filepurgeEFIESP)
+                            foreach (string file in filepurgeEFIESP)
+                            {
                                 try
                                 {
-                                    var things = File.ReadAllText(letter + @":" + file).ToCharArray();
-                                    for (var i = 0; i < things.Length; i++) things[i] = ' ';
+                                    char[] things = File.ReadAllText(letter + @":" + file).ToCharArray();
+                                    for (int i = 0; i < things.Length; i++)
+                                    {
+                                        things[i] = ' ';
+                                    }
+
                                     File.WriteAllText(letter + @":" + file, new string(things));
                                     Logging.Log("Purged " + file);
                                 }
@@ -227,8 +240,10 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
-                            foreach (var folder in folderdeletionEFIESP)
+                            foreach (string folder in folderdeletionEFIESP)
+                            {
                                 try
                                 {
                                     Directory.Delete(letter + @":" + folder, true);
@@ -238,6 +253,7 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
                             ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
                             break;
@@ -246,12 +262,13 @@ namespace DD2FFU
                         {
                             ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                            foreach (var file in filedeletionDATA)
+                            foreach (string file in filedeletionDATA)
+                            {
                                 try
                                 {
                                     if (File.Exists(letter + @":" + file))
                                     {
-                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        FileAttributes attributes = File.GetAttributes(letter + @":" + file);
                                         if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
                                         {
                                             File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
@@ -265,22 +282,28 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
                             try
                             {
-                                foreach (var item in Directory.EnumerateFileSystemEntries(
-                                    letter.Substring(0, 1) + @":\SystemData\Telemetry", "*", SearchOption.AllDirectories))
+                                foreach (string item in Directory.EnumerateFileSystemEntries(
+                                    letter[..1] + @":\SystemData\Telemetry", "*", SearchOption.AllDirectories))
+                                {
                                     try
                                     {
-                                        if (item != letter.Substring(0, 1) + @":\SystemData\Telemetry\Archive" &&
-                                            item != letter.Substring(0, 1) +
+                                        if (item != letter[..1] + @":\SystemData\Telemetry\Archive" &&
+                                            item != letter[..1] +
                                             @":\SystemData\Telemetry\KernelDumps\LiveDumps" && item !=
-                                            letter.Substring(0, 1) + @":\SystemData\Telemetry\KernelDumps")
+                                            letter[..1] + @":\SystemData\Telemetry\KernelDumps")
                                         {
                                             if (File.Exists(item))
+                                            {
                                                 File.Delete(item);
+                                            }
                                             else
+                                            {
                                                 Directory.Delete(item, true);
+                                            }
 
                                             Logging.Log("Removed " + item);
                                         }
@@ -289,6 +312,7 @@ namespace DD2FFU
                                     {
                                         Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                     }
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -302,12 +326,13 @@ namespace DD2FFU
                         {
                             ImageUtils.MountDiskId(physicalharddisk, partition.id.ToString(), letter);
 
-                            foreach (var file in filedeletionCrashDump)
+                            foreach (string file in filedeletionCrashDump)
+                            {
                                 try
                                 {
                                     if (File.Exists(letter + @":" + file))
                                     {
-                                        var attributes = File.GetAttributes(letter + @":" + file);
+                                        FileAttributes attributes = File.GetAttributes(letter + @":" + file);
                                         if (attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System))
                                         {
                                             File.SetAttributes(letter + @":" + file, FileAttributes.Normal);
@@ -321,6 +346,7 @@ namespace DD2FFU
                                 {
                                     Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
                                 }
+                            }
 
                             ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
                             break;

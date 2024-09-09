@@ -14,24 +14,27 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
     {
         [XmlArrayItem(ElementName = "StringValue", IsNullable = false, Type = typeof(string))]
         [XmlArray]
-        public string[] StringValues { get; set; }
+        public string[] StringValues
+        {
+            get; set;
+        }
 
         public void SaveAsRegFile(TextWriter writer, string elementName)
         {
-            var stringBuilder = new StringBuilder();
-            for (var index = 0; index < StringValues.Length; ++index)
+            StringBuilder stringBuilder = new();
+            for (int index = 0; index < StringValues.Length; ++index)
             {
-                var guid = BcdObjects.IdFromName(StringValues[index]);
-                stringBuilder.Append(string.Format("{{{0}}}", guid));
-                stringBuilder.Append("\0");
+                System.Guid guid = BcdObjects.IdFromName(StringValues[index]);
+                _ = stringBuilder.Append(string.Format("{{{0}}}", guid));
+                _ = stringBuilder.Append("\0");
             }
 
-            stringBuilder.Append("\0");
+            _ = stringBuilder.Append("\0");
             BcdElementValueTypeInput.WriteObjectsValue(writer, elementName, "\"Element\"=hex(7):",
                 stringBuilder.ToString());
-            foreach (var stringValue in StringValues)
+            foreach (string stringValue in StringValues)
             {
-                var guid = BcdObjects.IdFromName(stringValue);
+                System.Guid guid = BcdObjects.IdFromName(stringValue);
                 writer.WriteLine(";Values={{{0}}}, \"{1}\"", guid, stringValue);
             }
 
@@ -40,10 +43,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void SaveAsRegData(BcdRegData bcdRegData, string path)
         {
-            var str1 = (string) null;
-            foreach (var stringValue in StringValues)
+            string str1 = null;
+            foreach (string stringValue in StringValues)
+            {
                 str1 = str1 + "\"{" + BcdObjects.IdFromName(stringValue) + "}\",";
-            var str2 = str1.TrimEnd(',');
+            }
+
+            string str2 = str1.TrimEnd(',');
             bcdRegData.AddRegValue(path, "Element", str2, "REG_MULTI_SZ");
         }
     }

@@ -15,16 +15,29 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         Namespace = "http://schemas.microsoft.com/embedded/2004/10/ImageUpdate/v2")]
     public class DeviceLayoutInputv2
     {
-        [XmlArrayItem(ElementName = "Store", IsNullable = false, Type = typeof(InputStore))] [XmlArray]
+        [XmlArrayItem(ElementName = "Store", IsNullable = false, Type = typeof(InputStore))]
+        [XmlArray]
         public InputStore[] Stores;
 
-        [XmlElement("SectorSize")] public uint SectorSize { get; set; }
+        [XmlElement("SectorSize")]
+        public uint SectorSize
+        {
+            get; set;
+        }
 
         [XmlElement("ChunkSize")] public uint ChunkSize { get; set; } = 256;
 
-        [XmlIgnore] public uint DefaultPartitionByteAlignment { get; set; }
+        [XmlIgnore]
+        public uint DefaultPartitionByteAlignment
+        {
+            get; set;
+        }
 
-        [XmlElement("VersionTag")] public string VersionTag { get; set; }
+        [XmlElement("VersionTag")]
+        public string VersionTag
+        {
+            get; set;
+        }
 
         [XmlElement("DefaultPartitionByteAlignment")]
         public string DefaultPartitionByteAlignmentAsString
@@ -32,17 +45,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             get => DefaultPartitionByteAlignment.ToString(CultureInfo.InvariantCulture);
             set
             {
-                uint num = 0;
-                if (!InputHelpers.StringToUint(value, out num))
+                if (!InputHelpers.StringToUint(value, out uint num))
+                {
                     throw new ImageCommonException(string.Format("The default byte alignment cannot be parsed: {0}",
-                        value));
+                                        value));
+                }
+
                 DefaultPartitionByteAlignment = num;
             }
         }
 
-        public InputStore MainOSStore
-        {
-            get { return Stores.FirstOrDefault(x => x.IsMainOSStore()); }
-        }
+        public InputStore MainOSStore => Stores.FirstOrDefault(x => x.IsMainOSStore());
     }
 }

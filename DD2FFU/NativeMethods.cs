@@ -51,7 +51,7 @@ namespace DD2FFU
         public const int VIRTUAL_STORAGE_TYPE_DEVICE_VHD = 2;
 
         public static readonly Guid VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT =
-            new Guid("EC984AEC-A0F9-47e9-901F-71415A66345B");
+            new("EC984AEC-A0F9-47e9-901F-71415A66345B");
 
         [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
         public static extern int AttachVirtualDisk(IntPtr VirtualDiskHandle, IntPtr SecurityDescriptor,

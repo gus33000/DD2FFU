@@ -20,28 +20,37 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private bool _alreadyDisposed;
         private OfflineRegistryHandle _bcdKey;
         private string _filePath;
-        private IULogger _logger = new IULogger();
+        private IULogger _logger = new();
 
         public BootConfigurationDatabase(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
+            {
                 throw new ImageStorageException(string.Format("{0}: The filePath is empty or null.",
-                    MethodBase.GetCurrentMethod().Name));
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
             if (!File.Exists(filePath))
+            {
                 throw new ImageStorageException(string.Format("{0}: The file ({1}) does not exist or is inaccessible.",
-                    MethodBase.GetCurrentMethod().Name, filePath));
+                                MethodBase.GetCurrentMethod().Name, filePath));
+            }
+
             _filePath = filePath;
-            Objects = new List<BcdObject>();
+            Objects = [];
         }
 
-        
+
         public BootConfigurationDatabase(string filePath, IULogger logger)
             : this(filePath)
         {
             _logger = logger;
         }
 
-        public List<BcdObject> Objects { get; }
+        public List<BcdObject> Objects
+        {
+            get;
+        }
 
         public void Dispose()
         {
@@ -57,7 +66,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         protected virtual void Dispose(bool isDisposing)
         {
             if (_alreadyDisposed)
+            {
                 return;
+            }
+
             if (isDisposing)
             {
                 _filePath = null;
@@ -78,7 +90,6 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _bcdKey = new OfflineRegistryHandle(_filePath);
             try
             {
-                var offlineRegistryHandle1 = (OfflineRegistryHandle) null;
                 OfflineRegistryHandle offlineRegistryHandle2;
                 try
                 {
@@ -93,15 +104,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
                 try
                 {
-                    var subKeyNames = offlineRegistryHandle2.GetSubKeyNames();
+                    string[] subKeyNames = offlineRegistryHandle2.GetSubKeyNames();
                     if (subKeyNames == null || subKeyNames.Length == 0)
-                        throw new ImageStorageException(string.Format(
-                            "{0}: The BCD hive is invalid. There are no keys under 'Objects'.",
-                            MethodBase.GetCurrentMethod().Name));
-                    foreach (var str in subKeyNames)
                     {
-                        var bcdObject = new BcdObject(str);
-                        var objectKey = offlineRegistryHandle2.OpenSubKey(str);
+                        throw new ImageStorageException(string.Format(
+                                                "{0}: The BCD hive is invalid. There are no keys under 'Objects'.",
+                                                MethodBase.GetCurrentMethod().Name));
+                    }
+
+                    foreach (string str in subKeyNames)
+                    {
+                        BcdObject bcdObject = new(str);
+                        OfflineRegistryHandle objectKey = offlineRegistryHandle2.OpenSubKey(str);
                         try
                         {
                             bcdObject.ReadFromRegistry(objectKey);
@@ -116,14 +130,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 }
                 finally
                 {
-                    if (offlineRegistryHandle2 != null)
-                    {
-                        offlineRegistryHandle2.Close();
-                        offlineRegistryHandle1 = null;
-                    }
+                    offlineRegistryHandle2?.Close();
                 }
             }
-            catch (ImageStorageException ex)
+            catch (ImageStorageException)
             {
                 throw;
             }
@@ -139,14 +149,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         {
             try
             {
-                var tempFileName = Path.GetTempFileName();
+                string tempFileName = Path.GetTempFileName();
                 File.Delete(tempFileName);
                 _bcdKey.SaveHive(tempFileName);
                 _bcdKey.Close();
                 _bcdKey = null;
-                var attributes = File.GetAttributes(_filePath);
+                FileAttributes attributes = File.GetAttributes(_filePath);
                 if ((attributes & FileAttributes.ReadOnly) != 0)
+                {
                     File.SetAttributes(_filePath, attributes & ~FileAttributes.ReadOnly);
+                }
+
                 File.Delete(_filePath);
                 File.Move(tempFileName, _filePath);
                 File.SetAttributes(_filePath, attributes);
@@ -160,25 +173,35 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public BcdObject GetObject(Guid objectId)
         {
-            foreach (var bcdObject in Objects)
+            foreach (BcdObject bcdObject in Objects)
+            {
                 if (bcdObject.Id == objectId)
+                {
                     return bcdObject;
+                }
+            }
+
             return null;
         }
 
         public void AddObject(BcdObject bcdObject)
         {
-            foreach (var bcdObject1 in Objects)
+            foreach (BcdObject bcdObject1 in Objects)
+            {
                 if (bcdObject1.Id == bcdObject.Id)
+                {
                     throw new ImageStorageException(string.Format("{0}: The object already exists in the BCD.",
-                        MethodBase.GetCurrentMethod().Name));
+                                        MethodBase.GetCurrentMethod().Name));
+                }
+            }
+
             Objects.Add(bcdObject);
         }
 
         public void LogInfo(int indentLevel)
         {
             _logger.LogInfo(new StringBuilder().Append(' ', indentLevel) + "Boot Configuration Database");
-            foreach (var bcdObject in Objects)
+            foreach (BcdObject bcdObject in Objects)
             {
                 bcdObject.LogInfo(_logger, checked(indentLevel + 2));
                 _logger.LogInfo("");
@@ -187,10 +210,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void SaveObject(BcdObject bcdObject)
         {
-            var offlineRegistryHandle1 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle2 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle3 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle4 = (OfflineRegistryHandle) null;
+            OfflineRegistryHandle offlineRegistryHandle1 = null;
+            OfflineRegistryHandle offlineRegistryHandle2 = null;
+            OfflineRegistryHandle offlineRegistryHandle3 = null;
+            OfflineRegistryHandle offlineRegistryHandle4 = null;
             try
             {
                 offlineRegistryHandle1 = _bcdKey.OpenSubKey("objects");
@@ -216,19 +239,26 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         [Conditional("DEBUG")]
         private void ValidateDeviceElement(BcdObject bcdObject, BcdElement bcdElement, OfflineRegistryHandle elementKey)
         {
-            var bcdElementDevice = bcdElement as BcdElementDevice;
-            var buffer = new byte[(int) bcdElementDevice.BinarySize];
-            var memoryStream = (MemoryStream) null;
+            BcdElementDevice bcdElementDevice = bcdElement as BcdElementDevice;
+            byte[] buffer = new byte[(int)bcdElementDevice.BinarySize];
+            MemoryStream memoryStream = null;
             try
             {
                 memoryStream = new MemoryStream(buffer);
                 bcdElementDevice.WriteToStream(memoryStream);
-                var binaryData = bcdElement.GetBinaryData();
+                byte[] binaryData = bcdElement.GetBinaryData();
                 if (binaryData.Length != buffer.Length)
+                {
                     throw new ImageStorageException("The binary data length is wrong.");
-                for (var index = 0; index < binaryData.Length; ++index)
+                }
+
+                for (int index = 0; index < binaryData.Length; ++index)
+                {
                     if (buffer[index] != binaryData[index])
+                    {
                         throw new ImageStorageException("The binary data is wrong.");
+                    }
+                }
             }
             finally
             {
@@ -248,11 +278,11 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void SaveElementValue(BcdObject bcdObject, BcdElement bcdElement)
         {
-            var offlineRegistryHandle1 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle2 = (OfflineRegistryHandle) null;
-            var offlineRegistryHandle3 = (OfflineRegistryHandle) null;
-            var elementKey = (OfflineRegistryHandle) null;
-            var str = bcdElement.DataType.ToString();
+            OfflineRegistryHandle offlineRegistryHandle1 = null;
+            OfflineRegistryHandle offlineRegistryHandle2 = null;
+            OfflineRegistryHandle offlineRegistryHandle3 = null;
+            OfflineRegistryHandle elementKey = null;
+            string str = bcdElement.DataType.ToString();
             try
             {
                 offlineRegistryHandle1 = _bcdKey.OpenSubKey("Objects");

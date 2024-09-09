@@ -18,32 +18,39 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             SetBinaryData(binaryData);
         }
 
-        
+
         public ulong Value
         {
             get
             {
-                var binaryData = GetBinaryData();
+                byte[] binaryData = GetBinaryData();
                 uint num1 = 0;
-                for (var index = 4; index < Math.Min(binaryData.Length, 8); ++index)
-                    num1 |= (uint) binaryData[index] << ((index - 4) * 8);
+                for (int index = 4; index < Math.Min(binaryData.Length, 8); ++index)
+                {
+                    num1 |= (uint)binaryData[index] << ((index - 4) * 8);
+                }
+
                 uint num2 = 0;
-                for (var index = 0; index < Math.Min(binaryData.Length, 4); ++index)
-                    num2 |= (uint) binaryData[index] << (index * 8);
-                return ((ulong) num1 << 32) | num2;
+                for (int index = 0; index < Math.Min(binaryData.Length, 4); ++index)
+                {
+                    num2 |= (uint)binaryData[index] << (index * 8);
+                }
+
+                return ((ulong)num1 << 32) | num2;
             }
         }
 
-        
+
         public override void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             base.LogInfo(logger, indentLevel);
+
             try
             {
-                logger.LogInfo(str + "Value: 0x{0:x}", (object) Value);
+                logger.LogInfo(str + "Value: 0x{0:x}", Value);
             }
-            catch (ImageStorageException ex)
+            catch (ImageStorageException)
             {
                 logger.LogInfo(str + "Value: <invalid data>");
             }

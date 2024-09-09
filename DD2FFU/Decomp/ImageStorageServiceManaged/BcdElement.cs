@@ -4,13 +4,12 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
+using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
-using Microsoft.Win32;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
@@ -25,7 +24,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             DataType = dataType;
         }
 
-        public BcdElementDataType DataType { get; set; }
+        public BcdElementDataType DataType
+        {
+            get; set;
+        }
 
         public string StringData
         {
@@ -33,9 +35,12 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (DataType.RegistryValueType != RegistryValueKind.String)
+                {
                     throw new ImageStorageException(string.Format(
-                        "{0}: Cannot set string data for an element format: {1}", MethodBase.GetCurrentMethod().Name,
-                        DataType.Format));
+                                        "{0}: Cannot set string data for an element format: {1}", MethodBase.GetCurrentMethod().Name,
+                                        DataType.Format));
+                }
+
                 _stringData = value;
             }
         }
@@ -44,55 +49,45 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override string ToString()
         {
-            if (DataType != null)
-                return DataType.ToString();
-            return "Unnamed BcdElement";
+            return DataType != null ? DataType.ToString() : "Unnamed BcdElement";
         }
 
         public static BcdElement CreateElement(OfflineRegistryHandle elementKey)
         {
-            var dataType = new BcdElementDataType();
-            var binaryData = (byte[]) null;
-            var stringData = (string) null;
-            var multiStringData = (string[]) null;
-            var num = uint.Parse(elementKey.Name.Substring(elementKey.Name.LastIndexOf('\\') + 1),
+            BcdElementDataType dataType = new();
+            byte[] binaryData = null;
+            string stringData = null;
+            string[] multiStringData = null;
+            uint num = uint.Parse(elementKey.Name[(elementKey.Name.LastIndexOf('\\') + 1)..],
                 NumberStyles.HexNumber);
             dataType.RawValue = num;
             switch (dataType.RegistryValueType)
             {
                 case RegistryValueKind.String:
-                    stringData = (string) elementKey.GetValue("Element", string.Empty);
+                    stringData = (string)elementKey.GetValue("Element", string.Empty);
                     break;
                 case RegistryValueKind.Binary:
-                    binaryData = (byte[]) elementKey.GetValue("Element", null);
+                    binaryData = (byte[])elementKey.GetValue("Element", null);
                     break;
                 case RegistryValueKind.MultiString:
-                    multiStringData = (string[]) elementKey.GetValue("Element", null);
+                    multiStringData = (string[])elementKey.GetValue("Element", null);
                     break;
                 default:
                     return null;
             }
 
-            switch (dataType.Format)
+            return dataType.Format switch
             {
-                case ElementFormat.Device:
-                    return new BcdElementDevice(binaryData, dataType);
-                case ElementFormat.String:
-                    return new BcdElementString(stringData, dataType);
-                case ElementFormat.Object:
-                    return new BcdElementObject(stringData, dataType);
-                case ElementFormat.ObjectList:
-                    return new BcdElementObjectList(multiStringData, dataType);
-                case ElementFormat.Integer:
-                    return new BcdElementInteger(binaryData, dataType);
-                case ElementFormat.Boolean:
-                    return new BcdElementBoolean(binaryData, dataType);
-                case ElementFormat.IntegerList:
-                    return new BcdElementIntegerList(binaryData, dataType);
-                default:
-                    throw new ImageStorageException(string.Format("{0}: Unknown element format: {1}.",
-                        MethodBase.GetCurrentMethod().Name, dataType.RawValue));
-            }
+                ElementFormat.Device => new BcdElementDevice(binaryData, dataType),
+                ElementFormat.String => new BcdElementString(stringData, dataType),
+                ElementFormat.Object => new BcdElementObject(stringData, dataType),
+                ElementFormat.ObjectList => new BcdElementObjectList(multiStringData, dataType),
+                ElementFormat.Integer => new BcdElementInteger(binaryData, dataType),
+                ElementFormat.Boolean => new BcdElementBoolean(binaryData, dataType),
+                ElementFormat.IntegerList => new BcdElementIntegerList(binaryData, dataType),
+                _ => throw new ImageStorageException(string.Format("{0}: Unknown element format: {1}.",
+                                        MethodBase.GetCurrentMethod().Name, dataType.RawValue)),
+            };
         }
 
         public byte[] GetBinaryData()
@@ -103,16 +98,19 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public void SetBinaryData(byte[] binaryData)
         {
             if (DataType.RegistryValueType != RegistryValueKind.Binary)
+            {
                 throw new ImageStorageException(string.Format("{0}: Cannot set binary data for an element format: {1}",
-                    MethodBase.GetCurrentMethod().Name, DataType.Format));
+                                MethodBase.GetCurrentMethod().Name, DataType.Format));
+            }
+
             _binaryData = binaryData;
         }
 
-        
+
         public virtual void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
-            logger.LogInfo(str + "BCD Element:        {0:x}", (object) DataType.RawValue);
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
+            logger.LogInfo(str + "BCD Element:        {0:x}", DataType.RawValue);
             DataType.LogInfo(logger, indentLevel);
         }
     }

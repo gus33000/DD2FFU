@@ -4,7 +4,6 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
-using System;
 using System.Text;
 using Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common;
 
@@ -21,21 +20,15 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public bool Value
         {
             get => GetBinaryData()[0] > 0;
-            set
-            {
-                if (value)
-                    GetBinaryData()[0] = 1;
-                else
-                    GetBinaryData()[0] = 0;
-            }
+            set => GetBinaryData()[0] = value ? (byte)1 : (byte)0;
         }
 
-        
+
         public override void LogInfo(IULogger logger, int indentLevel)
         {
-            var str = new StringBuilder().Append(' ', indentLevel).ToString();
+            string str = new StringBuilder().Append(' ', indentLevel).ToString();
             base.LogInfo(logger, indentLevel);
-            logger.LogInfo(str + "Value: {0}", (object) Value);
+            logger.LogInfo(str + "Value: {0}", Value);
         }
     }
 }

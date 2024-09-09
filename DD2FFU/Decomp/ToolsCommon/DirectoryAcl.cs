@@ -31,14 +31,20 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
         public DirectoryAcl(string directory, string rootPath)
         {
             if (!LongPathDirectory.Exists(directory))
+            {
                 throw new DirectoryNotFoundException(string.Format("Folder {0} cannot be found", directory));
+            }
+
             Initialize(new DirectoryInfo(directory), rootPath);
         }
 
         public DirectoryAcl(DirectoryInfo di, string rootPath)
         {
             if (di == null)
+            {
                 throw new ArgumentNullException(nameof(di));
+            }
+
             Initialize(di, rootPath);
         }
 
@@ -50,10 +56,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
                 if (Nos != null)
                 {
                     MacLabel = SecurityUtils.GetFileSystemMandatoryLevel(FullPath);
-                    if (string.IsNullOrEmpty(MacLabel))
-                        MacLabel = null;
-                    else
-                        MacLabel = SddlNormalizer.FixAceSddl(MacLabel);
+                    MacLabel = string.IsNullOrEmpty(MacLabel) ? null : SddlNormalizer.FixAceSddl(MacLabel);
                 }
 
                 return MacLabel;
@@ -67,7 +70,7 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
             {
                 if (m_objectSecurity == null)
                 {
-                    var directorySecurity = (DirectorySecurity) null;
+                    DirectorySecurity directorySecurity = null;
                     if (Nos != null)
                     {
                         directorySecurity = new DirectorySecurity();
@@ -85,41 +88,49 @@ namespace Decomp.Microsoft.WindowsPhone.ImageUpdate.Tools.Common
 
         protected override string ComputeExplicitDACL()
         {
-            var str = (string) null;
+            string str = null;
             if (m_isRoot)
             {
                 str = Nos.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
             }
             else
             {
-                var accessControl = m_di.GetAccessControl(AccessControlSections.All);
-                var accessRules = accessControl.GetAccessRules(true, false, typeof(NTAccount));
-                var count = accessRules.Count;
+                DirectorySecurity accessControl = m_di.GetAccessControl(AccessControlSections.All);
+                AuthorizationRuleCollection accessRules = accessControl.GetAccessRules(true, false, typeof(NTAccount));
+                int count = accessRules.Count;
                 foreach (FileSystemAccessRule rule in accessRules)
+                {
                     if (rule.IsInherited)
                     {
-                        accessControl.RemoveAccessRule(rule);
+                        _ = accessControl.RemoveAccessRule(rule);
                         --count;
                     }
+                }
 
                 if (DACLProtected && accessControl.AreAccessRulesCanonical)
+                {
                     accessControl.SetAccessRuleProtection(true, PreserveInheritance);
+                }
+
                 if (DACLProtected || count > 0)
+                {
                     str = accessControl.GetSecurityDescriptorSddlForm(AccessControlSections.Access);
+                }
             }
 
             if (!string.IsNullOrEmpty(str))
+            {
                 str = regexStripDacl.Replace(str, string.Empty);
+            }
+
             return SddlNormalizer.FixAceSddl(str);
         }
 
         private void Initialize(DirectoryInfo di, string rootPath)
         {
-            if (di == null)
-                throw new ArgumentNullException(nameof(di));
-            m_di = di;
+            m_di = di ?? throw new ArgumentNullException(nameof(di));
             m_isRoot = string.Equals(di.FullName, rootPath, StringComparison.OrdinalIgnoreCase);
-            var upper = System.IO.Path.Combine("\\", di.FullName.Remove(0, rootPath.Length))
+            string upper = System.IO.Path.Combine("\\", di.FullName.Remove(0, rootPath.Length))
                 .ToUpper(CultureInfo.InvariantCulture);
             Initialize(di.GetAccessControl(AccessControlSections.All), upper, di.FullName, null, null);
         }

@@ -10,11 +10,18 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
     public class InputIntegerRule : InputRule
     {
-        [XmlArrayItem(ElementName = "Value", IsNullable = false, Type = typeof(ulong))] [XmlArray("List")]
+        [XmlArrayItem(ElementName = "Value", IsNullable = false, Type = typeof(ulong))]
+        [XmlArray("List")]
         public ulong[] Values;
 
-        public ulong? Max { get; set; }
+        public ulong? Max
+        {
+            get; set;
+        }
 
-        public ulong? Min { get; set; }
+        public ulong? Min
+        {
+            get; set;
+        }
     }
 }

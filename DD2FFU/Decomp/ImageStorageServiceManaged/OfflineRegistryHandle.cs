@@ -4,12 +4,12 @@
 // MVID: BF244519-1EED-4829-8682-56E05E4ACE17
 // Assembly location: C:\Users\gus33000\source\repos\DD2FFU\DD2FFU\libraries\imagestorageservicemanaged.dll
 
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32;
 
 namespace Decomp.Microsoft.WindowsPhone.Imaging
 {
@@ -20,7 +20,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         private readonly string _path;
 
         public OfflineRegistryHandle(string hivePath)
-            : base(IntPtr.Zero, true)
+            : base(nint.Zero, true)
         {
             UnsafeHandle = Win32Exports.OfflineRegistryOpenHive(hivePath);
             _hive = true;
@@ -28,8 +28,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _path = "";
         }
 
-        private OfflineRegistryHandle(IntPtr subKeyHandle, string name, string path)
-            : base(IntPtr.Zero, true)
+        private OfflineRegistryHandle(nint subKeyHandle, string name, string path)
+            : base(nint.Zero, true)
         {
             UnsafeHandle = subKeyHandle;
             _hive = false;
@@ -37,31 +37,32 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             _path = path;
         }
 
-        public IntPtr UnsafeHandle { get; }
+        public nint UnsafeHandle
+        {
+            get;
+        }
 
         public override bool IsInvalid => _disposed;
 
-        public string Name { get; }
-
-        public string Path
+        public string Name
         {
-            get
-            {
-                if (_hive)
-                    return "[" + Name + "]";
-                return _path + "\\" + Name;
-            }
+            get;
         }
+
+        public string Path => _hive ? "[" + Name + "]" : _path + "\\" + Name;
 
         public void SaveHive(string path)
         {
             if (!_hive)
+            {
                 throw new ImageStorageException(string.Format("{0}: This function can only be called on a hive handle.",
-                    MethodBase.GetCurrentMethod().Name));
+                                MethodBase.GetCurrentMethod().Name));
+            }
+
             Win32Exports.OfflineRegistrySaveHive(UnsafeHandle, path);
         }
 
-        public static implicit operator IntPtr(OfflineRegistryHandle offlineRegistryHandle)
+        public static implicit operator nint(OfflineRegistryHandle offlineRegistryHandle)
         {
             return offlineRegistryHandle.UnsafeHandle;
         }
@@ -72,12 +73,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             {
                 _disposed = true;
                 GC.SuppressFinalize(this);
-                if (UnsafeHandle != IntPtr.Zero)
+                if (UnsafeHandle != nint.Zero)
                 {
                     if (_hive)
+                    {
                         Win32Exports.OfflineRegistryCloseHive(UnsafeHandle);
+                    }
                     else
+                    {
                         Win32Exports.OfflineRegistryCloseSubKey(UnsafeHandle);
+                    }
                 }
             }
 
@@ -86,14 +91,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public string[] GetSubKeyNames()
         {
-            var stringList = new List<string>();
+            List<string> stringList = [];
             uint num = 0;
             string str;
             do
             {
                 str = Win32Exports.OfflineRegistryEnumKey(UnsafeHandle, num++);
                 if (str != null)
+                {
                     stringList.Add(str);
+                }
             } while (str != null);
 
             return stringList.ToArray();
@@ -101,14 +108,16 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public string[] GetValueNames()
         {
-            var stringList = new List<string>();
+            List<string> stringList = [];
             uint num = 0;
             string str;
             do
             {
                 str = Win32Exports.OfflineRegistryEnumValue(UnsafeHandle, num++);
                 if (str != null)
+                {
                     stringList.Add(str);
+                }
             } while (str != null);
 
             return stringList.ToArray();
@@ -116,10 +125,8 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public OfflineRegistryHandle OpenSubKey(string keyName)
         {
-            var subKeyHandle = Win32Exports.OfflineRegistryOpenSubKey(UnsafeHandle, keyName);
-            if (subKeyHandle == IntPtr.Zero)
-                return null;
-            return new OfflineRegistryHandle(subKeyHandle, keyName, Path);
+            nint subKeyHandle = Win32Exports.OfflineRegistryOpenSubKey(UnsafeHandle, keyName);
+            return subKeyHandle == nint.Zero ? null : new OfflineRegistryHandle(subKeyHandle, keyName, Path);
         }
 
         public RegistryValueKind GetValueKind(string valueName)
@@ -127,7 +134,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             return GetValueKind(Win32Exports.OfflineRegistryGetValueKind(UnsafeHandle, valueName));
         }
 
-        
+
         public uint GetValueSize(string valueName)
         {
             return Win32Exports.OfflineRegistryGetValueSize(UnsafeHandle, valueName);
@@ -140,12 +147,13 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public object GetValue(string valueName, object defaultValue)
         {
-            var obj = defaultValue;
+            object obj = defaultValue;
+
             try
             {
                 obj = Win32Exports.OfflineRegistryGetValue(UnsafeHandle, valueName);
             }
-            catch (ImageStorageException ex)
+            catch (ImageStorageException)
             {
             }
 
@@ -158,7 +166,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                 Win32Exports.OfflineRegistryGetValueKind(UnsafeHandle, valueName), binaryData);
         }
 
-        
+
         public void SetValue(string valueName, byte[] binaryData, uint valueType)
         {
             Win32Exports.OfflineRegistrySetValue(UnsafeHandle, valueName, valueType, binaryData);
@@ -166,42 +174,42 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public void SetValue(string valueName, string stringData)
         {
-            var bytes = Encoding.Unicode.GetBytes(stringData);
+            byte[] bytes = Encoding.Unicode.GetBytes(stringData);
             SetValue(valueName, bytes, 1U);
         }
 
         public void SetValue(string valueName, List<string> values)
         {
-            var stringBuilder = new StringBuilder();
-            foreach (var str in values)
+            StringBuilder stringBuilder = new();
+            foreach (string str in values)
             {
-                stringBuilder.Append(str);
-                stringBuilder.Append(char.MinValue);
+                _ = stringBuilder.Append(str);
+                _ = stringBuilder.Append(char.MinValue);
             }
 
-            var bytes = Encoding.Unicode.GetBytes(stringBuilder.ToString());
+            byte[] bytes = Encoding.Unicode.GetBytes(stringBuilder.ToString());
             SetValue(valueName, bytes, 7U);
         }
 
-        
+
         public void SetValue(string valueName, uint value)
         {
-            var binaryData = new byte[4]
+            byte[] binaryData = new byte[4]
             {
                 0,
                 0,
                 0,
                 (byte) ((value >> 24) & byte.MaxValue)
             };
-            binaryData[2] = (byte) ((value >> 16) & byte.MaxValue);
-            binaryData[1] = (byte) ((value >> 8) & byte.MaxValue);
-            binaryData[0] = (byte) (value & byte.MaxValue);
+            binaryData[2] = (byte)((value >> 16) & byte.MaxValue);
+            binaryData[1] = (byte)((value >> 8) & byte.MaxValue);
+            binaryData[0] = (byte)(value & byte.MaxValue);
             SetValue(valueName, binaryData, 4U);
         }
 
         public OfflineRegistryHandle CreateSubKey(string subKey)
         {
-            return new OfflineRegistryHandle(Win32Exports.OfflineRegistryCreateKey((IntPtr) this, subKey), subKey,
+            return new OfflineRegistryHandle(Win32Exports.OfflineRegistryCreateKey((nint)this, subKey), subKey,
                 Path);
         }
 
@@ -212,7 +220,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         private static RegistryValueKind GetValueKind(uint valueType)
         {
-            var registryValueKind = RegistryValueKind.Unknown;
+            RegistryValueKind registryValueKind = RegistryValueKind.Unknown;
             switch (valueType)
             {
                 case 0:

@@ -16,13 +16,22 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (value.DeviceType == DeviceTypeChoice.RamdiskDevice)
+                {
                     throw new ImageStorageException("A RamDisk's parent device cannot be another ramdisk.");
+                }
+
                 _parent = value;
             }
         }
 
-        public string FilePath { get; set; }
+        public string FilePath
+        {
+            get; set;
+        }
 
-        public bool RamdiskOptions { get; set; }
+        public bool RamdiskOptions
+        {
+            get; set;
+        }
     }
 }

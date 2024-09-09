@@ -19,18 +19,30 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public DataBlockStream(IBlockStreamSource streamSource, uint bytesPerBlock)
         {
             BytesPerBlock = bytesPerBlock;
-            EntryLookupTable = new SortedDictionary<int, int>();
-            BlockEntries = new List<DataBlockEntry>();
+            EntryLookupTable = [];
+            BlockEntries = [];
             Source = streamSource;
         }
 
-        public List<DataBlockEntry> BlockEntries { get; }
+        public List<DataBlockEntry> BlockEntries
+        {
+            get;
+        }
 
-        private uint BytesPerBlock { get; }
+        private uint BytesPerBlock
+        {
+            get;
+        }
 
-        internal SortedDictionary<int, int> EntryLookupTable { get; set; }
+        internal SortedDictionary<int, int> EntryLookupTable
+        {
+            get; set;
+        }
 
-        private IBlockStreamSource Source { get; }
+        private IBlockStreamSource Source
+        {
+            get;
+        }
 
         public override bool CanRead => true;
 
@@ -48,20 +60,17 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
             set
             {
                 if (value > Length)
+                {
                     throw new ImageStorageException("The given position is beyond the end of the image payload.");
+                }
+
                 _position = value;
             }
         }
 
-        private int BlockIndexFromStreamPosition
-        {
-            get
-            {
-                if (_position / BytesPerBlock > int.MaxValue)
-                    throw new ImageStorageException("The stream position is outside the addressable block range.");
-                return (int) (_position / BytesPerBlock);
-            }
-        }
+        private int BlockIndexFromStreamPosition => _position / BytesPerBlock > int.MaxValue
+                    ? throw new ImageStorageException("The stream position is outside the addressable block range.")
+                    : (int)(_position / BytesPerBlock);
 
         public override void Flush()
         {
@@ -70,7 +79,10 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public override long Seek(long offset, SeekOrigin origin)
         {
             if (offset > Length)
+            {
                 throw new ImageStorageException("The  offset is beyond the end of the image.");
+            }
+
             switch (origin)
             {
                 case SeekOrigin.Begin:
@@ -78,20 +90,38 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     return _position;
                 case SeekOrigin.Current:
                     if (offset == 0L)
+                    {
                         return _position;
+                    }
+
                     if (offset < 0L)
+                    {
                         throw new ImageStorageException("Negative offsets are not implemented.");
+                    }
+
                     if (_position >= Length)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     if (Length - _position < offset)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     _position = offset;
                     return _position;
                 case SeekOrigin.End:
                     if (offset > 0L)
+                    {
                         throw new ImageStorageException("The offset is beyond the end of the image.");
+                    }
+
                     if (Length + offset < 0L)
+                    {
                         throw new ImageStorageException("The offset is invalid.");
+                    }
+
                     _position = Length + offset;
                     return _position;
                 default:
@@ -106,20 +136,20 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var num = 0;
+            int num = 0;
             do
             {
-                var length = (int) Math.Min(BytesPerBlock - _position % BytesPerBlock, count - num);
-                var fromStreamPosition = BlockIndexFromStreamPosition;
+                int length = (int)Math.Min(BytesPerBlock - (_position % BytesPerBlock), count - num);
+                int fromStreamPosition = BlockIndexFromStreamPosition;
                 if (_blockIndex != fromStreamPosition)
                 {
                     if (!EntryLookupTable.ContainsKey(fromStreamPosition))
                     {
-                        var dataBlockEntry = new DataBlockEntry(BytesPerBlock);
+                        DataBlockEntry dataBlockEntry = new(BytesPerBlock);
                         dataBlockEntry.DataSource.Source = DataBlockSource.DataSource.Memory;
-                        var newMemoryData = dataBlockEntry.DataSource.GetNewMemoryData(BytesPerBlock);
-                        Source.ReadBlock((uint) fromStreamPosition, newMemoryData, 0);
-                        dataBlockEntry.BlockLocationsOnDisk.Add(new DiskLocation((uint) fromStreamPosition,
+                        byte[] newMemoryData = dataBlockEntry.DataSource.GetNewMemoryData(BytesPerBlock);
+                        Source.ReadBlock((uint)fromStreamPosition, newMemoryData, 0);
+                        dataBlockEntry.BlockLocationsOnDisk.Add(new DiskLocation((uint)fromStreamPosition,
                             DiskLocation.DiskAccessMethod.DiskBegin));
                         BlockEntries.Add(dataBlockEntry);
                         EntryLookupTable.Add(fromStreamPosition, BlockEntries.Count - 1);
@@ -133,7 +163,7 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
                     _blockIndex = fromStreamPosition;
                 }
 
-                Array.Copy(_currentEntry.DataSource.GetMemoryData(), (int) (_position % BytesPerBlock), buffer, offset,
+                Array.Copy(_currentEntry.DataSource.GetMemoryData(), (int)(_position % BytesPerBlock), buffer, offset,
                     length);
                 offset += length;
                 num += length;
@@ -146,22 +176,28 @@ namespace Decomp.Microsoft.WindowsPhone.Imaging
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (offset + Position > Length)
+            {
                 throw new EndOfStreamException("Cannot write past the end of the stream.");
-            var num = 0;
+            }
+
+            int num = 0;
             do
             {
-                var length = (int) Math.Min(BytesPerBlock - _position % BytesPerBlock, count - num);
-                var fromStreamPosition = BlockIndexFromStreamPosition;
+                int length = (int)Math.Min(BytesPerBlock - (_position % BytesPerBlock), count - num);
+                int fromStreamPosition = BlockIndexFromStreamPosition;
                 if (!EntryLookupTable.ContainsKey(fromStreamPosition))
+                {
                     throw new ImageStorageException(
-                        "Attempting to write to an unallocated block data stream location.");
+                                        "Attempting to write to an unallocated block data stream location.");
+                }
+
                 if (fromStreamPosition != _blockIndex)
                 {
                     _currentEntry = BlockEntries[EntryLookupTable[fromStreamPosition]];
                     _blockIndex = fromStreamPosition;
                 }
 
-                var destinationIndex = (int) (_position % BytesPerBlock);
+                int destinationIndex = (int)(_position % BytesPerBlock);
                 Array.Copy(buffer, offset, _currentEntry.DataSource.GetMemoryData(), destinationIndex, length);
                 offset += length;
                 num += length;
