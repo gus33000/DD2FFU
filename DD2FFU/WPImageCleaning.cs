@@ -113,7 +113,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -154,7 +154,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -165,7 +165,7 @@ namespace DD2FFU
                             }
                             catch (Exception ex)
                             {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                Logging.Log(ex.ToString(), LoggingLevel.Error);
                             }
 
                             CleanFS(letter);
@@ -187,7 +187,7 @@ namespace DD2FFU
                             }
                             catch (Exception ex)
                             {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                Logging.Log(ex.ToString(), LoggingLevel.Error);
                             }
 
                             CleanFS(letter);
@@ -219,7 +219,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -238,7 +238,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -251,7 +251,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -280,7 +280,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -310,13 +310,13 @@ namespace DD2FFU
                                     }
                                     catch (Exception ex)
                                     {
-                                        Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                        Logging.Log(ex.ToString(), LoggingLevel.Error);
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                Logging.Log(ex.ToString(), LoggingLevel.Error);
                             }
 
                             ImageUtils.UnMountDiskId(physicalharddisk, partition.id.ToString(), letter);
@@ -344,7 +344,7 @@ namespace DD2FFU
                                 }
                                 catch (Exception ex)
                                 {
-                                    Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                                    Logging.Log(ex.ToString(), LoggingLevel.Error);
                                 }
                             }
 
@@ -364,7 +364,7 @@ namespace DD2FFU
                     }
                     catch (Exception ex)
                     {
-                        Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
+                        Logging.Log(ex.ToString(), LoggingLevel.Error);
                     }
 
                     CleanFS(letter);

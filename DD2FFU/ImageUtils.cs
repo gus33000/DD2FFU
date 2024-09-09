@@ -326,8 +326,8 @@ namespace DD2FFU
             }
             catch (Exception ex)
             {
-                Logging.Log(ex.ToString(), Logging.LoggingLevel.Error);
-                Logging.Log("Failed to open disk " + PhysicalDiskId.Last(), Logging.LoggingLevel.Error);
+                Logging.Log(ex.ToString(), LoggingLevel.Error);
+                Logging.Log("Failed to open disk " + PhysicalDiskId.Last(), LoggingLevel.Error);
                 throw new Exception("Failed to open disk " + PhysicalDiskId.Last());
             }
 
@@ -352,7 +352,7 @@ namespace DD2FFU
 
             if (partitionArray == null)
             {
-                Logging.Log("Failed to read partition array", Logging.LoggingLevel.Error);
+                Logging.Log("Failed to read partition array", LoggingLevel.Error);
                 throw new Exception("Failed to read partition array");
             }
 

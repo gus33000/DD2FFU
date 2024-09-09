@@ -25,12 +25,6 @@ namespace DD2FFU
 {
     internal static class Logging
     {
-        public enum LoggingLevel
-        {
-            Information,
-            Warning,
-            Error
-        }
 
         private static readonly ConsoleColor Foreground;
 
